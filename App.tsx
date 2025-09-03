@@ -27,7 +27,7 @@ async function setupPlayer() {
 
 export default function App() {
   const [now, setNow] = useState<string>("Indigo FM");
-  const [currentMode, setCurrentMode] = useState<"live" | "podcast">("live");
+  const [currentMode, setCurrentMode] = useState<"live" | "podcast">("podcast");
   const [isPlayerReady, setIsPlayerReady] = useState(false);
 
   useEffect(() => {
