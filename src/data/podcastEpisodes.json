@@ -1,0 +1,22 @@
+[
+  {
+    "id": "othershow",
+    "url": "https://indigofmradio.podomatic.com/enclosure/2025-09-02T05_34_47-07_00.mp3",
+    "title": "Other Show ep 1",
+    "artist": "Indigo FM Podcast",
+    "artwork": "https://example.com/artwork1.jpg",
+    "duration": 1800,
+    "description": "First episode of the Other Show series",
+    "publishDate": "2025-09-02"
+  },
+  {
+    "id": "eclectic avenue",
+    "url": "https://indigofmradio.podomatic.com/enclosure/2025-08-22T21_27_55-07_00.mp3",
+    "title": "IndigoFM Ep 1",
+    "artist": "Indigo FM Podcast",
+    "artwork": "https://example.com/artwork2.jpg",
+    "duration": 2400,
+    "description": "The first episode of IndigoFM podcast",
+    "publishDate": "2025-08-22"
+  }
+]
