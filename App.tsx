@@ -28,14 +28,37 @@ async function setupPlayer() {
 export default function App() {
   const [now, setNow] = useState<string>("Indigo FM");
   const [currentMode, setCurrentMode] = useState<"live" | "podcast">("live");
+  const [isPlayerReady, setIsPlayerReady] = useState(false);
 
   useEffect(() => {
-    setupPlayer();
+    const initializePlayer = async () => {
+      try {
+        console.log("Setting up player...");
+        await setupPlayer();
+        console.log("Player setup complete");
+        setIsPlayerReady(true);
+      } catch (error) {
+        console.error("Error setting up player:", error);
+      }
+    };
+
+    initializePlayer();
   }, []);
 
   const handleNowPlayingUpdate = (title: string) => {
     setNow(title);
   };
+
+  // Don't render components until player is ready
+  if (!isPlayerReady) {
+    return (
+      <SafeAreaView
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      >
+        <Text>Loading player...</Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
