@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { View, Text, ScrollView } from "react-native";
-import TrackPlayer from "react-native-track-player";
+import TrackPlayer, { useProgress } from "react-native-track-player";
 import EpisodeList from "./EpisodeList";
 import PlayingWindow from "./PlayingWindow";
 import { PodcastEpisode } from "../types/types";
@@ -14,6 +14,8 @@ interface PodcastProps {
 }
 
 export default function Podcast({ onNowPlayingUpdate }: PodcastProps) {
+  const progress = useProgress();
+
   const loadPodcasts = async () => {
     await TrackPlayer.reset();
     await TrackPlayer.add(PODCAST_EPISODES);
@@ -46,7 +48,11 @@ export default function Podcast({ onNowPlayingUpdate }: PodcastProps) {
         </Text>
 
         {/* Episodes List Component */}
-        <EpisodeList episodes={PODCAST_EPISODES} onEpisodePress={playEpisode} />
+        <EpisodeList
+          episodes={PODCAST_EPISODES}
+          onEpisodePress={playEpisode}
+          currentTrackDuration={progress.duration}
+        />
       </ScrollView>
 
       {/* Playing Window Component - Fixed at Bottom */}

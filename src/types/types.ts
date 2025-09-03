@@ -3,8 +3,9 @@ export interface PodcastEpisode {
   url: string;
   title: string;
   artist: string;
+  show: string;
   artwork?: string;
-  duration: number;
+  //duration: number;
   description?: string;
-  publishDate?: string;
+  //publishDate?: string;
 }

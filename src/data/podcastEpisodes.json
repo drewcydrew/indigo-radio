@@ -1,22 +1,38 @@
 [
   {
-    "id": "othershow",
-    "url": "https://indigofmradio.podomatic.com/enclosure/2025-09-02T05_34_47-07_00.mp3",
-    "title": "Other Show ep 1",
+    "id": "edm1",
+    "url": "https://indigofmradio.podomatic.com/enclosure/2025-08-02T16_21_25-07_00.mp3",
+    "title": "03 August 2025",
     "artist": "Indigo FM Podcast",
-    "artwork": "https://example.com/artwork1.jpg",
-    "duration": 1800,
-    "description": "First episode of the Other Show series",
-    "publishDate": "2025-09-02"
+    "show": "Everyone Deserves Music",
+    "artwork": "https://assets.podomatic.net/ts/28/84/58/info58064/150x150_17488949.jpg?1754178980",
+    "description": "And the new music joy of discovery just keeps rolling on and out. This show features new releases from Adelaide's Sunsick Daisy, the late Nell Smith (UK), Winter McQuinn with friends Dylan Young and Acacia Pip etc  (Melb), Cloth (Glasgow), The Terrifying Lows (Melb), Hilltop Hoods (Ade), Kurt Vile & Luke Roberts (US), Folk Bitch Trio (Melb), Minor Gold (Bris), Dutch Mustard (UK via Netherlands), Carla Geneve (Perth), The Smith Street Band (Melb), Blood Orange feat Caroline Polachek (US) and Jess Ribeiro (Melb). Oh and there's a couple of 2019 tracks from Michelle Zauner aka japanese Breakfast incl a cover of Tears for Fears 1985 track ''Head Over Heels'."
   },
   {
-    "id": "eclectic avenue",
+    "id": "ea1",
     "url": "https://indigofmradio.podomatic.com/enclosure/2025-08-22T21_27_55-07_00.mp3",
-    "title": "IndigoFM Ep 1",
+    "title": "Is it the Intonation?",
     "artist": "Indigo FM Podcast",
-    "artwork": "https://example.com/artwork2.jpg",
-    "duration": 2400,
-    "description": "The first episode of IndigoFM podcast",
-    "publishDate": "2025-08-22"
+    "show": "Eclectic Avenue",
+    "artwork": "https://assets.podomatic.net/ts/28/84/58/info58064/640x640_17492651.jpg?1754568223",
+    "description": "This episode's Oblique Strategies prompt is \"is the intonation wrong\"? ....so Sandy, Nigel and Bernie spend two hours desperately trying to choose music to get close to this whole concept. Some try harder than others!!"
+  },
+  {
+    "id": "ea2",
+    "url": "https://indigofmradio.podomatic.com/enclosure/2025-08-06T05_22_52-07_00.mp3",
+    "title": "Is there Something Missing?",
+    "artist": "Indigo FM Podcast",
+    "show": "Eclectic Avenue",
+    "artwork": "https://assets.podomatic.net/ts/28/84/58/info58064/640x640_17492651.jpg?1754568223",
+    "description": "Nigel, Sandy and Michael each have a different take on the theme of 'is there something missing' playing a range of wonderful tunes, questioning the relevance of each other's songs to the theme, and just enjoying sharing time together."
+  },
+  {
+    "id": "wta1",
+    "url": "https://indigofmradio.podomatic.com/enclosure/2025-08-05T03_13_54-07_00.mp3",
+    "title": "5/8/25",
+    "artist": "Indigo FM Podcast",
+    "show": "Waste the Alphabet",
+    "artwork": "https://assets.podomatic.net/ts/28/84/58/info58064/640x640_17484794.jpg?1753784343",
+    "description": "Hear new music from Carla Geneve, Emily Wurramara, Radio Free Alice, Mulga Bore Hard Rock and more."
   }
 ]

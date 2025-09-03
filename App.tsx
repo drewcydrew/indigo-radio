@@ -60,16 +60,12 @@ export default function App() {
         </View>
       </View>
 
-      {/* Floating Toggle Button */}
+      {/* Floating Toggle Switch */}
       <View
         style={{
           position: "absolute",
-          top: 50, // Adjust based on your SafeAreaView
+          top: 50,
           right: 16,
-          backgroundColor: "#007AFF",
-          borderRadius: 20,
-          paddingHorizontal: 12,
-          paddingVertical: 8,
           shadowColor: "#000",
           shadowOffset: {
             width: 0,
@@ -85,10 +81,67 @@ export default function App() {
           onPress={() =>
             setCurrentMode(currentMode === "live" ? "podcast" : "live")
           }
+          style={{
+            flexDirection: "row",
+            backgroundColor: "#f0f0f0",
+            borderRadius: 25,
+            padding: 3,
+            width: 120,
+            height: 36,
+          }}
         >
-          <Text style={{ color: "white", fontWeight: "600", fontSize: 12 }}>
-            {currentMode === "live" ? "📻 LIVE" : "🎧 PODCAST"}
-          </Text>
+          {/* Toggle Background Track */}
+          <View
+            style={{
+              position: "absolute",
+              top: 3,
+              left: currentMode === "live" ? 3 : 63,
+              backgroundColor: "#007AFF",
+              borderRadius: 22,
+              width: 57,
+              height: 30,
+            }}
+          />
+
+          {/* Radio Option */}
+          <View
+            style={{
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 1,
+            }}
+          >
+            <Text
+              style={{
+                color: currentMode === "live" ? "white" : "#666",
+                fontWeight: "600",
+                fontSize: 11,
+              }}
+            >
+              📻 LIVE
+            </Text>
+          </View>
+
+          {/* Podcast Option */}
+          <View
+            style={{
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 1,
+            }}
+          >
+            <Text
+              style={{
+                color: currentMode === "podcast" ? "white" : "#666",
+                fontWeight: "600",
+                fontSize: 11,
+              }}
+            >
+              🎧 POD
+            </Text>
+          </View>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
