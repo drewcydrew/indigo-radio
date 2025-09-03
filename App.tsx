@@ -1,28 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, Text, View, TouchableOpacity } from "react-native";
+import {
+  SafeAreaView,
+  Text,
+  View,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
 import TrackPlayer, { Capability } from "react-native-track-player";
 import LiveRadio from "./src/components/LiveRadio";
 import Podcast from "./src/components/Podcast";
 
-// 1) Register background service at module load (RNTP v4)
-TrackPlayer.registerPlaybackService(
-  () => require("./src/playback-service").default
-);
-
 async function setupPlayer() {
-  await TrackPlayer.setupPlayer();
-  await TrackPlayer.updateOptions({
-    capabilities: [
-      Capability.Play,
-      Capability.Pause,
-      Capability.Stop,
-      Capability.SkipToNext,
-      Capability.SkipToPrevious,
-      Capability.SeekTo,
-    ],
-    compactCapabilities: [Capability.Play, Capability.Pause],
-    android: { alwaysPauseOnInterruption: true },
-  });
+  if (Platform.OS !== "web") {
+    await TrackPlayer.setupPlayer();
+    await TrackPlayer.updateOptions({
+      capabilities: [Capability.Play, Capability.Pause, Capability.Stop],
+      compactCapabilities: [Capability.Play, Capability.Pause],
+    });
+  }
 }
 
 export default function App() {
@@ -39,6 +34,10 @@ export default function App() {
         setIsPlayerReady(true);
       } catch (error) {
         console.error("Error setting up player:", error);
+        // On web, just set ready since no TrackPlayer setup needed
+        if (Platform.OS === "web") {
+          setIsPlayerReady(true);
+        }
       }
     };
 
@@ -60,6 +59,65 @@ export default function App() {
     );
   }
 
+  // Web implementation
+  if (Platform.OS === "web") {
+    return (
+      <div style={{ minHeight: "100vh", fontFamily: "Arial, sans-serif" }}>
+        {/* Header */}
+        <div style={{ padding: 16, paddingTop: 8 }}>
+          <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 8 }}>
+            Indigo FM
+          </h1>
+          <p style={{ fontSize: 16, opacity: 0.7, margin: 0 }}>Now Playing</p>
+          <p style={{ fontSize: 18, marginBottom: 16 }}>{now}</p>
+        </div>
+
+        {/* Toggle Switch */}
+        <div style={{ padding: 16 }}>
+          <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+            <button
+              onClick={() => setCurrentMode("live")}
+              style={{
+                padding: "8px 16px",
+                backgroundColor: currentMode === "live" ? "#007AFF" : "#f0f0f0",
+                color: currentMode === "live" ? "white" : "#666",
+                border: "none",
+                borderRadius: 20,
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              📻 LIVE
+            </button>
+            <button
+              onClick={() => setCurrentMode("podcast")}
+              style={{
+                padding: "8px 16px",
+                backgroundColor:
+                  currentMode === "podcast" ? "#007AFF" : "#f0f0f0",
+                color: currentMode === "podcast" ? "white" : "#666",
+                border: "none",
+                borderRadius: 20,
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              🎧 POD
+            </button>
+          </div>
+
+          {/* Content */}
+          {currentMode === "live" ? (
+            <LiveRadio onNowPlayingUpdate={handleNowPlayingUpdate} />
+          ) : (
+            <Podcast onNowPlayingUpdate={handleNowPlayingUpdate} />
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Mobile implementation
   return (
     <SafeAreaView style={{ flex: 1 }}>
       {/* Main Content - Full Screen */}
