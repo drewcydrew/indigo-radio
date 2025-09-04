@@ -5,15 +5,12 @@ import TrackPlayer, {
   useTrackPlayerEvents,
 } from "react-native-track-player";
 import { RadioProgram } from "../types/types";
-import radioPrograms from "../data/radioPrograms.json";
+import usePrograms from "../hooks/usePrograms";
 import ScheduleDisplay from "./ScheduleDisplay";
 import TodaysSchedule from "./TodaysSchedule";
 import LiveRadioPlayer from "./LiveRadioPlayer";
 
 const STREAM_URL = "https://internetradio.indigofm.au:8032/stream";
-
-// Cast the imported JSON to the proper type with type assertion
-const RADIO_PROGRAMS = radioPrograms as RadioProgram[];
 
 interface LiveRadioProps {
   onNowPlayingUpdate: (title: string) => void;
@@ -28,44 +25,8 @@ export default function LiveRadio({
     null
   );
 
-  // Function to get current program based on day and time
-  const getCurrentProgram = (): RadioProgram | null => {
-    const now = new Date();
-    const currentTime = now.toTimeString().slice(0, 5); // Get HH:MM format
-
-    // Map JavaScript day names to our format
-    const dayMapping: { [key: number]: RadioProgram["day"] } = {
-      0: "sunday",
-      1: "monday",
-      2: "tuesday",
-      3: "wednesday",
-      4: "thursday",
-      5: "friday",
-      6: "saturday",
-    };
-
-    const dayName = dayMapping[now.getDay()];
-
-    // Find programs for today
-    const todaysPrograms = RADIO_PROGRAMS.filter(
-      (program) => program.day === dayName
-    );
-
-    // Find current program
-    const currentProgram = todaysPrograms.find((program) => {
-      const startTime = program.startTime;
-      const endTime = program.endTime;
-
-      // Handle programs that go past midnight
-      if (endTime < startTime) {
-        return currentTime >= startTime || currentTime <= endTime;
-      }
-
-      return currentTime >= startTime && currentTime <= endTime;
-    });
-
-    return currentProgram || null;
-  };
+  // Use the hook to get program data
+  const { programs, getCurrentProgram } = usePrograms();
 
   // Update current program every minute
   useEffect(() => {
@@ -87,7 +48,7 @@ export default function LiveRadio({
     const interval = setInterval(updateProgram, 60000);
 
     return () => clearInterval(interval);
-  }, [onNowPlayingUpdate]);
+  }, [onNowPlayingUpdate, getCurrentProgram]);
 
   // Only use track player events on mobile
   if (Platform.OS !== "web") {
@@ -129,7 +90,7 @@ export default function LiveRadio({
       <View style={styles.content}>
         {/* Today's Schedule Component */}
         <TodaysSchedule
-          programs={RADIO_PROGRAMS}
+          programs={programs}
           currentProgram={currentProgram}
           showTitle={true}
           onGoToShow={onGoToShow}
