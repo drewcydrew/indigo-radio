@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { PodcastEpisode } from "../types/types";
 
 const API_URL =
-  "https://radio-endpoint-d8p5mc3jh-drewcydrews-projects.vercel.app/api/shows/podcasts";
+  "https://radio-endpoint-mbp1mpfmj-drewcydrews-projects.vercel.app/api/shows/podcasts";
 
 export default function usePodcastEpisodes() {
   const [episodes, setEpisodes] = useState<PodcastEpisode[]>([]);

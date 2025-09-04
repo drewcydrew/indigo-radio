@@ -3,6 +3,18 @@ export const runtime = 'edge';
 import { neon } from '@neondatabase/serverless';
 const sql = neon(process.env.NEON_DATABASE_URL);
 
+// CORS (allow any origin)
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, x-vercel-protection-bypass'
+};
+
+// Preflight
+export function OPTIONS() {
+  return new Response(null, { headers: corsHeaders });
+}
+
 export async function GET() {
   try {
     const rows = await sql/*sql*/`
@@ -100,7 +112,6 @@ export async function GET() {
 
       // specialSegments from segments JSON
       if (Array.isArray(r.segments) && r.segments.length) {
-        // Ensure keys are exactly { name, description }
         obj.specialSegments = r.segments.map(s => ({
           name: s.name,
           description: s.description
@@ -111,9 +122,12 @@ export async function GET() {
     });
 
     return new Response(JSON.stringify(result), {
-      headers: { 'content-type': 'application/json' }
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
     });
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: corsHeaders
+    });
   }
 }

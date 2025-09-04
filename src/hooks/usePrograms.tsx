@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { RadioProgram } from "../types/types";
 
 const API_URL =
-  "https://radio-endpoint-g6iz0ufyp-drewcydrews-projects.vercel.app/api/shows/programme";
+  "https://radio-endpoint-1l8mrm02y-drewcydrews-projects.vercel.app/api/shows/programme";
 
 export default function usePrograms() {
   const [programs, setPrograms] = useState<RadioProgram[]>([]);

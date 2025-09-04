@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { ShowDefinition } from "../types/types";
 
 const API_URL =
-  "https://radio-endpoint-byixzlym5-drewcydrews-projects.vercel.app/api/shows";
+  "https://radio-endpoint-mbp1mpfmj-drewcydrews-projects.vercel.app/api/shows";
 
 export default function useShowDetails() {
   const [showDefinitions, setShowDefinitions] = useState<ShowDefinition[]>([]);
