@@ -1,0 +1,15 @@
+
+
+TRUNCATE TABLE programme;
+
+\copy programme (id, name, day, start_time, end_time) FROM 'programme.csv' WITH (FORMAT csv, HEADER true);
+
+
+TRUNCATE TABLE podcast_episodes;
+
+\copy podcast_episodes (id, url, title, "show", description, created_at) FROM 'podcast_episodes.csv' WITH (FORMAT csv, HEADER true);
+
+
+TRUNCATE TABLE shows CASCADE;
+
+\copy shows (id, show_id, name, frequency, duration, description, scope, tagline, type, focus, approach, mix, schedule, demographic, established, style, perspective, artwork) FROM 'shows.csv' WITH (FORMAT csv, HEADER true);

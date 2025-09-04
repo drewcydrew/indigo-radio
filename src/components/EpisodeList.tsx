@@ -38,9 +38,10 @@ export default function EpisodeList({
   const shows = [...new Set(episodes.map((episode) => episode.show))];
 
   // Filter episodes by selected show
-  const filteredEpisodes = selectedShow
-    ? episodes.filter((episode) => episode.show === selectedShow)
-    : episodes;
+  const filteredEpisodes =
+    selectedShow && selectedShow !== ""
+      ? episodes.filter((episode) => episode.show === selectedShow)
+      : episodes;
 
   const formatDuration = (seconds?: number) => {
     if (!seconds) return "Unknown";
@@ -113,7 +114,7 @@ export default function EpisodeList({
             style={styles.picker}
             itemStyle={Platform.OS === "ios" ? styles.pickerItem : undefined}
           >
-            <Picker.Item label="All Shows" value={null} />
+            <Picker.Item label="All Shows" value="" />
             {shows.map((show) => (
               <Picker.Item key={show} label={show} value={show} />
             ))}
