@@ -1,0 +1,158 @@
+[
+  {
+    "showId": "acoustic-cafe",
+    "name": "The Acoustic Cafe",
+    "host": "Kev",
+    "frequency": "fortnightly",
+    "description": "An eclectic mix of traditional and contemporary folk, Americana, bluegrass, blues, old timey and world music from Australia and overseas",
+    "genres": ["folk", "americana", "bluegrass", "blues", "old timey", "world music"],
+    "scope": "Australian and international"
+  },
+  {
+    "showId": "asleep-at-wheel",
+    "name": "Asleep At The Wheel",
+    "host": "Harvey",
+    "frequency": "fortnightly",
+    "description": "A big wheel keeps on turning on Sunday afternoon in Yackandandah between 2 pm and 4 pm. Covering soul, country, swamp pop, Cajun, blues, rockabilly and most importantly good music. Hopefully you won't get lost nor be asleep on this highway",
+    "genres": ["soul", "country", "swamp pop", "cajun", "blues", "rockabilly"],
+    "tagline": "Good music for the highway"
+  },
+  {
+    "showId": "baby-boomers-revenge",
+    "name": "Baby Boomers Revenge",
+    "host": "Neil",
+    "frequency": "fortnightly",
+    "description": "Reliving the Baby Boomers era with a strong emphasis on influential artists like the Beatles, Eagles and bands who were influenced by them",
+    "genres": ["classic rock", "60s", "70s", "baby boomer era"],
+    "featuredArtists": ["Beatles", "Eagles"],
+    "focus": "Influential artists and their legacy"
+  },
+  {
+    "showId": "blues-hotel",
+    "name": "The Blues Hotel",
+    "host": "Kelvin",
+    "frequency": "weekly",
+    "duration": "2 hours",
+    "description": "2 hour blues music program featuring classics, independent artists, interviews",
+    "genres": ["blues"],
+    "features": ["classics", "independent artists", "interviews"]
+  },
+  {
+    "showId": "bullfrogs-roadhouse",
+    "name": "Bullfrog's Roadhouse",
+    "host": "Mark",
+    "frequency": "weekly",
+    "description": "You supply the food and drink, we supply the tunes – blues, roots, alt-country. Tune in to hear what comes next",
+    "genres": ["blues", "roots", "alt-country"],
+    "tagline": "You supply the food and drink, we supply the tunes"
+  },
+  {
+    "showId": "car-wheels-gravel-road",
+    "name": "Car Wheels on a Gravel Road",
+    "host": "Tiff",
+    "frequency": "fortnightly",
+    "description": "Just a little bit country, mostly lots of Americana, Alt country, folk, rock and some blues. A mix of old and new songs, great classics and up and coming brilliance. Seriously good driving music!",
+    "genres": ["americana", "alt-country", "folk", "rock", "blues", "country"],
+    "mix": "old and new songs",
+    "tagline": "Seriously good driving music!"
+  },
+  {
+    "showId": "country",
+    "name": "COUNTRY",
+    "host": "Kaylene",
+    "frequency": "weekly",
+    "duration": "3 hours",
+    "description": "Kaylene brings your weekly super informative and enthusiastic 3 hour dose of wall to wall country music from across the eras",
+    "genres": ["country"],
+    "scope": "across the eras",
+    "style": "super informative and enthusiastic"
+  },
+  {
+    "showId": "eclectic-avenue",
+    "name": "Eclectic Avenue",
+    "hosts": ["Michael", "Sandy", "Bernie"],
+    "frequency": "fortnightly",
+    "description": "Brings you a smorgasbord of musical delights to titillate your musical taste buds from across the genres loosely brought together each week by a topical, quirky, out-of-left-field, nonsensical, and/or lazy theme",
+    "genres": ["eclectic", "multi-genre"],
+    "approach": "thematic programming",
+    "themes": ["topical", "quirky", "out-of-left-field", "nonsensical", "lazy"]
+  },
+  {
+    "showId": "everyone-deserves-music",
+    "name": "Everyone Deserves Music",
+    "host": "Scott",
+    "frequency": "weekly",
+    "description": "Modern indie/folk/roots music incl local and touring artists. We delve into the cave and drag out relics from 30 years ago on 1994 Time Machine and spin some platter on Wax Lyrical",
+    "genres": ["indie", "folk", "roots"],
+    "focus": "local and touring artists",
+    "specialSegments": [
+      {
+        "name": "1994 Time Machine",
+        "description": "Relics from 30 years ago"
+      },
+      {
+        "name": "Wax Lyrical",
+        "description": "Vinyl showcase"
+      }
+    ]
+  },
+  {
+    "showId": "monthly-music",
+    "name": "Monthly Music",
+    "host": "Charles",
+    "frequency": "quarterly",
+    "description": "New music from around the world",
+    "scope": "international",
+    "focus": "new music"
+  },
+  {
+    "showId": "uncut-unsigned",
+    "name": "Uncut and Unsigned",
+    "hosts": ["Tony", "Mark (Shippa)"],
+    "frequency": "weekly",
+    "description": "Airing and Interviewing independent/unsigned artists-mainly of an Australian origin",
+    "focus": "independent/unsigned artists",
+    "scope": "mainly Australian",
+    "features": ["music", "interviews"]
+  },
+  {
+    "showId": "waste-alphabet",
+    "name": "Waste The Alphabet",
+    "host": "Doug",
+    "frequency": "weekly",
+    "description": "Playing the best new independent Australian music",
+    "genres": ["independent"],
+    "scope": "Australian",
+    "focus": "new music"
+  },
+  {
+    "showId": "yack-garden-club",
+    "name": "Yackandandah Garden Club",
+    "hosts": ["Karen", "Chrissie"],
+    "frequency": "quarterly",
+    "description": "Karen and Chrissie with the latest seasonal gardening tips",
+    "type": "community program",
+    "focus": "seasonal gardening tips"
+  },
+  {
+    "showId": "yack-primary-school",
+    "name": "Yackandandah Primary School News",
+    "hosts": ["Wil", "Raff", "Hunter", "Nico", "Molly", "Maeve", "Will", "Claudia", "Lucas", "Alfie", "Henry", "Felix"],
+    "frequency": "weekly",
+    "schedule": "Mondays & Wednesdays",
+    "description": "Year 5-6 students offer a young person's view of the community",
+    "type": "school program",
+    "demographic": "Year 5-6 students",
+    "perspective": "young person's view of the community"
+  },
+  {
+    "showId": "yack-womens-shed",
+    "name": "Yackandandah Women's Shed",
+    "hosts": ["Robynne", "Janet", "Chrissie", "Margot"],
+    "frequency": "monthly",
+    "description": "Robynne, Janet, Chrissie and Margot bring a monthly update on their very active community group formed late 2020",
+    "type": "community program",
+    "established": "late 2020",
+    "focus": "community group updates"
+  }
+]

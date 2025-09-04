@@ -19,3 +19,32 @@ export interface RadioProgram {
   endTime: string;   // Format: "HH:MM" (24-hour)
   host?: string;
 }
+
+export interface ShowDefinition {
+  showId: string;
+  name: string;
+  host?: string;
+  hosts?: string[];
+  frequency: string;
+  duration?: string;
+  description: string;
+  genres?: string[];
+  scope?: string;
+  focus?: string;
+  tagline?: string;
+  mix?: string;
+  style?: string;
+  approach?: string;
+  themes?: string[];
+  featuredArtists?: string[];
+  features?: string[];
+  specialSegments?: {
+    name: string;
+    description: string;
+  }[];
+  type?: string;
+  established?: string;
+  demographic?: string;
+  perspective?: string;
+  schedule?: string;
+}
