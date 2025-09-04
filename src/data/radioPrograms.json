@@ -2,7 +2,6 @@
   {
     "id": "indigenous-playlist-mon-9am",
     "name": "Indigenous Playlist",
-    "description": "Celebrating indigenous music and culture",
     "day": "monday",
     "startTime": "09:00",
     "endTime": "12:00"
@@ -10,7 +9,6 @@
   {
     "id": "playlist-mon-12pm",
     "name": "Playlist",
-    "description": "Curated music selection",
     "day": "monday",
     "startTime": "12:00",
     "endTime": "14:00"
@@ -18,7 +16,6 @@
   {
     "id": "yack-garden-club-mon",
     "name": "Yack Garden Club & Produce Market",
-    "description": "Gardening tips and local produce information",
     "day": "monday",
     "startTime": "14:00",
     "endTime": "16:00"
@@ -26,7 +23,6 @@
   {
     "id": "playlist-mon-2pm",
     "name": "Playlist",
-    "description": "Curated music selection",
     "day": "monday",
     "startTime": "14:00",
     "endTime": "16:00"
@@ -34,7 +30,6 @@
   {
     "id": "yack-ps-mon",
     "name": "Yack PS",
-    "description": "Local primary school program",
     "day": "monday",
     "startTime": "16:00",
     "endTime": "18:00"
@@ -42,7 +37,6 @@
   {
     "id": "playlist-mon-6pm",
     "name": "Playlist",
-    "description": "Curated music selection",
     "day": "monday",
     "startTime": "18:00",
     "endTime": "20:00"
@@ -50,7 +44,6 @@
   {
     "id": "car-wheels-gravel-road-mon",
     "name": "Car Wheels on a Gravel Road",
-    "description": "Country and folk music show",
     "day": "monday",
     "startTime": "20:00",
     "endTime": "22:00"
@@ -58,7 +51,6 @@
   {
     "id": "the-vault-mon",
     "name": "The Vault",
-    "description": "Classic tracks from the archives",
     "day": "monday",
     "startTime": "22:00",
     "endTime": "00:00"
@@ -66,7 +58,6 @@
   {
     "id": "indigenous-playlist-tue-9am",
     "name": "Indigenous Playlist",
-    "description": "Celebrating indigenous music and culture",
     "day": "tuesday",
     "startTime": "09:00",
     "endTime": "12:00"
@@ -74,7 +65,6 @@
   {
     "id": "bullfrogs-roadhouse-tue",
     "name": "Bullfrog's Roadhouse",
-    "description": "Blues and rock music",
     "day": "tuesday",
     "startTime": "09:00",
     "endTime": "12:00"
@@ -82,7 +72,6 @@
   {
     "id": "playlist-tue-12pm",
     "name": "Playlist",
-    "description": "Curated music selection",
     "day": "tuesday",
     "startTime": "12:00",
     "endTime": "14:00"
@@ -90,7 +79,6 @@
   {
     "id": "baby-boomers-revenge-tue",
     "name": "Baby Boomers Revenge",
-    "description": "Music from the baby boomer era",
     "day": "tuesday",
     "startTime": "12:00",
     "endTime": "14:00"
@@ -98,7 +86,6 @@
   {
     "id": "playlist-tue-2pm",
     "name": "Playlist",
-    "description": "Curated music selection",
     "day": "tuesday",
     "startTime": "14:00",
     "endTime": "16:00"
@@ -106,7 +93,6 @@
   {
     "id": "uncut-unsigned-tue",
     "name": "Uncut and Unsigned",
-    "description": "Showcasing new and independent artists",
     "day": "tuesday",
     "startTime": "16:00",
     "endTime": "18:00"
@@ -114,7 +100,6 @@
   {
     "id": "waste-alphabet-tue",
     "name": "Waste the Alphabet",
-    "description": "Alternative music show",
     "day": "tuesday",
     "startTime": "18:00",
     "endTime": "20:00"
@@ -122,7 +107,6 @@
   {
     "id": "acoustic-cafe-tue",
     "name": "Acoustic Cafe",
-    "description": "Acoustic and unplugged music",
     "day": "tuesday",
     "startTime": "20:00",
     "endTime": "22:00"
@@ -130,7 +114,6 @@
   {
     "id": "the-vault-tue",
     "name": "The Vault",
-    "description": "Classic tracks from the archives",
     "day": "tuesday",
     "startTime": "22:00",
     "endTime": "00:00"
@@ -138,7 +121,6 @@
   {
     "id": "alternative-playlist-wed",
     "name": "Alternative Playlist",
-    "description": "Alternative and indie music selection",
     "day": "wednesday",
     "startTime": "09:00",
     "endTime": "12:00"
@@ -146,7 +128,6 @@
   {
     "id": "car-wheels-gravel-road-wed",
     "name": "Car Wheels on a Gravel Road",
-    "description": "Country and folk music show",
     "day": "wednesday",
     "startTime": "09:00",
     "endTime": "12:00"
@@ -154,7 +135,6 @@
   {
     "id": "playlist-wed-12pm",
     "name": "Playlist",
-    "description": "Curated music selection",
     "day": "wednesday",
     "startTime": "12:00",
     "endTime": "14:00"
@@ -162,7 +142,6 @@
   {
     "id": "playlist-wed-2pm",
     "name": "Playlist",
-    "description": "Curated music selection",
     "day": "wednesday",
     "startTime": "14:00",
     "endTime": "16:00"
@@ -170,7 +149,6 @@
   {
     "id": "yack-ps-wed",
     "name": "Yack PS",
-    "description": "Local primary school program",
     "day": "wednesday",
     "startTime": "16:00",
     "endTime": "18:00"
@@ -178,7 +156,6 @@
   {
     "id": "playlist-wed-6pm",
     "name": "Playlist",
-    "description": "Curated music selection",
     "day": "wednesday",
     "startTime": "18:00",
     "endTime": "20:00"
@@ -186,7 +163,6 @@
   {
     "id": "blues-hotel-wed",
     "name": "The Blues Hotel",
-    "description": "Blues music showcase",
     "day": "wednesday",
     "startTime": "18:00",
     "endTime": "20:00"
@@ -194,7 +170,6 @@
   {
     "id": "eclectic-avenue-wed",
     "name": "Eclectic Avenue",
-    "description": "Diverse musical selection",
     "day": "wednesday",
     "startTime": "20:00",
     "endTime": "22:00"
@@ -202,7 +177,6 @@
   {
     "id": "playlist-wed-10pm",
     "name": "Playlist",
-    "description": "Curated music selection",
     "day": "wednesday",
     "startTime": "22:00",
     "endTime": "00:00"
@@ -210,7 +184,6 @@
   {
     "id": "alternative-playlist-thu",
     "name": "Alternative Playlist",
-    "description": "Alternative and indie music selection",
     "day": "thursday",
     "startTime": "00:00",
     "endTime": "09:00"
@@ -218,7 +191,6 @@
   {
     "id": "car-wheels-gravel-road",
     "name": "Car Wheels on a Gravel Road",
-    "description": "Country and folk music show",
     "day": "thursday",
     "startTime": "09:00",
     "endTime": "10:00"
@@ -226,7 +198,6 @@
   {
     "id": "playlist-thu-12pm",
     "name": "Playlist",
-    "description": "Curated music selection",
     "day": "thursday",
     "startTime": "10:00",
     "endTime": "18:00"
@@ -234,7 +205,6 @@
   {
     "id": "oz-rock-hour-thu",
     "name": "Oz Rock Hour",
-    "description": "Australian rock music",
     "day": "thursday",
     "startTime": "18:00",
     "endTime": "19:00"
@@ -242,7 +212,6 @@
   {
     "id": "made-by-music-thu",
     "name": "Made by Music",
-    "description": "Music production and artist stories",
     "day": "thursday",
     "startTime": "19:00",
     "endTime": "20:00"
@@ -250,7 +219,6 @@
   {
     "id": "waste-alphabet-thu",
     "name": "Waste the Alphabet",
-    "description": "Alternative music show",
     "day": "thursday",
     "startTime": "20:00",
     "endTime": "22:00"
@@ -258,7 +226,6 @@
   {
     "id": "everyone-deserves-music-thu",
     "name": "Everyone Deserves Music",
-    "description": "Inclusive music programming",
     "day": "thursday",
     "startTime": "22:00",
     "endTime": "00:00"
@@ -266,7 +233,6 @@
   {
     "id": "alternative-playlist-fri",
     "name": "Alternative Playlist",
-    "description": "Alternative and indie music selection",
     "day": "friday",
     "startTime": "09:00",
     "endTime": "12:00"
@@ -274,7 +240,6 @@
   {
     "id": "playlist-fri-12pm",
     "name": "Playlist",
-    "description": "Curated music selection",
     "day": "friday",
     "startTime": "12:00",
     "endTime": "14:00"
@@ -282,7 +247,6 @@
   {
     "id": "playlist-fri-2pm",
     "name": "Playlist",
-    "description": "Curated music selection",
     "day": "friday",
     "startTime": "14:00",
     "endTime": "16:00"
@@ -290,7 +254,6 @@
   {
     "id": "everyone-deserves-music-fri",
     "name": "Everyone Deserves Music",
-    "description": "Inclusive music programming",
     "day": "friday",
     "startTime": "16:00",
     "endTime": "18:00"
@@ -298,7 +261,6 @@
   {
     "id": "uncut-unsigned-fri",
     "name": "Uncut and Unsigned",
-    "description": "Showcasing new and independent artists",
     "day": "friday",
     "startTime": "18:00",
     "endTime": "20:00"
@@ -306,7 +268,6 @@
   {
     "id": "car-wheels-gravel-road-fri",
     "name": "Car Wheels on a Gravel Road",
-    "description": "Country and folk music show",
     "day": "friday",
     "startTime": "20:00",
     "endTime": "22:00"
@@ -314,7 +275,6 @@
   {
     "id": "blues-hotel-fri",
     "name": "The Blues Hotel",
-    "description": "Blues music showcase",
     "day": "friday",
     "startTime": "22:00",
     "endTime": "00:00"
@@ -322,7 +282,6 @@
   {
     "id": "roots-americana-sat",
     "name": "Roots / Americana Playlist",
-    "description": "Roots and Americana music",
     "day": "saturday",
     "startTime": "09:00",
     "endTime": "12:00"
@@ -330,7 +289,6 @@
   {
     "id": "tonic-sat",
     "name": "Tonic",
-    "description": "Music to refresh and energize",
     "day": "saturday",
     "startTime": "09:00",
     "endTime": "12:00"
@@ -338,7 +296,6 @@
   {
     "id": "baby-boomers-revenge-sat",
     "name": "Baby Boomers Revenge",
-    "description": "Music from the baby boomer era",
     "day": "saturday",
     "startTime": "12:00",
     "endTime": "14:00"
@@ -346,7 +303,6 @@
   {
     "id": "oz-rock-hour-sat",
     "name": "Oz Rock Hour",
-    "description": "Australian rock music",
     "day": "saturday",
     "startTime": "12:00",
     "endTime": "14:00"
@@ -354,7 +310,6 @@
   {
     "id": "blues-hotel-sat",
     "name": "The Blues Hotel",
-    "description": "Blues music showcase",
     "day": "saturday",
     "startTime": "14:00",
     "endTime": "16:00"
@@ -362,7 +317,6 @@
   {
     "id": "everyone-deserves-music-sat",
     "name": "Everyone Deserves Music",
-    "description": "Inclusive music programming",
     "day": "saturday",
     "startTime": "16:00",
     "endTime": "18:00"
@@ -370,7 +324,6 @@
   {
     "id": "bullfrogs-roadhouse-sat",
     "name": "Bullfrog's Roadhouse",
-    "description": "Blues and rock music",
     "day": "saturday",
     "startTime": "18:00",
     "endTime": "20:00"
@@ -378,7 +331,6 @@
   {
     "id": "waste-alphabet-sat",
     "name": "Waste the Alphabet",
-    "description": "Alternative music show",
     "day": "saturday",
     "startTime": "20:00",
     "endTime": "22:00"
@@ -386,7 +338,6 @@
   {
     "id": "acoustic-cafe-eclectic-avenue-sat",
     "name": "Acoustic Cafe / Eclectic Avenue",
-    "description": "Acoustic music and diverse selection",
     "day": "saturday",
     "startTime": "22:00",
     "endTime": "00:00"
@@ -394,7 +345,6 @@
   {
     "id": "playlist-sun-9am",
     "name": "Playlist",
-    "description": "Curated music selection",
     "day": "sunday",
     "startTime": "09:00",
     "endTime": "12:00"
@@ -402,7 +352,6 @@
   {
     "id": "bush-sounds-sun",
     "name": "Bush Sounds",
-    "description": "Australian bush and country music",
     "day": "sunday",
     "startTime": "09:00",
     "endTime": "12:00"
@@ -410,7 +359,6 @@
   {
     "id": "primary-school-general-sun",
     "name": "Primary School General",
-    "description": "Educational content for primary school students",
     "day": "sunday",
     "startTime": "09:00",
     "endTime": "12:00"
@@ -418,7 +366,6 @@
   {
     "id": "yackandandah-primary-school-sun",
     "name": "Yackandandah Primary School",
-    "description": "Local primary school programming",
     "day": "sunday",
     "startTime": "12:00",
     "endTime": "14:00"
@@ -426,7 +373,6 @@
   {
     "id": "everyone-deserves-music-sun",
     "name": "Everyone Deserves Music",
-    "description": "Inclusive music programming",
     "day": "sunday",
     "startTime": "12:00",
     "endTime": "14:00"
@@ -434,7 +380,6 @@
   {
     "id": "asleep-at-wheel-sun",
     "name": "Asleep at the Wheel",
-    "description": "Late night music programming",
     "day": "sunday",
     "startTime": "14:00",
     "endTime": "16:00"
@@ -442,7 +387,6 @@
   {
     "id": "oz-rock-hour-sun",
     "name": "Oz Rock Hour",
-    "description": "Australian rock music",
     "day": "sunday",
     "startTime": "16:00",
     "endTime": "18:00"
@@ -450,7 +394,6 @@
   {
     "id": "bullfrogs-roadhouse-sun",
     "name": "Bullfrog's Roadhouse",
-    "description": "Blues and rock music",
     "day": "sunday",
     "startTime": "16:00",
     "endTime": "18:00"
@@ -458,7 +401,6 @@
   {
     "id": "uncut-unsigned-sun",
     "name": "Uncut and Unsigned",
-    "description": "Showcasing new and independent artists",
     "day": "sunday",
     "startTime": "18:00",
     "endTime": "20:00"
@@ -466,7 +408,6 @@
   {
     "id": "atomic-countdown-sun",
     "name": "Atomic Countdown",
-    "description": "Music countdown show",
     "day": "sunday",
     "startTime": "20:00",
     "endTime": "22:00"
@@ -474,7 +415,6 @@
   {
     "id": "aussie-music-weekly-sun",
     "name": "Aussie Music Weekly",
-    "description": "Weekly Australian music showcase",
     "day": "sunday",
     "startTime": "22:00",
     "endTime": "00:00"
@@ -482,7 +422,6 @@
   {
     "id": "beale-st-caravan-sun",
     "name": "Beale St Caravan",
-    "description": "Blues and soul music journey",
     "day": "sunday",
     "startTime": "22:00",
     "endTime": "00:00"

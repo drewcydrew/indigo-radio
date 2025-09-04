@@ -3,14 +3,16 @@ import { View, Text, Platform, StyleSheet } from "react-native";
 import TrackPlayer, { useProgress } from "react-native-track-player";
 import EpisodeList from "./EpisodeList";
 import PlayingWindow from "./PlayingWindow";
-import { PodcastEpisode } from "../types/types";
+import { PodcastEpisode, ShowDefinition } from "../types/types";
 import podcastEpisodes from "../data/podcastEpisodes.json";
+import showDefinitions from "../data/showDefinitions.json";
 
 // @ts-ignore
 import ReactAudioPlayer from "react-audio-player";
 
 // Cast the imported JSON to the proper type
 const PODCAST_EPISODES: PodcastEpisode[] = podcastEpisodes;
+const SHOW_DEFINITIONS = showDefinitions as ShowDefinition[];
 
 interface PodcastProps {
   onNowPlayingUpdate: (title: string) => void;
@@ -33,7 +35,26 @@ export default function Podcast({
   const loadPodcasts = async () => {
     if (Platform.OS !== "web") {
       await TrackPlayer.reset();
-      await TrackPlayer.add(PODCAST_EPISODES);
+
+      // Transform episodes to include artist information from show definitions
+      const episodesWithArtist = PODCAST_EPISODES.map((episode) => {
+        const showDef = SHOW_DEFINITIONS.find(
+          (show) => show.name.toLowerCase() === episode.show.toLowerCase()
+        );
+        const artist =
+          showDef?.host ||
+          (showDef?.hosts ? showDef.hosts.join(", ") : "Indigo FM Podcast");
+
+        return {
+          id: episode.id,
+          url: episode.url,
+          title: episode.title,
+          artist,
+          artwork: showDef?.artwork,
+        };
+      });
+
+      await TrackPlayer.add(episodesWithArtist);
     }
     onNowPlayingUpdate("Podcast Episodes Loaded");
   };

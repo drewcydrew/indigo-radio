@@ -76,6 +76,7 @@ export default function TodaysSchedule({
   const renderProgram = ({ item: program }: { item: RadioProgram }) => {
     const showDef = findShowDefinition(program.name);
     const isCurrentProgram = currentProgram?.id === program.id;
+    const description = showDef?.description || "Radio programming";
 
     return (
       <TouchableOpacity
@@ -119,7 +120,7 @@ export default function TodaysSchedule({
               ]}
               numberOfLines={2}
             >
-              {program.description}
+              {description}
             </Text>
           </View>
           <Text

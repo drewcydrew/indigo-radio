@@ -117,6 +117,8 @@ export default function ScheduleDisplay({
                       </Text>
                       {programsByDay[day].map((program) => {
                         const showDef = findShowDefinition(program.name);
+                        const description =
+                          showDef?.description || "Radio programming";
                         return (
                           <TouchableOpacity
                             key={program.id}
@@ -143,7 +145,7 @@ export default function ScheduleDisplay({
                                   </Text>
                                 )}
                                 <Text style={styles.descriptionText}>
-                                  {program.description}
+                                  {description}
                                 </Text>
                               </View>
                               <Text style={styles.timeText}>
@@ -205,6 +207,8 @@ export default function ScheduleDisplay({
                     </Text>
                     {programsByDay[day].map((program) => {
                       const showDef = findShowDefinition(program.name);
+                      const description =
+                        showDef?.description || "Radio programming";
                       return (
                         <TouchableOpacity
                           key={program.id}
@@ -231,7 +235,7 @@ export default function ScheduleDisplay({
                                 </Text>
                               )}
                               <Text style={styles.descriptionText}>
-                                {program.description}
+                                {description}
                               </Text>
                             </View>
                             <Text style={styles.timeText}>

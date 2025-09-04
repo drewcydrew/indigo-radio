@@ -7,7 +7,10 @@ import {
   Image,
   StyleSheet,
 } from "react-native";
-import { PodcastEpisode } from "../types/types";
+import { PodcastEpisode, ShowDefinition } from "../types/types";
+import showDefinitions from "../data/showDefinitions.json";
+
+const SHOW_DEFINITIONS = showDefinitions as ShowDefinition[];
 
 interface EpisodeListProps {
   episodes: PodcastEpisode[];
@@ -62,41 +65,63 @@ export default function EpisodeList({
     </TouchableOpacity>
   );
 
-  const renderEpisode = ({ item: episode }: { item: PodcastEpisode }) => (
-    <TouchableOpacity
-      style={styles.episodeItem}
-      onPress={() => onEpisodePress(episode.id)}
-    >
-      {/* Artwork */}
-      <View style={styles.artworkContainer}>
-        {episode.artwork ? (
-          <Image
-            source={{ uri: episode.artwork }}
-            style={styles.artwork}
-            resizeMode="cover"
-          />
-        ) : (
-          <View style={styles.placeholderArtwork}>
-            <Text style={styles.placeholderIcon}>🎧</Text>
-          </View>
-        )}
-      </View>
+  // Function to find show definition by show name
+  const findShowDefinition = (showName: string): ShowDefinition | null => {
+    return (
+      SHOW_DEFINITIONS.find(
+        (show) =>
+          show.name.toLowerCase() === showName.toLowerCase() ||
+          show.showId
+            .toLowerCase()
+            .includes(showName.toLowerCase().replace(/\s+/g, "-"))
+      ) || null
+    );
+  };
 
-      {/* Episode Info */}
-      <View style={styles.episodeInfo}>
-        <Text style={styles.showName}>{episode.show}</Text>
-        <Text style={styles.episodeTitle}>{episode.title}</Text>
-        <Text style={styles.duration}>
-          Duration: {formatDuration(currentTrackDuration)}
-        </Text>
-        {episode.description && (
-          <Text style={styles.description} numberOfLines={2}>
-            {episode.description}
+  const renderEpisode = ({ item: episode }: { item: PodcastEpisode }) => {
+    const showDef = findShowDefinition(episode.show);
+    const artwork = showDef?.artwork;
+    const artist =
+      showDef?.host ||
+      (showDef?.hosts ? showDef.hosts.join(", ") : "Indigo FM Podcast");
+
+    return (
+      <TouchableOpacity
+        style={styles.episodeItem}
+        onPress={() => onEpisodePress(episode.id)}
+      >
+        {/* Artwork */}
+        <View style={styles.artworkContainer}>
+          {artwork ? (
+            <Image
+              source={{ uri: artwork }}
+              style={styles.artwork}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={styles.placeholderArtwork}>
+              <Text style={styles.placeholderIcon}>🎧</Text>
+            </View>
+          )}
+        </View>
+
+        {/* Episode Info */}
+        <View style={styles.episodeInfo}>
+          <Text style={styles.showName}>{episode.show}</Text>
+          <Text style={styles.episodeTitle}>{episode.title}</Text>
+          <Text style={styles.artistName}>{artist}</Text>
+          <Text style={styles.duration}>
+            Duration: {formatDuration(currentTrackDuration)}
           </Text>
-        )}
-      </View>
-    </TouchableOpacity>
-  );
+          {episode.description && (
+            <Text style={styles.description} numberOfLines={2}>
+              {episode.description}
+            </Text>
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   const renderHeader = () => (
     <View>
@@ -200,6 +225,12 @@ const styles = StyleSheet.create({
   episodeTitle: {
     fontWeight: "600",
     marginBottom: 4,
+  },
+  artistName: {
+    fontSize: 12,
+    opacity: 0.7,
+    marginBottom: 4,
+    fontStyle: "italic",
   },
   duration: {
     opacity: 0.7,
