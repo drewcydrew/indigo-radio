@@ -4,14 +4,11 @@ import TrackPlayer, { useProgress } from "react-native-track-player";
 import EpisodeList from "./EpisodeList";
 import PlayingWindow from "./PlayingWindow";
 import { PodcastEpisode } from "../types/types";
-import podcastEpisodes from "../data/podcastEpisodes.json";
 import useShowDetails from "../hooks/useShowDetails";
+import usePodcastEpisodes from "../hooks/usePodcastEpisodes";
 
 // @ts-ignore
 import ReactAudioPlayer from "react-audio-player";
-
-// Cast the imported JSON to the proper type
-const PODCAST_EPISODES: PodcastEpisode[] = podcastEpisodes;
 
 interface PodcastProps {
   onNowPlayingUpdate: (title: string) => void;
@@ -28,8 +25,9 @@ export default function Podcast({
     null
   );
 
-  // Use the hook to get show details
+  // Use the hooks to get show details and podcast episodes
   const { showDefinitions } = useShowDetails();
+  const { episodes } = usePodcastEpisodes();
 
   // Only use progress on mobile
   const progress = Platform.OS !== "web" ? useProgress() : { duration: 0 };
@@ -39,7 +37,7 @@ export default function Podcast({
       await TrackPlayer.reset();
 
       // Transform episodes to include artist information from show definitions
-      const episodesWithArtist = PODCAST_EPISODES.map((episode) => {
+      const episodesWithArtist = episodes.map((episode) => {
         const showDef = showDefinitions.find(
           (show) => show.name.toLowerCase() === episode.show.toLowerCase()
         );
@@ -62,7 +60,7 @@ export default function Podcast({
   };
 
   const playEpisode = async (episodeId: string) => {
-    const episode = PODCAST_EPISODES.find((ep) => ep.id === episodeId);
+    const episode = episodes.find((ep) => ep.id === episodeId);
     if (episode) {
       setCurrentEpisode(episode);
       if (Platform.OS === "web") {
@@ -70,9 +68,7 @@ export default function Podcast({
         setCurrentEpisodeTitle(episode.title);
         onNowPlayingUpdate(episode.title);
       } else {
-        const episodeIndex = PODCAST_EPISODES.findIndex(
-          (ep) => ep.id === episodeId
-        );
+        const episodeIndex = episodes.findIndex((ep) => ep.id === episodeId);
         if (episodeIndex !== -1) {
           await TrackPlayer.skip(episodeIndex);
           await TrackPlayer.play();
@@ -84,7 +80,7 @@ export default function Podcast({
 
   useEffect(() => {
     loadPodcasts();
-  }, []);
+  }, [episodes, showDefinitions]); // Add dependencies to reload when data changes
 
   // Web audio player component
   const WebAudioPlayer = () => {
@@ -106,7 +102,7 @@ export default function Podcast({
 
         <View style={styles.webEpisodeList}>
           <EpisodeList
-            episodes={PODCAST_EPISODES}
+            episodes={episodes}
             onEpisodePress={playEpisode}
             currentTrackDuration={0}
           />
@@ -122,7 +118,7 @@ export default function Podcast({
     <View style={styles.container}>
       {/* Episodes List Component with built-in header */}
       <EpisodeList
-        episodes={PODCAST_EPISODES}
+        episodes={episodes}
         onEpisodePress={playEpisode}
         currentTrackDuration={progress.duration}
         showTitle={true}
