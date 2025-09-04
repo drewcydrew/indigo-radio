@@ -4,6 +4,7 @@ import {
   Text,
   TouchableOpacity,
   FlatList,
+  Image,
   StyleSheet,
 } from "react-native";
 import { RadioProgram, ShowDefinition } from "../types/types";
@@ -77,6 +78,7 @@ export default function TodaysSchedule({
     const showDef = findShowDefinition(program.name);
     const isCurrentProgram = currentProgram?.id === program.id;
     const description = showDef?.description || "Radio programming";
+    const artwork = showDef?.artwork;
 
     return (
       <TouchableOpacity
@@ -88,6 +90,21 @@ export default function TodaysSchedule({
         disabled={!showDef}
       >
         <View style={styles.programContent}>
+          {/* Thumbnail Image */}
+          <View style={styles.thumbnailContainer}>
+            {artwork ? (
+              <Image
+                source={{ uri: artwork }}
+                style={styles.thumbnail}
+                resizeMode="cover"
+              />
+            ) : (
+              <View style={styles.placeholderThumbnail}>
+                <Text style={styles.placeholderIcon}>📻</Text>
+              </View>
+            )}
+          </View>
+
           <View style={styles.programInfo}>
             <View style={styles.programTitleRow}>
               <Text
@@ -123,6 +140,7 @@ export default function TodaysSchedule({
               {description}
             </Text>
           </View>
+
           <Text
             style={[
               styles.timeText,
@@ -232,6 +250,26 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
+  },
+  thumbnailContainer: {
+    marginRight: 12,
+  },
+  thumbnail: {
+    width: 50,
+    height: 50,
+    borderRadius: 6,
+    backgroundColor: "#e0e0e0",
+  },
+  placeholderThumbnail: {
+    width: 50,
+    height: 50,
+    borderRadius: 6,
+    backgroundColor: "#e0e0e0",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  placeholderIcon: {
+    fontSize: 20,
   },
   programInfo: {
     flex: 1,
