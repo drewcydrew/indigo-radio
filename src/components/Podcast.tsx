@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, Platform, StyleSheet } from "react-native";
+import { View, Text, Platform, StyleSheet } from "react-native";
 import TrackPlayer, { useProgress } from "react-native-track-player";
 import EpisodeList from "./EpisodeList";
 import PlayingWindow from "./PlayingWindow";
@@ -19,6 +19,9 @@ interface PodcastProps {
 export default function Podcast({ onNowPlayingUpdate }: PodcastProps) {
   const [currentEpisodeUrl, setCurrentEpisodeUrl] = useState<string>("");
   const [currentEpisodeTitle, setCurrentEpisodeTitle] = useState<string>("");
+  const [currentEpisode, setCurrentEpisode] = useState<PodcastEpisode | null>(
+    null
+  );
 
   // Only use progress on mobile
   const progress = Platform.OS !== "web" ? useProgress() : { duration: 0 };
@@ -34,6 +37,7 @@ export default function Podcast({ onNowPlayingUpdate }: PodcastProps) {
   const playEpisode = async (episodeId: string) => {
     const episode = PODCAST_EPISODES.find((ep) => ep.id === episodeId);
     if (episode) {
+      setCurrentEpisode(episode);
       if (Platform.OS === "web") {
         setCurrentEpisodeUrl(episode.url);
         setCurrentEpisodeTitle(episode.title);
@@ -86,25 +90,19 @@ export default function Podcast({ onNowPlayingUpdate }: PodcastProps) {
     );
   }
 
-  // Mobile implementation
+  // Mobile implementation - Remove ScrollView wrapper
   return (
     <View style={styles.container}>
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-      >
-        <Text style={styles.title}>Podcast Episodes</Text>
-
-        {/* Episodes List Component */}
-        <EpisodeList
-          episodes={PODCAST_EPISODES}
-          onEpisodePress={playEpisode}
-          currentTrackDuration={progress.duration}
-        />
-      </ScrollView>
+      {/* Episodes List Component with built-in header */}
+      <EpisodeList
+        episodes={PODCAST_EPISODES}
+        onEpisodePress={playEpisode}
+        currentTrackDuration={progress.duration}
+        showTitle={true}
+      />
 
       {/* Playing Window Component - Fixed at Bottom */}
-      <PlayingWindow />
+      <PlayingWindow currentEpisode={currentEpisode} />
     </View>
   );
 }
@@ -112,9 +110,7 @@ export default function Podcast({ onNowPlayingUpdate }: PodcastProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  scrollView: {
-    flex: 1,
+    paddingBottom: 180, // Add padding to prevent content from being hidden behind floating player
   },
   title: {
     fontSize: 18,

@@ -65,8 +65,6 @@ export default function App() {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>Indigo FM</Text>
-          <Text style={styles.nowPlayingLabel}>Now Playing</Text>
-          <Text style={styles.nowPlayingText}>{now}</Text>
         </View>
 
         {/* Toggle Switch */}
@@ -129,8 +127,6 @@ export default function App() {
         {/* App Title */}
         <View style={styles.header}>
           <Text style={styles.title}>Indigo FM</Text>
-          <Text style={styles.nowPlayingLabel}>Now Playing</Text>
-          <Text style={styles.nowPlayingText}>{now}</Text>
         </View>
 
         {/* Full Screen Component */}
@@ -211,14 +207,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "600",
     marginBottom: 8,
-  },
-  nowPlayingLabel: {
-    fontSize: 16,
-    opacity: 0.7,
-  },
-  nowPlayingText: {
-    fontSize: 18,
-    marginBottom: 16,
   },
   content: {
     flex: 1,

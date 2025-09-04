@@ -1,17 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Platform, Button, StyleSheet } from "react-native";
+import { View, Text, Platform, StyleSheet } from "react-native";
 import TrackPlayer, {
   Event,
   useTrackPlayerEvents,
-  usePlaybackState,
-  State,
 } from "react-native-track-player";
 import { RadioProgram } from "../types/types";
 import radioPrograms from "../data/radioPrograms.json";
 import ScheduleDisplay from "./ScheduleDisplay";
-
-// @ts-ignore
-import ReactAudioPlayer from "react-audio-player";
+import TodaysSchedule from "./TodaysSchedule";
+import LiveRadioPlayer from "./LiveRadioPlayer";
 
 const STREAM_URL = "https://internetradio.indigofm.au:8032/stream";
 
@@ -23,7 +20,6 @@ interface LiveRadioProps {
 }
 
 export default function LiveRadio({ onNowPlayingUpdate }: LiveRadioProps) {
-  const playback = usePlaybackState();
   const [currentProgram, setCurrentProgram] = useState<RadioProgram | null>(
     null
   );
@@ -119,82 +115,24 @@ export default function LiveRadio({ onNowPlayingUpdate }: LiveRadioProps) {
     }
   };
 
-  const togglePlayPause = async () => {
-    if (Platform.OS === "web") return;
-
-    const isPlaying = playback.state === State.Playing;
-    if (isPlaying) {
-      await TrackPlayer.pause();
-    } else {
-      await TrackPlayer.play();
-    }
-  };
-
   useEffect(() => {
     playLiveRadio();
   }, []);
-
-  // Web audio player component
-  const WebAudioPlayer = () => {
-    if (Platform.OS !== "web") return null;
-
-    return (
-      <View style={styles.audioPlayerContainer}>
-        <ReactAudioPlayer src={STREAM_URL} controls autoPlay />
-      </View>
-    );
-  };
-
-  const isPlaying =
-    Platform.OS === "web" ? false : playback.state === State.Playing;
 
   return (
     <View style={styles.container}>
       {/* Live Radio Content */}
       <View style={styles.content}>
-        <Text style={styles.radioIcon}>📻</Text>
-        <Text style={styles.title}>Live Radio</Text>
-
-        {/* Current Program Info */}
-        {currentProgram ? (
-          <View style={styles.programInfo}>
-            <Text style={styles.programTitle}>{currentProgram.name}</Text>
-            {currentProgram.host && (
-              <Text style={styles.hostText}>with {currentProgram.host}</Text>
-            )}
-            <Text style={styles.timeText}>
-              {currentProgram.startTime} - {currentProgram.endTime}
-            </Text>
-            <Text style={styles.descriptionText}>
-              {currentProgram.description}
-            </Text>
-          </View>
-        ) : (
-          <Text style={styles.defaultText}>Streaming live from Indigo FM</Text>
-        )}
-
-        {/* Web Audio Player */}
-        <WebAudioPlayer />
-
-        {/* Schedule Display Component */}
-        <ScheduleDisplay programs={RADIO_PROGRAMS} />
+        {/* Today's Schedule Component */}
+        <TodaysSchedule
+          programs={RADIO_PROGRAMS}
+          currentProgram={currentProgram}
+          showTitle={true}
+        />
       </View>
 
-      {/* Live Radio Controls (Play/Pause only) - Mobile only */}
-      {Platform.OS !== "web" && (
-        <View style={styles.controls}>
-          <View style={styles.buttonContainer}>
-            <Button
-              title={isPlaying ? "Pause" : "Play"}
-              onPress={togglePlayPause}
-            />
-          </View>
-
-          <Text style={styles.stateText}>
-            State: {String(playback?.state ?? "unknown")}
-          </Text>
-        </View>
-      )}
+      {/* Live Radio Player - Fixed at Bottom */}
+      <LiveRadioPlayer currentProgram={currentProgram} />
     </View>
   );
 }
@@ -202,17 +140,16 @@ export default function LiveRadio({ onNowPlayingUpdate }: LiveRadioProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingBottom: 180, // Add padding to prevent content from being hidden behind floating player
   },
   content: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 40,
     paddingHorizontal: 20,
   },
   radioIcon: {
     fontSize: 48,
     marginBottom: 16,
+    textAlign: "center",
   },
   title: {
     fontSize: 24,
@@ -254,22 +191,5 @@ const styles = StyleSheet.create({
     opacity: 0.7,
     textAlign: "center",
     marginBottom: 32,
-  },
-  audioPlayerContainer: {
-    marginVertical: 20,
-    width: "100%",
-    alignItems: "center",
-  },
-  controls: {
-    marginBottom: 20,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 20,
-  },
-  stateText: {
-    opacity: 0.6,
-    textAlign: "center",
   },
 });

@@ -6,10 +6,13 @@ import TrackPlayer, {
   State,
 } from "react-native-track-player";
 import CustomSlider from "./CustomSlider";
+import { PodcastEpisode } from "../types/types";
 
-interface PlayingWindowProps {}
+interface PlayingWindowProps {
+  currentEpisode?: PodcastEpisode | null;
+}
 
-export default function PlayingWindow({}: PlayingWindowProps) {
+export default function PlayingWindow({ currentEpisode }: PlayingWindowProps) {
   const playback = usePlaybackState();
   const progress = useProgress();
 
@@ -44,7 +47,18 @@ export default function PlayingWindow({}: PlayingWindowProps) {
   };
 
   return (
-    <View>
+    <View style={styles.container}>
+      {/* Now Playing Section */}
+      {currentEpisode && (
+        <View style={styles.nowPlayingContainer}>
+          <Text style={styles.nowPlayingLabel}>Now Playing</Text>
+          <Text style={styles.nowPlayingTitle} numberOfLines={1}>
+            {currentEpisode.title}
+          </Text>
+          <Text style={styles.nowPlayingShow}>{currentEpisode.show}</Text>
+        </View>
+      )}
+
       {/* Progress Bar and Time Display */}
       {progress.duration > 0 && (
         <View style={styles.progressContainer}>
@@ -82,8 +96,48 @@ export default function PlayingWindow({}: PlayingWindowProps) {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderTopColor: "#e0e0e0",
+    padding: 16,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+    zIndex: 1000,
+  },
+  nowPlayingContainer: {
+    marginBottom: 12,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  nowPlayingLabel: {
+    fontSize: 12,
+    opacity: 0.7,
+    marginBottom: 4,
+  },
+  nowPlayingTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 2,
+  },
+  nowPlayingShow: {
+    fontSize: 14,
+    color: "#007AFF",
+    fontWeight: "500",
+  },
   progressContainer: {
-    marginBottom: 20,
+    marginBottom: 16,
   },
   timeContainer: {
     flexDirection: "row",
@@ -97,9 +151,12 @@ const styles = StyleSheet.create({
   controlsContainer: {
     flexDirection: "row",
     gap: 12,
-    marginBottom: 20,
+    marginBottom: 12,
+    justifyContent: "center",
   },
   stateText: {
     opacity: 0.6,
+    textAlign: "center",
+    fontSize: 12,
   },
 });
