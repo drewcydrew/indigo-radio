@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Button } from "react-native";
+import { View, Text, Button, StyleSheet } from "react-native";
 import TrackPlayer, {
   usePlaybackState,
   useProgress,
@@ -47,20 +47,10 @@ export default function PlayingWindow({}: PlayingWindowProps) {
     <View>
       {/* Progress Bar and Time Display */}
       {progress.duration > 0 && (
-        <View style={{ marginBottom: 20 }}>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginBottom: 8,
-            }}
-          >
-            <Text style={{ fontSize: 14, opacity: 0.7 }}>
-              {formatTime(progress.position)}
-            </Text>
-            <Text style={{ fontSize: 14, opacity: 0.7 }}>
-              {formatTime(progress.duration)}
-            </Text>
+        <View style={styles.progressContainer}>
+          <View style={styles.timeContainer}>
+            <Text style={styles.timeText}>{formatTime(progress.position)}</Text>
+            <Text style={styles.timeText}>{formatTime(progress.duration)}</Text>
           </View>
 
           <CustomSlider
@@ -75,7 +65,7 @@ export default function PlayingWindow({}: PlayingWindowProps) {
       )}
 
       {/* Playback Controls */}
-      <View style={{ flexDirection: "row", gap: 12, marginBottom: 20 }}>
+      <View style={styles.controlsContainer}>
         <Button title="← 15s" onPress={skipBackward} />
         <Button
           title={isPlaying ? "Pause" : "Play"}
@@ -84,9 +74,32 @@ export default function PlayingWindow({}: PlayingWindowProps) {
         <Button title="15s →" onPress={skipForward} />
       </View>
 
-      <Text style={{ opacity: 0.6 }}>
+      <Text style={styles.stateText}>
         State: {String(playback?.state ?? "unknown")}
       </Text>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  progressContainer: {
+    marginBottom: 20,
+  },
+  timeContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  timeText: {
+    fontSize: 14,
+    opacity: 0.7,
+  },
+  controlsContainer: {
+    flexDirection: "row",
+    gap: 12,
+    marginBottom: 20,
+  },
+  stateText: {
+    opacity: 0.6,
+  },
+});

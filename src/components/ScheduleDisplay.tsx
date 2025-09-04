@@ -5,11 +5,12 @@ import {
   Button,
   ScrollView,
   Modal,
-  Platform,
   TouchableOpacity,
+  StyleSheet,
 } from "react-native";
 import { RadioProgram, ShowDefinition } from "../types/types";
 import showDefinitions from "../data/showDefinitions.json";
+import ShowDetailsModal from "./ShowDetailsModal";
 
 // Cast the imported JSON to the proper type
 const SHOW_DEFINITIONS = showDefinitions as ShowDefinition[];
@@ -74,586 +75,9 @@ export default function ScheduleDisplay({ programs }: ScheduleDisplayProps) {
     sunday: "Sunday",
   };
 
-  // Show details modal component
-  const ShowDetailsModal = ({ show }: { show: ShowDefinition }) => {
-    const hostDisplay = show.hosts ? show.hosts.join(", ") : show.host;
-
-    if (Platform.OS === "web") {
-      return (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            zIndex: 2000,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            padding: "20px",
-          }}
-          onClick={hideDetails}
-        >
-          <div
-            style={{
-              backgroundColor: "white",
-              borderRadius: "12px",
-              padding: "24px",
-              maxWidth: "600px",
-              maxHeight: "80vh",
-              width: "100%",
-              overflow: "auto",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-                marginBottom: "20px",
-              }}
-            >
-              <h2
-                style={{
-                  fontSize: "24px",
-                  fontWeight: "600",
-                  margin: 0,
-                  flex: 1,
-                }}
-              >
-                {show.name}
-              </h2>
-              <button
-                onClick={hideDetails}
-                style={{
-                  background: "none",
-                  border: "none",
-                  fontSize: "24px",
-                  cursor: "pointer",
-                  padding: "4px",
-                }}
-              >
-                ×
-              </button>
-            </div>
-
-            {hostDisplay && (
-              <p
-                style={{
-                  fontSize: "16px",
-                  fontWeight: "500",
-                  marginBottom: "8px",
-                  color: "#007AFF",
-                }}
-              >
-                Hosted by: {hostDisplay}
-              </p>
-            )}
-
-            <p
-              style={{
-                fontSize: "14px",
-                marginBottom: "16px",
-                lineHeight: "1.5",
-              }}
-            >
-              {show.description}
-            </p>
-
-            {show.tagline && (
-              <div
-                style={{
-                  backgroundColor: "#f0f8ff",
-                  padding: "12px",
-                  borderRadius: "8px",
-                  marginBottom: "16px",
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: "14px",
-                    fontStyle: "italic",
-                    margin: 0,
-                    color: "#007AFF",
-                  }}
-                >
-                  "{show.tagline}"
-                </p>
-              </div>
-            )}
-
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-                gap: "16px",
-              }}
-            >
-              <div>
-                <h4
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: "600",
-                    marginBottom: "8px",
-                    color: "#666",
-                  }}
-                >
-                  Frequency
-                </h4>
-                <p style={{ fontSize: "14px", margin: 0 }}>{show.frequency}</p>
-              </div>
-
-              {show.duration && (
-                <div>
-                  <h4
-                    style={{
-                      fontSize: "14px",
-                      fontWeight: "600",
-                      marginBottom: "8px",
-                      color: "#666",
-                    }}
-                  >
-                    Duration
-                  </h4>
-                  <p style={{ fontSize: "14px", margin: 0 }}>{show.duration}</p>
-                </div>
-              )}
-
-              {show.genres && show.genres.length > 0 && (
-                <div>
-                  <h4
-                    style={{
-                      fontSize: "14px",
-                      fontWeight: "600",
-                      marginBottom: "8px",
-                      color: "#666",
-                    }}
-                  >
-                    Genres
-                  </h4>
-                  <div
-                    style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}
-                  >
-                    {show.genres.map((genre, index) => (
-                      <span
-                        key={index}
-                        style={{
-                          backgroundColor: "#e3f2fd",
-                          color: "#1976d2",
-                          padding: "2px 8px",
-                          borderRadius: "12px",
-                          fontSize: "12px",
-                        }}
-                      >
-                        {genre}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {show.specialSegments && show.specialSegments.length > 0 && (
-              <div style={{ marginTop: "16px" }}>
-                <h4
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: "600",
-                    marginBottom: "8px",
-                    color: "#666",
-                  }}
-                >
-                  Special Segments
-                </h4>
-                {show.specialSegments.map((segment, index) => (
-                  <div key={index} style={{ marginBottom: "8px" }}>
-                    <p
-                      style={{ fontSize: "14px", fontWeight: "500", margin: 0 }}
-                    >
-                      {segment.name}
-                    </p>
-                    <p style={{ fontSize: "13px", opacity: 0.7, margin: 0 }}>
-                      {segment.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <Modal
-        visible={true}
-        animationType="slide"
-        presentationStyle="pageSheet"
-        onRequestClose={hideDetails}
-      >
-        <View style={{ flex: 1, backgroundColor: "white" }}>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: 20,
-              paddingTop: 60,
-              borderBottomWidth: 1,
-              borderBottomColor: "#e0e0e0",
-            }}
-          >
-            <Text style={{ fontSize: 20, fontWeight: "600", flex: 1 }}>
-              {show.name}
-            </Text>
-            <TouchableOpacity onPress={hideDetails}>
-              <Text style={{ fontSize: 18, color: "#007AFF" }}>Done</Text>
-            </TouchableOpacity>
-          </View>
-
-          <ScrollView
-            style={{ flex: 1 }}
-            contentContainerStyle={{ padding: 20 }}
-          >
-            {hostDisplay && (
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontWeight: "500",
-                  marginBottom: 8,
-                  color: "#007AFF",
-                }}
-              >
-                Hosted by: {hostDisplay}
-              </Text>
-            )}
-
-            <Text style={{ fontSize: 14, marginBottom: 16, lineHeight: 20 }}>
-              {show.description}
-            </Text>
-
-            {show.tagline && (
-              <View
-                style={{
-                  backgroundColor: "#f0f8ff",
-                  padding: 12,
-                  borderRadius: 8,
-                  marginBottom: 16,
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 14,
-                    fontStyle: "italic",
-                    color: "#007AFF",
-                  }}
-                >
-                  "{show.tagline}"
-                </Text>
-              </View>
-            )}
-
-            <View style={{ marginBottom: 16 }}>
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontWeight: "600",
-                  marginBottom: 8,
-                  color: "#666",
-                }}
-              >
-                Frequency
-              </Text>
-              <Text style={{ fontSize: 14 }}>{show.frequency}</Text>
-            </View>
-
-            {show.duration && (
-              <View style={{ marginBottom: 16 }}>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    fontWeight: "600",
-                    marginBottom: 8,
-                    color: "#666",
-                  }}
-                >
-                  Duration
-                </Text>
-                <Text style={{ fontSize: 14 }}>{show.duration}</Text>
-              </View>
-            )}
-
-            {show.genres && show.genres.length > 0 && (
-              <View style={{ marginBottom: 16 }}>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    fontWeight: "600",
-                    marginBottom: 8,
-                    color: "#666",
-                  }}
-                >
-                  Genres
-                </Text>
-                <View
-                  style={{ flexDirection: "row", flexWrap: "wrap", gap: 4 }}
-                >
-                  {show.genres.map((genre, index) => (
-                    <View
-                      key={index}
-                      style={{
-                        backgroundColor: "#e3f2fd",
-                        paddingHorizontal: 8,
-                        paddingVertical: 2,
-                        borderRadius: 12,
-                      }}
-                    >
-                      <Text style={{ color: "#1976d2", fontSize: 12 }}>
-                        {genre}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-              </View>
-            )}
-
-            {show.specialSegments && show.specialSegments.length > 0 && (
-              <View>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    fontWeight: "600",
-                    marginBottom: 8,
-                    color: "#666",
-                  }}
-                >
-                  Special Segments
-                </Text>
-                {show.specialSegments.map((segment, index) => (
-                  <View key={index} style={{ marginBottom: 8 }}>
-                    <Text style={{ fontSize: 14, fontWeight: "500" }}>
-                      {segment.name}
-                    </Text>
-                    <Text style={{ fontSize: 13, opacity: 0.7 }}>
-                      {segment.description}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            )}
-          </ScrollView>
-        </View>
-      </Modal>
-    );
-  };
-
-  // Web implementation
-  if (Platform.OS === "web") {
-    return (
-      <>
-        <button
-          onClick={showSchedule}
-          style={{
-            padding: "8px 16px",
-            backgroundColor: "#007AFF",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontSize: "14px",
-            marginTop: "16px",
-          }}
-        >
-          Show Schedule
-        </button>
-
-        {isVisible && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
-              zIndex: 1000,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              padding: "20px",
-            }}
-            onClick={hideSchedule}
-          >
-            <div
-              style={{
-                backgroundColor: "white",
-                borderRadius: "12px",
-                padding: "24px",
-                maxWidth: "800px",
-                maxHeight: "80vh",
-                width: "100%",
-                overflow: "hidden",
-                position: "relative",
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "20px",
-                }}
-              >
-                <h2 style={{ fontSize: "24px", fontWeight: "600", margin: 0 }}>
-                  Program Schedule
-                </h2>
-                <button
-                  onClick={hideSchedule}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    fontSize: "24px",
-                    cursor: "pointer",
-                    padding: "4px",
-                  }}
-                >
-                  ×
-                </button>
-              </div>
-
-              <div
-                style={{ overflow: "auto", maxHeight: "calc(80vh - 100px)" }}
-              >
-                {dayOrder.map(
-                  (day) =>
-                    programsByDay[day] && (
-                      <div key={day} style={{ marginBottom: "24px" }}>
-                        <h3
-                          style={{
-                            fontSize: "18px",
-                            fontWeight: "600",
-                            marginBottom: "12px",
-                            color: "#007AFF",
-                          }}
-                        >
-                          {dayNames[day as keyof typeof dayNames]}
-                        </h3>
-                        {programsByDay[day].map((program) => {
-                          const showDef = findShowDefinition(program.name);
-                          return (
-                            <div
-                              key={program.id}
-                              onClick={() => showDef && showDetails(showDef)}
-                              style={{
-                                padding: "12px",
-                                marginBottom: "8px",
-                                backgroundColor: "#f5f5f5",
-                                borderRadius: "8px",
-                                borderLeft: "4px solid #007AFF",
-                                cursor: showDef ? "pointer" : "default",
-                                transition: "all 0.2s ease",
-                              }}
-                              onMouseEnter={(e) => {
-                                if (showDef) {
-                                  e.currentTarget.style.backgroundColor =
-                                    "#e3f2fd";
-                                  e.currentTarget.style.transform =
-                                    "translateY(-1px)";
-                                }
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor =
-                                  "#f5f5f5";
-                                e.currentTarget.style.transform =
-                                  "translateY(0)";
-                              }}
-                            >
-                              <div
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "space-between",
-                                  alignItems: "flex-start",
-                                }}
-                              >
-                                <div style={{ flex: 1 }}>
-                                  <h4
-                                    style={{
-                                      fontSize: "16px",
-                                      fontWeight: "600",
-                                      margin: "0 0 4px 0",
-                                      display: "flex",
-                                      alignItems: "center",
-                                      gap: "8px",
-                                    }}
-                                  >
-                                    {program.name}
-                                    {showDef && (
-                                      <span
-                                        style={{
-                                          fontSize: "12px",
-                                          opacity: 0.6,
-                                        }}
-                                      >
-                                        ℹ️
-                                      </span>
-                                    )}
-                                  </h4>
-                                  {program.host && (
-                                    <p
-                                      style={{
-                                        fontSize: "14px",
-                                        margin: "0 0 4px 0",
-                                        opacity: 0.8,
-                                      }}
-                                    >
-                                      with {program.host}
-                                    </p>
-                                  )}
-                                  <p
-                                    style={{
-                                      fontSize: "14px",
-                                      margin: "0 0 8px 0",
-                                      opacity: 0.6,
-                                      fontStyle: "italic",
-                                    }}
-                                  >
-                                    {program.description}
-                                  </p>
-                                </div>
-                                <div
-                                  style={{
-                                    fontSize: "14px",
-                                    fontWeight: "600",
-                                    color: "#007AFF",
-                                  }}
-                                >
-                                  {program.startTime} - {program.endTime}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {selectedShow && <ShowDetailsModal show={selectedShow} />}
-      </>
-    );
-  }
-
-  // Mobile implementation
   return (
     <>
-      <View style={{ marginTop: 16 }}>
+      <View style={styles.buttonContainer}>
         <Button title="Show Schedule" onPress={showSchedule} />
       </View>
 
@@ -663,44 +87,23 @@ export default function ScheduleDisplay({ programs }: ScheduleDisplayProps) {
         presentationStyle="pageSheet"
         onRequestClose={hideSchedule}
       >
-        <View style={{ flex: 1, backgroundColor: "white" }}>
-          {/* Header */}
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: 20,
-              paddingTop: 60,
-              borderBottomWidth: 1,
-              borderBottomColor: "#e0e0e0",
-            }}
-          >
-            <Text style={{ fontSize: 24, fontWeight: "600" }}>
-              Program Schedule
-            </Text>
+        <View style={styles.modalContainer}>
+          <View style={styles.header}>
+            <Text style={styles.headerTitle}>Program Schedule</Text>
             <TouchableOpacity onPress={hideSchedule}>
-              <Text style={{ fontSize: 18, color: "#007AFF" }}>Done</Text>
+              <Text style={styles.doneButton}>Done</Text>
             </TouchableOpacity>
           </View>
 
-          {/* Schedule Content */}
           <ScrollView
-            style={{ flex: 1 }}
-            contentContainerStyle={{ padding: 20 }}
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
           >
             {dayOrder.map(
               (day) =>
                 programsByDay[day] && (
-                  <View key={day} style={{ marginBottom: 24 }}>
-                    <Text
-                      style={{
-                        fontSize: 18,
-                        fontWeight: "600",
-                        marginBottom: 12,
-                        color: "#007AFF",
-                      }}
-                    >
+                  <View key={day} style={styles.daySection}>
+                    <Text style={styles.dayTitle}>
                       {dayNames[day as keyof typeof dayNames]}
                     </Text>
                     {programsByDay[day].map((program) => {
@@ -709,76 +112,32 @@ export default function ScheduleDisplay({ programs }: ScheduleDisplayProps) {
                         <TouchableOpacity
                           key={program.id}
                           onPress={() => showDef && showDetails(showDef)}
-                          style={{
-                            padding: 12,
-                            marginBottom: 8,
-                            backgroundColor: "#f5f5f5",
-                            borderRadius: 8,
-                            borderLeftWidth: 4,
-                            borderLeftColor: "#007AFF",
-                            opacity: showDef ? 1 : 0.8,
-                          }}
+                          style={[
+                            styles.programCard,
+                            { opacity: showDef ? 1 : 0.8 },
+                          ]}
                           disabled={!showDef}
                         >
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              justifyContent: "space-between",
-                              alignItems: "flex-start",
-                            }}
-                          >
-                            <View style={{ flex: 1, marginRight: 12 }}>
-                              <View
-                                style={{
-                                  flexDirection: "row",
-                                  alignItems: "center",
-                                  gap: 8,
-                                }}
-                              >
-                                <Text
-                                  style={{
-                                    fontSize: 16,
-                                    fontWeight: "600",
-                                    marginBottom: 4,
-                                  }}
-                                >
+                          <View style={styles.programContent}>
+                            <View style={styles.programLeft}>
+                              <View style={styles.programTitleRow}>
+                                <Text style={styles.programTitle}>
                                   {program.name}
                                 </Text>
                                 {showDef && (
-                                  <Text style={{ fontSize: 12, opacity: 0.6 }}>
-                                    ℹ️
-                                  </Text>
+                                  <Text style={styles.infoIcon}>ℹ️</Text>
                                 )}
                               </View>
                               {program.host && (
-                                <Text
-                                  style={{
-                                    fontSize: 14,
-                                    marginBottom: 4,
-                                    opacity: 0.8,
-                                  }}
-                                >
+                                <Text style={styles.hostText}>
                                   with {program.host}
                                 </Text>
                               )}
-                              <Text
-                                style={{
-                                  fontSize: 14,
-                                  marginBottom: 8,
-                                  opacity: 0.6,
-                                  fontStyle: "italic",
-                                }}
-                              >
+                              <Text style={styles.descriptionText}>
                                 {program.description}
                               </Text>
                             </View>
-                            <Text
-                              style={{
-                                fontSize: 14,
-                                fontWeight: "600",
-                                color: "#007AFF",
-                              }}
-                            >
+                            <Text style={styles.timeText}>
                               {program.startTime} - {program.endTime}
                             </Text>
                           </View>
@@ -792,7 +151,98 @@ export default function ScheduleDisplay({ programs }: ScheduleDisplayProps) {
         </View>
       </Modal>
 
-      {selectedShow && <ShowDetailsModal show={selectedShow} />}
+      {selectedShow && (
+        <ShowDetailsModal show={selectedShow} onClose={hideDetails} />
+      )}
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  buttonContainer: {
+    marginTop: 16,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "white",
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 20,
+    paddingTop: 60,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: "600",
+  },
+  doneButton: {
+    fontSize: 18,
+    color: "#007AFF",
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: 20,
+  },
+  daySection: {
+    marginBottom: 24,
+  },
+  dayTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 12,
+    color: "#007AFF",
+  },
+  programCard: {
+    padding: 12,
+    marginBottom: 8,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: "#007AFF",
+  },
+  programContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  programLeft: {
+    flex: 1,
+    marginRight: 12,
+  },
+  programTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  programTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 4,
+  },
+  infoIcon: {
+    fontSize: 12,
+    opacity: 0.6,
+  },
+  hostText: {
+    fontSize: 14,
+    marginBottom: 4,
+    opacity: 0.8,
+  },
+  descriptionText: {
+    fontSize: 14,
+    marginBottom: 8,
+    opacity: 0.6,
+    fontStyle: "italic",
+  },
+  timeText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#007AFF",
+  },
+});

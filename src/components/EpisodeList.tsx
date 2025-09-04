@@ -6,6 +6,7 @@ import {
   ScrollView,
   Image,
   Platform,
+  StyleSheet,
 } from "react-native";
 import { PodcastEpisode } from "../types/types";
 
@@ -37,176 +38,132 @@ export default function EpisodeList({
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
+  // Web filter button component
+  const WebFilterButton = ({
+    show,
+    isActive,
+    onPress,
+  }: {
+    show: string | null;
+    isActive: boolean;
+    onPress: () => void;
+  }) => {
+    if (Platform.OS !== "web") return null;
+
+    return (
+      <TouchableOpacity
+        style={[
+          styles.webFilterButton,
+          isActive ? styles.webActiveFilter : styles.webInactiveFilter,
+        ]}
+        onPress={onPress}
+      >
+        <Text
+          style={[styles.webFilterText, { color: isActive ? "white" : "#666" }]}
+        >
+          {show || "All Shows"}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
+
+  // Web episode item component
+  const WebEpisodeItem = ({ episode }: { episode: PodcastEpisode }) => {
+    if (Platform.OS !== "web") return null;
+
+    return (
+      <TouchableOpacity
+        style={styles.webEpisodeItem}
+        onPress={() => onEpisodePress(episode.id)}
+      >
+        {/* Artwork */}
+        <View style={styles.artworkContainer}>
+          {episode.artwork ? (
+            <Image
+              source={{ uri: episode.artwork }}
+              style={styles.artwork}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={styles.placeholderArtwork}>
+              <Text style={styles.placeholderIcon}>🎧</Text>
+            </View>
+          )}
+        </View>
+
+        {/* Episode Info */}
+        <View style={styles.episodeInfo}>
+          <Text style={styles.showName}>{episode.show}</Text>
+          <Text style={styles.episodeTitle}>{episode.title}</Text>
+          <Text style={styles.duration}>
+            Duration: {formatDuration(currentTrackDuration)}
+          </Text>
+          {episode.description && (
+            <Text style={styles.description} numberOfLines={2}>
+              {episode.description}
+            </Text>
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
   // Web implementation
   if (Platform.OS === "web") {
     return (
-      <div style={{ marginBottom: 20 }}>
+      <View style={styles.container}>
         {/* Show Filter Buttons */}
-        <div
-          style={{
-            display: "flex",
-            gap: 8,
-            marginBottom: 16,
-            overflowX: "auto",
-          }}
-        >
-          <button
-            style={{
-              padding: "8px 16px",
-              backgroundColor: selectedShow === null ? "#007AFF" : "#f0f0f0",
-              color: selectedShow === null ? "white" : "#666",
-              border: "none",
-              borderRadius: 20,
-              fontWeight: 600,
-              fontSize: 12,
-              cursor: "pointer",
-              whiteSpace: "nowrap",
-            }}
-            onClick={() => setSelectedShow(null)}
-          >
-            All Shows
-          </button>
-
+        <View style={styles.webFilterContainer}>
+          <WebFilterButton
+            show={null}
+            isActive={selectedShow === null}
+            onPress={() => setSelectedShow(null)}
+          />
           {shows.map((show) => (
-            <button
+            <WebFilterButton
               key={show}
-              style={{
-                padding: "8px 16px",
-                backgroundColor: selectedShow === show ? "#007AFF" : "#f0f0f0",
-                color: selectedShow === show ? "white" : "#666",
-                border: "none",
-                borderRadius: 20,
-                fontWeight: 600,
-                fontSize: 12,
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-              }}
-              onClick={() => setSelectedShow(show)}
-            >
-              {show}
-            </button>
+              show={show}
+              isActive={selectedShow === show}
+              onPress={() => setSelectedShow(show)}
+            />
           ))}
-        </div>
+        </View>
 
         {/* Episodes List */}
         {filteredEpisodes.map((episode) => (
-          <div
-            key={episode.id}
-            style={{
-              padding: 12,
-              backgroundColor: "#f5f5f5",
-              marginBottom: 8,
-              borderRadius: 8,
-              display: "flex",
-              alignItems: "flex-start",
-              cursor: "pointer",
-            }}
-            onClick={() => onEpisodePress(episode.id)}
-          >
-            {/* Artwork */}
-            <div style={{ marginRight: 12 }}>
-              {episode.artwork ? (
-                <img
-                  src={episode.artwork}
-                  style={{
-                    width: 60,
-                    height: 60,
-                    borderRadius: 8,
-                    backgroundColor: "#e0e0e0",
-                    objectFit: "cover",
-                  }}
-                  alt={episode.title}
-                />
-              ) : (
-                <div
-                  style={{
-                    width: 60,
-                    height: 60,
-                    borderRadius: 8,
-                    backgroundColor: "#e0e0e0",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 24,
-                  }}
-                >
-                  🎧
-                </div>
-              )}
-            </div>
-
-            {/* Episode Info */}
-            <div style={{ flex: 1 }}>
-              <div
-                style={{
-                  fontWeight: 600,
-                  color: "#007AFF",
-                  fontSize: 12,
-                  marginBottom: 2,
-                }}
-              >
-                {episode.show}
-              </div>
-              <div style={{ fontWeight: 600, marginBottom: 4 }}>
-                {episode.title}
-              </div>
-              <div style={{ opacity: 0.7, fontSize: 12, marginBottom: 4 }}>
-                Duration: {formatDuration(currentTrackDuration)}
-              </div>
-              {episode.description && (
-                <div
-                  style={{
-                    opacity: 0.6,
-                    fontSize: 12,
-                    lineHeight: "16px",
-                    marginTop: 4,
-                    display: "-webkit-box",
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: "vertical",
-                    overflow: "hidden",
-                  }}
-                >
-                  {episode.description}
-                </div>
-              )}
-            </div>
-          </div>
+          <WebEpisodeItem key={episode.id} episode={episode} />
         ))}
 
         {filteredEpisodes.length === 0 && (
-          <div style={{ textAlign: "center", opacity: 0.6, marginTop: 20 }}>
+          <Text style={styles.noEpisodes}>
             No episodes found for "{selectedShow}"
-          </div>
+          </Text>
         )}
-      </div>
+      </View>
     );
   }
 
   // Mobile implementation
   return (
-    <View style={{ marginBottom: 20 }}>
+    <View style={styles.container}>
       {/* Show Filter Buttons */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={{ marginBottom: 16 }}
+        style={styles.filterScrollView}
       >
         <TouchableOpacity
-          style={{
-            paddingHorizontal: 16,
-            paddingVertical: 8,
-            backgroundColor: selectedShow === null ? "#007AFF" : "#f0f0f0",
-            borderRadius: 20,
-            marginRight: 8,
-          }}
+          style={[
+            styles.filterButton,
+            selectedShow === null ? styles.activeFilter : styles.inactiveFilter,
+          ]}
           onPress={() => setSelectedShow(null)}
         >
           <Text
-            style={{
-              color: selectedShow === null ? "white" : "#666",
-              fontWeight: "600",
-              fontSize: 12,
-            }}
+            style={[
+              styles.filterText,
+              { color: selectedShow === null ? "white" : "#666" },
+            ]}
           >
             All Shows
           </Text>
@@ -215,21 +172,19 @@ export default function EpisodeList({
         {shows.map((show) => (
           <TouchableOpacity
             key={show}
-            style={{
-              paddingHorizontal: 16,
-              paddingVertical: 8,
-              backgroundColor: selectedShow === show ? "#007AFF" : "#f0f0f0",
-              borderRadius: 20,
-              marginRight: 8,
-            }}
+            style={[
+              styles.filterButton,
+              selectedShow === show
+                ? styles.activeFilter
+                : styles.inactiveFilter,
+            ]}
             onPress={() => setSelectedShow(show)}
           >
             <Text
-              style={{
-                color: selectedShow === show ? "white" : "#666",
-                fontWeight: "600",
-                fontSize: 12,
-              }}
+              style={[
+                styles.filterText,
+                { color: selectedShow === show ? "white" : "#666" },
+              ]}
             >
               {show}
             </Text>
@@ -241,77 +196,33 @@ export default function EpisodeList({
       {filteredEpisodes.map((episode) => (
         <TouchableOpacity
           key={episode.id}
-          style={{
-            padding: 12,
-            backgroundColor: "#f5f5f5",
-            marginBottom: 8,
-            borderRadius: 8,
-            flexDirection: "row",
-            alignItems: "flex-start",
-          }}
+          style={styles.episodeItem}
           onPress={() => onEpisodePress(episode.id)}
         >
           {/* Artwork */}
-          <View style={{ marginRight: 12 }}>
+          <View style={styles.artworkContainer}>
             {episode.artwork ? (
               <Image
                 source={{ uri: episode.artwork }}
-                style={{
-                  width: 60,
-                  height: 60,
-                  borderRadius: 8,
-                  backgroundColor: "#e0e0e0",
-                }}
+                style={styles.artwork}
                 resizeMode="cover"
               />
             ) : (
-              <View
-                style={{
-                  width: 60,
-                  height: 60,
-                  borderRadius: 8,
-                  backgroundColor: "#e0e0e0",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Text style={{ fontSize: 24 }}>🎧</Text>
+              <View style={styles.placeholderArtwork}>
+                <Text style={styles.placeholderIcon}>🎧</Text>
               </View>
             )}
           </View>
 
           {/* Episode Info */}
-          <View style={{ flex: 1 }}>
-            <Text
-              style={{
-                fontWeight: "600",
-                color: "#007AFF",
-                fontSize: 12,
-                marginBottom: 2,
-              }}
-            >
-              {episode.show}
-            </Text>
-
-            <Text style={{ fontWeight: "600", marginBottom: 4 }}>
-              {episode.title}
-            </Text>
-
-            {/* Duration */}
-            <Text style={{ opacity: 0.7, fontSize: 12, marginBottom: 4 }}>
+          <View style={styles.episodeInfo}>
+            <Text style={styles.showName}>{episode.show}</Text>
+            <Text style={styles.episodeTitle}>{episode.title}</Text>
+            <Text style={styles.duration}>
               Duration: {formatDuration(currentTrackDuration)}
             </Text>
-
             {episode.description && (
-              <Text
-                style={{
-                  opacity: 0.6,
-                  fontSize: 12,
-                  lineHeight: 16,
-                  marginTop: 4,
-                }}
-                numberOfLines={2}
-              >
+              <Text style={styles.description} numberOfLines={2}>
                 {episode.description}
               </Text>
             )}
@@ -320,10 +231,121 @@ export default function EpisodeList({
       ))}
 
       {filteredEpisodes.length === 0 && (
-        <Text style={{ textAlign: "center", opacity: 0.6, marginTop: 20 }}>
+        <Text style={styles.noEpisodes}>
           No episodes found for "{selectedShow}"
         </Text>
       )}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    marginBottom: 20,
+  },
+  filterScrollView: {
+    marginBottom: 16,
+  },
+  filterButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginRight: 8,
+  },
+  activeFilter: {
+    backgroundColor: "#007AFF",
+  },
+  inactiveFilter: {
+    backgroundColor: "#f0f0f0",
+  },
+  filterText: {
+    fontWeight: "600",
+    fontSize: 12,
+  },
+  webFilterContainer: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 16,
+    flexWrap: "wrap",
+  },
+  webFilterButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  webActiveFilter: {
+    backgroundColor: "#007AFF",
+  },
+  webInactiveFilter: {
+    backgroundColor: "#f0f0f0",
+  },
+  webFilterText: {
+    fontWeight: "600",
+    fontSize: 12,
+  },
+  episodeItem: {
+    padding: 12,
+    backgroundColor: "#f5f5f5",
+    marginBottom: 8,
+    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+  webEpisodeItem: {
+    padding: 12,
+    backgroundColor: "#f5f5f5",
+    marginBottom: 8,
+    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+  artworkContainer: {
+    marginRight: 12,
+  },
+  artwork: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    backgroundColor: "#e0e0e0",
+  },
+  placeholderArtwork: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    backgroundColor: "#e0e0e0",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  placeholderIcon: {
+    fontSize: 24,
+  },
+  episodeInfo: {
+    flex: 1,
+  },
+  showName: {
+    fontWeight: "600",
+    color: "#007AFF",
+    fontSize: 12,
+    marginBottom: 2,
+  },
+  episodeTitle: {
+    fontWeight: "600",
+    marginBottom: 4,
+  },
+  duration: {
+    opacity: 0.7,
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  description: {
+    opacity: 0.6,
+    fontSize: 12,
+    lineHeight: 16,
+    marginTop: 4,
+  },
+  noEpisodes: {
+    textAlign: "center",
+    opacity: 0.6,
+    marginTop: 20,
+  },
+});

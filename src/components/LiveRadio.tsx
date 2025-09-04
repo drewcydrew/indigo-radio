@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Platform, Button } from "react-native";
+import { View, Text, Platform, Button, StyleSheet } from "react-native";
 import TrackPlayer, {
   Event,
   useTrackPlayerEvents,
@@ -134,178 +134,142 @@ export default function LiveRadio({ onNowPlayingUpdate }: LiveRadioProps) {
     playLiveRadio();
   }, []);
 
-  // Web implementation
-  if (Platform.OS === "web") {
+  // Web audio player component
+  const WebAudioPlayer = () => {
+    if (Platform.OS !== "web") return null;
+
     return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          padding: 20,
-        }}
-      >
-        <div style={{ fontSize: 48, marginBottom: 16 }}>📻</div>
-        <h2
-          style={{
-            fontSize: 24,
-            fontWeight: 600,
-            marginBottom: 8,
-            textAlign: "center",
-          }}
-        >
-          Live Radio
-        </h2>
-
-        {/* Current Program Info */}
-        {currentProgram ? (
-          <div style={{ textAlign: "center", marginBottom: 24 }}>
-            <h3 style={{ fontSize: 20, fontWeight: 600, marginBottom: 4 }}>
-              {currentProgram.name}
-            </h3>
-            {currentProgram.host && (
-              <p style={{ fontSize: 16, opacity: 0.8, marginBottom: 4 }}>
-                with {currentProgram.host}
-              </p>
-            )}
-            <p style={{ fontSize: 14, opacity: 0.7, marginBottom: 8 }}>
-              {currentProgram.startTime} - {currentProgram.endTime}
-            </p>
-            <p style={{ fontSize: 14, opacity: 0.6, fontStyle: "italic" }}>
-              {currentProgram.description}
-            </p>
-          </div>
-        ) : (
-          <p
-            style={{
-              fontSize: 16,
-              opacity: 0.7,
-              textAlign: "center",
-              marginBottom: 32,
-            }}
-          >
-            Streaming live from Indigo FM
-          </p>
-        )}
-
+      <View style={styles.audioPlayerContainer}>
         <ReactAudioPlayer src={STREAM_URL} controls autoPlay />
-
-        {/* Schedule Display Component */}
-        <ScheduleDisplay programs={RADIO_PROGRAMS} />
-      </div>
+      </View>
     );
-  }
+  };
 
-  // Mobile implementation
-  const isPlaying = playback.state === State.Playing;
+  const isPlaying =
+    Platform.OS === "web" ? false : playback.state === State.Playing;
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container}>
       {/* Live Radio Content */}
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          marginBottom: 40,
-          paddingHorizontal: 20,
-        }}
-      >
-        <Text style={{ fontSize: 48, marginBottom: 16 }}>📻</Text>
-        <Text
-          style={{
-            fontSize: 24,
-            fontWeight: "600",
-            marginBottom: 8,
-            textAlign: "center",
-          }}
-        >
-          Live Radio
-        </Text>
+      <View style={styles.content}>
+        <Text style={styles.radioIcon}>📻</Text>
+        <Text style={styles.title}>Live Radio</Text>
 
         {/* Current Program Info */}
         {currentProgram ? (
-          <View style={{ alignItems: "center", marginBottom: 24 }}>
-            <Text
-              style={{
-                fontSize: 20,
-                fontWeight: "600",
-                marginBottom: 4,
-                textAlign: "center",
-              }}
-            >
-              {currentProgram.name}
-            </Text>
+          <View style={styles.programInfo}>
+            <Text style={styles.programTitle}>{currentProgram.name}</Text>
             {currentProgram.host && (
-              <Text
-                style={{
-                  fontSize: 16,
-                  opacity: 0.8,
-                  marginBottom: 4,
-                  textAlign: "center",
-                }}
-              >
-                with {currentProgram.host}
-              </Text>
+              <Text style={styles.hostText}>with {currentProgram.host}</Text>
             )}
-            <Text
-              style={{
-                fontSize: 14,
-                opacity: 0.7,
-                marginBottom: 8,
-                textAlign: "center",
-              }}
-            >
+            <Text style={styles.timeText}>
               {currentProgram.startTime} - {currentProgram.endTime}
             </Text>
-            <Text
-              style={{
-                fontSize: 14,
-                opacity: 0.6,
-                fontStyle: "italic",
-                textAlign: "center",
-                paddingHorizontal: 20,
-              }}
-            >
+            <Text style={styles.descriptionText}>
               {currentProgram.description}
             </Text>
           </View>
         ) : (
-          <Text
-            style={{
-              fontSize: 16,
-              opacity: 0.7,
-              textAlign: "center",
-              marginBottom: 32,
-            }}
-          >
-            Streaming live from Indigo FM
-          </Text>
+          <Text style={styles.defaultText}>Streaming live from Indigo FM</Text>
         )}
+
+        {/* Web Audio Player */}
+        <WebAudioPlayer />
 
         {/* Schedule Display Component */}
         <ScheduleDisplay programs={RADIO_PROGRAMS} />
       </View>
 
-      {/* Live Radio Controls (Play/Pause only) */}
-      <View style={{ marginBottom: 20 }}>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            marginBottom: 20,
-          }}
-        >
-          <Button
-            title={isPlaying ? "Pause" : "Play"}
-            onPress={togglePlayPause}
-          />
-        </View>
+      {/* Live Radio Controls (Play/Pause only) - Mobile only */}
+      {Platform.OS !== "web" && (
+        <View style={styles.controls}>
+          <View style={styles.buttonContainer}>
+            <Button
+              title={isPlaying ? "Pause" : "Play"}
+              onPress={togglePlayPause}
+            />
+          </View>
 
-        <Text style={{ opacity: 0.6, textAlign: "center" }}>
-          State: {String(playback?.state ?? "unknown")}
-        </Text>
-      </View>
+          <Text style={styles.stateText}>
+            State: {String(playback?.state ?? "unknown")}
+          </Text>
+        </View>
+      )}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 40,
+    paddingHorizontal: 20,
+  },
+  radioIcon: {
+    fontSize: 48,
+    marginBottom: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "600",
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  programInfo: {
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  programTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    marginBottom: 4,
+    textAlign: "center",
+  },
+  hostText: {
+    fontSize: 16,
+    opacity: 0.8,
+    marginBottom: 4,
+    textAlign: "center",
+  },
+  timeText: {
+    fontSize: 14,
+    opacity: 0.7,
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  descriptionText: {
+    fontSize: 14,
+    opacity: 0.6,
+    fontStyle: "italic",
+    textAlign: "center",
+    paddingHorizontal: 20,
+  },
+  defaultText: {
+    fontSize: 16,
+    opacity: 0.7,
+    textAlign: "center",
+    marginBottom: 32,
+  },
+  audioPlayerContainer: {
+    marginVertical: 20,
+    width: "100%",
+    alignItems: "center",
+  },
+  controls: {
+    marginBottom: 20,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 20,
+  },
+  stateText: {
+    opacity: 0.6,
+    textAlign: "center",
+  },
+});

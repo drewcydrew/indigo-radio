@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, Platform } from "react-native";
+import { View, Text, ScrollView, Platform, StyleSheet } from "react-native";
 import TrackPlayer, { useProgress } from "react-native-track-player";
 import EpisodeList from "./EpisodeList";
 import PlayingWindow from "./PlayingWindow";
@@ -55,41 +55,45 @@ export default function Podcast({ onNowPlayingUpdate }: PodcastProps) {
     loadPodcasts();
   }, []);
 
+  // Web audio player component
+  const WebAudioPlayer = () => {
+    if (Platform.OS !== "web" || !currentEpisodeUrl) return null;
+
+    return (
+      <View style={styles.webPlayerContainer}>
+        <Text style={styles.webPlayerTitle}>{currentEpisodeTitle}</Text>
+        <ReactAudioPlayer src={currentEpisodeUrl} controls />
+      </View>
+    );
+  };
+
   // Web implementation
   if (Platform.OS === "web") {
     return (
-      <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>
-          Podcast Episodes
-        </h2>
+      <View style={styles.webContainer}>
+        <Text style={styles.webTitle}>Podcast Episodes</Text>
 
-        <div style={{ flex: 1, overflowY: "auto", marginBottom: 20 }}>
+        <View style={styles.webEpisodeList}>
           <EpisodeList
             episodes={PODCAST_EPISODES}
             onEpisodePress={playEpisode}
             currentTrackDuration={0}
           />
-        </div>
+        </View>
 
-        {currentEpisodeUrl && (
-          <div style={{ borderTop: "1px solid #e0e0e0", paddingTop: 16 }}>
-            <h3 style={{ fontSize: 16, marginBottom: 8 }}>
-              {currentEpisodeTitle}
-            </h3>
-            <ReactAudioPlayer src={currentEpisodeUrl} controls />
-          </div>
-        )}
-      </div>
+        <WebAudioPlayer />
+      </View>
     );
   }
 
   // Mobile implementation
   return (
-    <View style={{ flex: 1 }}>
-      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-        <Text style={{ fontSize: 18, fontWeight: "600", marginBottom: 16 }}>
-          Podcast Episodes
-        </Text>
+    <View style={styles.container}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
+        <Text style={styles.title}>Podcast Episodes</Text>
 
         {/* Episodes List Component */}
         <EpisodeList
@@ -104,3 +108,40 @@ export default function Podcast({ onNowPlayingUpdate }: PodcastProps) {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 16,
+  },
+  webContainer: {
+    flex: 1,
+    height: "100%",
+  },
+  webTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 16,
+  },
+  webEpisodeList: {
+    flex: 1,
+    marginBottom: 20,
+  },
+  webPlayerContainer: {
+    borderTopWidth: 1,
+    borderTopColor: "#e0e0e0",
+    paddingTop: 16,
+  },
+  webPlayerTitle: {
+    fontSize: 16,
+    marginBottom: 8,
+    fontWeight: "500",
+  },
+});

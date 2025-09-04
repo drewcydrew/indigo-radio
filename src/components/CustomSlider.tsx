@@ -1,5 +1,11 @@
 import React, { useRef, useState, useEffect } from "react";
-import { View, TouchableOpacity, PanResponder, Animated } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  PanResponder,
+  Animated,
+  StyleSheet,
+} from "react-native";
 
 interface CustomSliderProps {
   value: number;
@@ -92,39 +98,23 @@ export default function CustomSlider({
   };
 
   return (
-    <View
-      onLayout={handleLayout}
-      style={[
-        {
-          height: 40,
-          justifyContent: "center",
-        },
-        style,
-      ]}
-    >
+    <View onLayout={handleLayout} style={[styles.container, style]}>
       <TouchableOpacity
         onPress={handleTouch}
-        style={{
-          height: 40,
-          justifyContent: "center",
-        }}
+        style={styles.touchableArea}
         activeOpacity={1}
       >
         <View
-          style={{
-            height: 4,
-            backgroundColor: maximumTrackTintColor,
-            borderRadius: 2,
-            overflow: "hidden",
-          }}
+          style={[styles.track, { backgroundColor: maximumTrackTintColor }]}
         >
           <View
-            style={{
-              height: 4,
-              backgroundColor: minimumTrackTintColor,
-              width: `${progressPercentage}%`,
-              borderRadius: 2,
-            }}
+            style={[
+              styles.progressTrack,
+              {
+                backgroundColor: minimumTrackTintColor,
+                width: `${progressPercentage}%`,
+              },
+            ]}
           />
         </View>
       </TouchableOpacity>
@@ -132,26 +122,51 @@ export default function CustomSlider({
       {/* Draggable Thumb */}
       <Animated.View
         {...panResponder.panHandlers}
-        style={{
-          position: "absolute",
-          left: `${progressPercentage}%`,
-          marginLeft: -10,
-          width: 20,
-          height: 20,
-          backgroundColor: thumbColor,
-          borderRadius: 10,
-          top: 10,
-          elevation: isDragging ? 8 : 2,
-          shadowColor: "#000",
-          shadowOffset: {
-            width: 0,
-            height: isDragging ? 4 : 1,
+        style={[
+          styles.thumb,
+          {
+            backgroundColor: thumbColor,
+            left: `${progressPercentage}%`,
+            elevation: isDragging ? 8 : 2,
+            shadowOpacity: isDragging ? 0.3 : 0.2,
+            shadowRadius: isDragging ? 4 : 2,
+            shadowOffset: {
+              width: 0,
+              height: isDragging ? 4 : 1,
+            },
+            transform: [{ scale: isDragging ? 1.2 : 1 }],
           },
-          shadowOpacity: isDragging ? 0.3 : 0.2,
-          shadowRadius: isDragging ? 4 : 2,
-          transform: [{ scale: isDragging ? 1.2 : 1 }],
-        }}
+        ]}
       />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    height: 40,
+    justifyContent: "center",
+  },
+  touchableArea: {
+    height: 40,
+    justifyContent: "center",
+  },
+  track: {
+    height: 4,
+    borderRadius: 2,
+    overflow: "hidden",
+  },
+  progressTrack: {
+    height: 4,
+    borderRadius: 2,
+  },
+  thumb: {
+    position: "absolute",
+    marginLeft: -10,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    top: 10,
+    shadowColor: "#000",
+  },
+});

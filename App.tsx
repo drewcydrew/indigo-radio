@@ -5,6 +5,7 @@ import {
   View,
   TouchableOpacity,
   Platform,
+  StyleSheet,
 } from "react-native";
 import TrackPlayer, { Capability } from "react-native-track-player";
 import LiveRadio from "./src/components/LiveRadio";
@@ -51,60 +52,63 @@ export default function App() {
   // Don't render components until player is ready
   if (!isPlayerReady) {
     return (
-      <SafeAreaView
-        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-      >
+      <SafeAreaView style={styles.loadingContainer}>
         <Text>Loading player...</Text>
       </SafeAreaView>
     );
   }
 
-  // Web implementation
+  // Web implementation using React Native components
   if (Platform.OS === "web") {
     return (
-      <div style={{ minHeight: "100vh", fontFamily: "Arial, sans-serif" }}>
+      <View style={styles.webContainer}>
         {/* Header */}
-        <div style={{ padding: 16, paddingTop: 8 }}>
-          <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 8 }}>
-            Indigo FM
-          </h1>
-          <p style={{ fontSize: 16, opacity: 0.7, margin: 0 }}>Now Playing</p>
-          <p style={{ fontSize: 18, marginBottom: 16 }}>{now}</p>
-        </div>
+        <View style={styles.header}>
+          <Text style={styles.title}>Indigo FM</Text>
+          <Text style={styles.nowPlayingLabel}>Now Playing</Text>
+          <Text style={styles.nowPlayingText}>{now}</Text>
+        </View>
 
         {/* Toggle Switch */}
-        <div style={{ padding: 16 }}>
-          <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
-            <button
-              onClick={() => setCurrentMode("live")}
-              style={{
-                padding: "8px 16px",
-                backgroundColor: currentMode === "live" ? "#007AFF" : "#f0f0f0",
-                color: currentMode === "live" ? "white" : "#666",
-                border: "none",
-                borderRadius: 20,
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
+        <View style={styles.webContent}>
+          <View style={styles.webToggleContainer}>
+            <TouchableOpacity
+              onPress={() => setCurrentMode("live")}
+              style={[
+                styles.webToggleButton,
+                currentMode === "live"
+                  ? styles.webActiveToggle
+                  : styles.webInactiveToggle,
+              ]}
             >
-              📻 LIVE
-            </button>
-            <button
-              onClick={() => setCurrentMode("podcast")}
-              style={{
-                padding: "8px 16px",
-                backgroundColor:
-                  currentMode === "podcast" ? "#007AFF" : "#f0f0f0",
-                color: currentMode === "podcast" ? "white" : "#666",
-                border: "none",
-                borderRadius: 20,
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
+              <Text
+                style={[
+                  styles.webToggleText,
+                  { color: currentMode === "live" ? "white" : "#666" },
+                ]}
+              >
+                📻 LIVE
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setCurrentMode("podcast")}
+              style={[
+                styles.webToggleButton,
+                currentMode === "podcast"
+                  ? styles.webActiveToggle
+                  : styles.webInactiveToggle,
+              ]}
             >
-              🎧 POD
-            </button>
-          </div>
+              <Text
+                style={[
+                  styles.webToggleText,
+                  { color: currentMode === "podcast" ? "white" : "#666" },
+                ]}
+              >
+                🎧 POD
+              </Text>
+            </TouchableOpacity>
+          </View>
 
           {/* Content */}
           {currentMode === "live" ? (
@@ -112,27 +116,25 @@ export default function App() {
           ) : (
             <Podcast onNowPlayingUpdate={handleNowPlayingUpdate} />
           )}
-        </div>
-      </div>
+        </View>
+      </View>
     );
   }
 
   // Mobile implementation
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={styles.container}>
       {/* Main Content - Full Screen */}
-      <View style={{ flex: 1 }}>
+      <View style={styles.mainContent}>
         {/* App Title */}
-        <View style={{ padding: 16, paddingTop: 8 }}>
-          <Text style={{ fontSize: 24, fontWeight: "600", marginBottom: 8 }}>
-            Indigo FM
-          </Text>
-          <Text style={{ fontSize: 16, opacity: 0.7 }}>Now Playing</Text>
-          <Text style={{ fontSize: 18, marginBottom: 16 }}>{now}</Text>
+        <View style={styles.header}>
+          <Text style={styles.title}>Indigo FM</Text>
+          <Text style={styles.nowPlayingLabel}>Now Playing</Text>
+          <Text style={styles.nowPlayingText}>{now}</Text>
         </View>
 
         {/* Full Screen Component */}
-        <View style={{ flex: 1, paddingHorizontal: 16 }}>
+        <View style={styles.content}>
           {currentMode === "live" ? (
             <LiveRadio onNowPlayingUpdate={handleNowPlayingUpdate} />
           ) : (
@@ -142,83 +144,40 @@ export default function App() {
       </View>
 
       {/* Floating Toggle Switch */}
-      <View
-        style={{
-          position: "absolute",
-          top: 50,
-          right: 16,
-          shadowColor: "#000",
-          shadowOffset: {
-            width: 0,
-            height: 2,
-          },
-          shadowOpacity: 0.25,
-          shadowRadius: 3.84,
-          elevation: 5,
-          zIndex: 1000,
-        }}
-      >
+      <View style={styles.floatingToggle}>
         <TouchableOpacity
           onPress={() =>
             setCurrentMode(currentMode === "live" ? "podcast" : "live")
           }
-          style={{
-            flexDirection: "row",
-            backgroundColor: "#f0f0f0",
-            borderRadius: 25,
-            padding: 3,
-            width: 120,
-            height: 36,
-          }}
+          style={styles.toggleSwitch}
         >
           {/* Toggle Background Track */}
           <View
-            style={{
-              position: "absolute",
-              top: 3,
-              left: currentMode === "live" ? 3 : 63,
-              backgroundColor: "#007AFF",
-              borderRadius: 22,
-              width: 57,
-              height: 30,
-            }}
+            style={[
+              styles.toggleTrack,
+              { left: currentMode === "live" ? 3 : 63 },
+            ]}
           />
 
           {/* Radio Option */}
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 1,
-            }}
-          >
+          <View style={styles.toggleOption}>
             <Text
-              style={{
-                color: currentMode === "live" ? "white" : "#666",
-                fontWeight: "600",
-                fontSize: 11,
-              }}
+              style={[
+                styles.toggleText,
+                { color: currentMode === "live" ? "white" : "#666" },
+              ]}
             >
               📻 LIVE
             </Text>
           </View>
 
           {/* Podcast Option */}
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 1,
-            }}
-          >
+          <View style={styles.toggleOption}>
             <Text
-              style={{
-                color: currentMode === "podcast" ? "white" : "#666",
-                fontWeight: "600",
-                fontSize: 11,
-              }}
+              style={[
+                styles.toggleText,
+                { color: currentMode === "podcast" ? "white" : "#666" },
+              ]}
             >
               🎧 POD
             </Text>
@@ -228,3 +187,104 @@ export default function App() {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  container: {
+    flex: 1,
+  },
+  webContainer: {
+    backgroundColor: "#fff",
+  },
+  mainContent: {
+    flex: 1,
+  },
+  header: {
+    padding: 16,
+    paddingTop: 8,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "600",
+    marginBottom: 8,
+  },
+  nowPlayingLabel: {
+    fontSize: 16,
+    opacity: 0.7,
+  },
+  nowPlayingText: {
+    fontSize: 18,
+    marginBottom: 16,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 16,
+  },
+  webContent: {
+    padding: 16,
+  },
+  webToggleContainer: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 20,
+  },
+  webToggleButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  webActiveToggle: {
+    backgroundColor: "#007AFF",
+  },
+  webInactiveToggle: {
+    backgroundColor: "#f0f0f0",
+  },
+  webToggleText: {
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  floatingToggle: {
+    position: "absolute",
+    top: 50,
+    right: 16,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    zIndex: 1000,
+  },
+  toggleSwitch: {
+    flexDirection: "row",
+    backgroundColor: "#f0f0f0",
+    borderRadius: 25,
+    padding: 3,
+    width: 120,
+    height: 36,
+  },
+  toggleTrack: {
+    position: "absolute",
+    top: 3,
+    backgroundColor: "#007AFF",
+    borderRadius: 22,
+    width: 57,
+    height: 30,
+  },
+  toggleOption: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1,
+  },
+  toggleText: {
+    fontWeight: "600",
+    fontSize: 11,
+  },
+});
