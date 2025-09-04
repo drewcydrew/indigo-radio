@@ -39,9 +39,9 @@ export default function EpisodeList({
 
   // Filter episodes by selected show
   const filteredEpisodes =
-    selectedShow && selectedShow !== ""
-      ? episodes.filter((episode) => episode.show === selectedShow)
-      : episodes;
+    !selectedShow || selectedShow === ""
+      ? episodes
+      : episodes.filter((episode) => episode.show === selectedShow);
 
   const formatDuration = (seconds?: number) => {
     if (!seconds) return "Unknown";
@@ -106,7 +106,17 @@ export default function EpisodeList({
 
       {/* Show Filter Dropdown */}
       <View style={styles.filterContainer}>
-        <Text style={styles.filterLabel}>Filter by Show:</Text>
+        <View style={styles.filterHeader}>
+          <Text style={styles.filterLabel}>Filter by Show:</Text>
+          {selectedShow && selectedShow !== "" && (
+            <TouchableOpacity
+              onPress={() => setSelectedShow(null)}
+              style={styles.clearButton}
+            >
+              <Text style={styles.clearButtonText}>CLEAR</Text>
+            </TouchableOpacity>
+          )}
+        </View>
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={selectedShow}
@@ -114,7 +124,7 @@ export default function EpisodeList({
             style={styles.picker}
             itemStyle={Platform.OS === "ios" ? styles.pickerItem : undefined}
           >
-            <Picker.Item label="All Shows" value="" />
+            <Picker.Item label="Select a show..." value="" />
             {shows.map((show) => (
               <Picker.Item key={show} label={show} value={show} />
             ))}
@@ -151,12 +161,29 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     paddingHorizontal: 16,
   },
+  filterHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
   filterLabel: {
     fontSize: 14,
     fontWeight: "600",
     color: "#333",
-    marginBottom: 8,
     letterSpacing: 0.3,
+  },
+  clearButton: {
+    backgroundColor: "#ff0000",
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  clearButtonText: {
+    color: "#fff",
+    fontSize: 10,
+    fontWeight: "700",
+    letterSpacing: 0.5,
   },
   pickerContainer: {
     backgroundColor: "#f8f8f8",
