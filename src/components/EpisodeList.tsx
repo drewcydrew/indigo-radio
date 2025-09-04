@@ -6,11 +6,10 @@ import {
   FlatList,
   Image,
   StyleSheet,
-  Platform,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
 import { PodcastEpisode, ShowDefinition } from "../types/types";
 import useShowDetails from "../hooks/useShowDetails";
+import ShowFilterDropdown from "./ShowFilterDropdown";
 
 interface EpisodeListProps {
   episodes: PodcastEpisode[];
@@ -53,6 +52,14 @@ export default function EpisodeList({
   // Function to find show definition by show name
   const findShowDefinition = (showName: string): ShowDefinition | null => {
     return findShowByName(showName);
+  };
+
+  const handleShowChange = (showName: string | null) => {
+    setSelectedShow(showName);
+  };
+
+  const handleClearFilter = () => {
+    setSelectedShow(null);
   };
 
   const renderEpisode = ({ item: episode }: { item: PodcastEpisode }) => {
@@ -105,32 +112,12 @@ export default function EpisodeList({
       {showTitle && <Text style={styles.title}>Podcast Episodes</Text>}
 
       {/* Show Filter Dropdown */}
-      <View style={styles.filterContainer}>
-        <View style={styles.filterHeader}>
-          <Text style={styles.filterLabel}>Filter by Show:</Text>
-          {selectedShow && selectedShow !== "" && (
-            <TouchableOpacity
-              onPress={() => setSelectedShow(null)}
-              style={styles.clearButton}
-            >
-              <Text style={styles.clearButtonText}>CLEAR</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={selectedShow}
-            onValueChange={(itemValue) => setSelectedShow(itemValue)}
-            style={styles.picker}
-            itemStyle={Platform.OS === "ios" ? styles.pickerItem : undefined}
-          >
-            <Picker.Item label="Select a show..." value="" />
-            {shows.map((show) => (
-              <Picker.Item key={show} label={show} value={show} />
-            ))}
-          </Picker>
-        </View>
-      </View>
+      <ShowFilterDropdown
+        shows={shows}
+        selectedShow={selectedShow}
+        onShowChange={handleShowChange}
+        onClearFilter={handleClearFilter}
+      />
     </View>
   );
 
@@ -156,51 +143,6 @@ export default function EpisodeList({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  filterContainer: {
-    marginBottom: 16,
-    paddingHorizontal: 16,
-  },
-  filterHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  filterLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-    letterSpacing: 0.3,
-  },
-  clearButton: {
-    backgroundColor: "#ff0000",
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  clearButtonText: {
-    color: "#fff",
-    fontSize: 10,
-    fontWeight: "700",
-    letterSpacing: 0.5,
-  },
-  pickerContainer: {
-    backgroundColor: "#f8f8f8",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    overflow: "hidden",
-    height: Platform.OS === "ios" ? 50 : undefined,
-  },
-  picker: {
-    height: Platform.OS === "ios" ? 50 : 50,
-    color: "#333",
-  },
-  pickerItem: {
-    fontSize: 16,
-    color: "#333",
-    height: Platform.OS === "ios" ? 50 : undefined,
   },
   episodeItem: {
     padding: 16,
