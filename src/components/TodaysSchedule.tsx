@@ -113,7 +113,6 @@ export default function TodaysSchedule({
                   <Text style={styles.liveText}>LIVE</Text>
                 </View>
               )}
-              {showDef && <Text style={styles.infoIcon}>INFO</Text>}
             </View>
             {program.host && (
               <Text
@@ -308,14 +307,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     letterSpacing: 0.5,
   },
-  infoIcon: {
-    fontSize: 10,
-    opacity: 0.6,
-    fontWeight: "600",
-    color: "#666",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
   hostText: {
     fontSize: 14,
     marginBottom: 4,
@@ -330,9 +321,11 @@ const styles = StyleSheet.create({
     opacity: 0.6,
     fontStyle: "italic",
     lineHeight: 16,
+    color: "#000",
   },
   currentDescriptionText: {
     opacity: 0.8,
+    color: "#fff",
   },
   timeText: {
     fontSize: 14,

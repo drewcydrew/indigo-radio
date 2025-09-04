@@ -26,6 +26,7 @@ export default function ScheduleDisplay({
 }: ScheduleDisplayProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [selectedShow, setSelectedShow] = useState<ShowDefinition | null>(null);
+  const [selectedDay, setSelectedDay] = useState<RadioProgram["day"]>("monday");
 
   // Use the hook to get show details
   const { findShowByName } = useShowDetails();
@@ -59,7 +60,7 @@ export default function ScheduleDisplay({
     programsByDay[day].sort((a, b) => a.startTime.localeCompare(b.startTime));
   });
 
-  const dayOrder = [
+  const dayOrder: RadioProgram["day"][] = [
     "monday",
     "tuesday",
     "wednesday",
@@ -68,7 +69,18 @@ export default function ScheduleDisplay({
     "saturday",
     "sunday",
   ];
+
   const dayNames = {
+    monday: "Mon",
+    tuesday: "Tue",
+    wednesday: "Wed",
+    thursday: "Thu",
+    friday: "Fri",
+    saturday: "Sat",
+    sunday: "Sun",
+  };
+
+  const dayFullNames = {
     monday: "Monday",
     tuesday: "Tuesday",
     wednesday: "Wednesday",
@@ -77,6 +89,112 @@ export default function ScheduleDisplay({
     saturday: "Saturday",
     sunday: "Sunday",
   };
+
+  // Get programs for selected day
+  const selectedDayPrograms = programsByDay[selectedDay] || [];
+
+  const renderDayTabs = () => (
+    <View style={styles.dayTabs}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.tabsContainer}
+      >
+        {dayOrder.map((day) => (
+          <TouchableOpacity
+            key={day}
+            style={[styles.dayTab, selectedDay === day && styles.activeDayTab]}
+            onPress={() => setSelectedDay(day)}
+          >
+            <Text
+              style={[
+                styles.dayTabText,
+                selectedDay === day && styles.activeDayTabText,
+              ]}
+            >
+              {dayNames[day]}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </View>
+  );
+
+  const renderScheduleContent = () => (
+    <View style={styles.modalContainer}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Program Schedule</Text>
+        <TouchableOpacity onPress={hideSchedule}>
+          <Text style={styles.doneButton}>Done</Text>
+        </TouchableOpacity>
+      </View>
+
+      {renderDayTabs()}
+
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <Text style={styles.selectedDayTitle}>{dayFullNames[selectedDay]}</Text>
+
+        {selectedDayPrograms.length === 0 ? (
+          <Text style={styles.noPrograms}>
+            No programs scheduled for {dayFullNames[selectedDay]}
+          </Text>
+        ) : (
+          selectedDayPrograms.map((program) => {
+            const showDef = findShowDefinition(program.name);
+            const description = showDef?.description || "Radio programming";
+            const artwork = showDef?.artwork;
+
+            return (
+              <TouchableOpacity
+                key={program.id}
+                onPress={() => showDef && showDetails(showDef)}
+                style={styles.programItem}
+                disabled={!showDef}
+              >
+                <View style={styles.programContent}>
+                  {/* Thumbnail Image */}
+                  <View style={styles.thumbnailContainer}>
+                    {artwork ? (
+                      <Image
+                        source={{ uri: artwork }}
+                        style={styles.thumbnail}
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <View style={styles.placeholderThumbnail}>
+                        <Text style={styles.placeholderIcon}>RADIO</Text>
+                      </View>
+                    )}
+                  </View>
+
+                  <View style={styles.programInfo}>
+                    <View style={styles.programTitleRow}>
+                      <Text style={styles.programTitle}>{program.name}</Text>
+                    </View>
+                    {program.host && (
+                      <Text style={styles.hostText}>
+                        Hosted by {program.host}
+                      </Text>
+                    )}
+                    <Text style={styles.descriptionText} numberOfLines={2}>
+                      {description}
+                    </Text>
+                  </View>
+
+                  <Text style={styles.timeText}>
+                    {program.startTime} - {program.endTime}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })
+        )}
+      </ScrollView>
+    </View>
+  );
 
   // If onClose is provided, show modal immediately (used by TodaysSchedule)
   if (onClose) {
@@ -88,89 +206,7 @@ export default function ScheduleDisplay({
           presentationStyle="pageSheet"
           onRequestClose={hideSchedule}
         >
-          <View style={styles.modalContainer}>
-            <View style={styles.header}>
-              <Text style={styles.headerTitle}>Program Schedule</Text>
-              <TouchableOpacity onPress={hideSchedule}>
-                <Text style={styles.doneButton}>Done</Text>
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView
-              style={styles.scrollView}
-              contentContainerStyle={styles.scrollContent}
-            >
-              {dayOrder.map(
-                (day) =>
-                  programsByDay[day] && (
-                    <View key={day} style={styles.daySection}>
-                      <Text style={styles.dayTitle}>
-                        {dayNames[day as keyof typeof dayNames]}
-                      </Text>
-                      {programsByDay[day].map((program) => {
-                        const showDef = findShowDefinition(program.name);
-                        const description =
-                          showDef?.description || "Radio programming";
-                        const artwork = showDef?.artwork;
-                        return (
-                          <TouchableOpacity
-                            key={program.id}
-                            onPress={() => showDef && showDetails(showDef)}
-                            style={[
-                              styles.programCard,
-                              { opacity: showDef ? 1 : 0.8 },
-                            ]}
-                            disabled={!showDef}
-                          >
-                            <View style={styles.programContent}>
-                              {/* Thumbnail Image */}
-                              <View style={styles.thumbnailContainer}>
-                                {artwork ? (
-                                  <Image
-                                    source={{ uri: artwork }}
-                                    style={styles.thumbnail}
-                                    resizeMode="cover"
-                                  />
-                                ) : (
-                                  <View style={styles.placeholderThumbnail}>
-                                    <Text style={styles.placeholderIcon}>
-                                      RADIO
-                                    </Text>
-                                  </View>
-                                )}
-                              </View>
-
-                              <View style={styles.programLeft}>
-                                <View style={styles.programTitleRow}>
-                                  <Text style={styles.programTitle}>
-                                    {program.name}
-                                  </Text>
-                                  {showDef && (
-                                    <Text style={styles.infoIcon}>INFO</Text>
-                                  )}
-                                </View>
-                                {program.host && (
-                                  <Text style={styles.hostText}>
-                                    Hosted by {program.host}
-                                  </Text>
-                                )}
-                                <Text style={styles.descriptionText}>
-                                  {description}
-                                </Text>
-                              </View>
-
-                              <Text style={styles.timeText}>
-                                {program.startTime} - {program.endTime}
-                              </Text>
-                            </View>
-                          </TouchableOpacity>
-                        );
-                      })}
-                    </View>
-                  )
-              )}
-            </ScrollView>
-          </View>
+          {renderScheduleContent()}
         </Modal>
 
         {selectedShow && (
@@ -197,87 +233,7 @@ export default function ScheduleDisplay({
         presentationStyle="pageSheet"
         onRequestClose={hideSchedule}
       >
-        <View style={styles.modalContainer}>
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>Program Schedule</Text>
-            <TouchableOpacity onPress={hideSchedule}>
-              <Text style={styles.doneButton}>Done</Text>
-            </TouchableOpacity>
-          </View>
-
-          <ScrollView
-            style={styles.scrollView}
-            contentContainerStyle={styles.scrollContent}
-          >
-            {dayOrder.map(
-              (day) =>
-                programsByDay[day] && (
-                  <View key={day} style={styles.daySection}>
-                    <Text style={styles.dayTitle}>
-                      {dayNames[day as keyof typeof dayNames]}
-                    </Text>
-                    {programsByDay[day].map((program) => {
-                      const showDef = findShowDefinition(program.name);
-                      const description =
-                        showDef?.description || "Radio programming";
-                      const artwork = showDef?.artwork;
-                      return (
-                        <TouchableOpacity
-                          key={program.id}
-                          onPress={() => showDef && showDetails(showDef)}
-                          style={[
-                            styles.programCard,
-                            { opacity: showDef ? 1 : 0.8 },
-                          ]}
-                          disabled={!showDef}
-                        >
-                          <View style={styles.programContent}>
-                            {/* Thumbnail Image */}
-                            <View style={styles.thumbnailContainer}>
-                              {artwork ? (
-                                <Image
-                                  source={{ uri: artwork }}
-                                  style={styles.thumbnail}
-                                  resizeMode="cover"
-                                />
-                              ) : (
-                                <View style={styles.placeholderThumbnail}>
-                                  <Text style={styles.placeholderIcon}>📻</Text>
-                                </View>
-                              )}
-                            </View>
-
-                            <View style={styles.programLeft}>
-                              <View style={styles.programTitleRow}>
-                                <Text style={styles.programTitle}>
-                                  {program.name}
-                                </Text>
-                                {showDef && (
-                                  <Text style={styles.infoIcon}>ℹ️</Text>
-                                )}
-                              </View>
-                              {program.host && (
-                                <Text style={styles.hostText}>
-                                  with {program.host}
-                                </Text>
-                              )}
-                              <Text style={styles.descriptionText}>
-                                {description}
-                              </Text>
-                            </View>
-
-                            <Text style={styles.timeText}>
-                              {program.startTime} - {program.endTime}
-                            </Text>
-                          </View>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
-                )
-            )}
-          </ScrollView>
-        </View>
+        {renderScheduleContent()}
       </Modal>
 
       {selectedShow && (
@@ -297,7 +253,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: "#000",
+    backgroundColor: "#fff",
   },
   header: {
     flexDirection: "row",
@@ -306,14 +262,13 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 60,
     borderBottomWidth: 1,
-    borderBottomColor: "#333",
-    backgroundColor: "#000",
+    borderBottomColor: "#eee",
+    backgroundColor: "#fff",
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#fff",
-    letterSpacing: 0.5,
+    color: "#000",
   },
   doneButton: {
     fontSize: 16,
@@ -321,39 +276,66 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: "#333",
+    backgroundColor: "#000",
     borderRadius: 4,
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
+  dayTabs: {
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  tabsContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    gap: 8,
+  },
+  dayTab: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: "#f8f8f8",
+    borderRadius: 20,
+    marginRight: 8,
+  },
+  activeDayTab: {
+    backgroundColor: "#000",
+  },
+  dayTabText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#666",
+  },
+  activeDayTabText: {
+    color: "#fff",
+  },
   scrollView: {
     flex: 1,
-    backgroundColor: "#000",
+    backgroundColor: "#fff",
   },
   scrollContent: {
     padding: 20,
   },
-  daySection: {
-    marginBottom: 32,
-  },
-  dayTitle: {
+  selectedDayTitle: {
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: "600",
     marginBottom: 16,
-    color: "#fff",
-    letterSpacing: 1,
-    textTransform: "uppercase",
-    borderBottomWidth: 2,
-    borderBottomColor: "#333",
-    paddingBottom: 8,
+    color: "#000",
   },
-  programCard: {
+  noPrograms: {
+    textAlign: "center",
+    opacity: 0.6,
+    marginTop: 20,
+    fontSize: 16,
+    color: "#666",
+  },
+  programItem: {
     padding: 16,
+    backgroundColor: "#f8f8f8",
     marginBottom: 8,
-    backgroundColor: "#111",
     borderRadius: 0,
     borderLeftWidth: 3,
-    borderLeftColor: "#fff",
+    borderLeftColor: "#000",
   },
   programContent: {
     flexDirection: "row",
@@ -366,24 +348,24 @@ const styles = StyleSheet.create({
   thumbnail: {
     width: 50,
     height: 50,
-    borderRadius: 0,
-    backgroundColor: "#333",
+    borderRadius: 6,
+    backgroundColor: "#e0e0e0",
   },
   placeholderThumbnail: {
     width: 50,
     height: 50,
     borderRadius: 0,
-    backgroundColor: "#333",
+    backgroundColor: "#ddd",
     alignItems: "center",
     justifyContent: "center",
   },
   placeholderIcon: {
     fontSize: 8,
     fontWeight: "700",
-    color: "#888",
+    color: "#666",
     letterSpacing: 0.5,
   },
-  programLeft: {
+  programInfo: {
     flex: 1,
     marginRight: 12,
   },
@@ -396,33 +378,24 @@ const styles = StyleSheet.create({
   programTitle: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#fff",
-    letterSpacing: 0.3,
-  },
-  infoIcon: {
-    fontSize: 10,
-    color: "#888",
-    fontWeight: "600",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
+    color: "#000",
   },
   hostText: {
     fontSize: 14,
     marginBottom: 4,
-    color: "#ccc",
+    color: "#666",
     fontWeight: "500",
   },
   descriptionText: {
     fontSize: 12,
-    marginBottom: 8,
-    color: "#888",
+    opacity: 0.6,
     fontStyle: "italic",
     lineHeight: 16,
+    color: "#000",
   },
   timeText: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#fff",
-    letterSpacing: 0.5,
+    color: "#000",
   },
 });
