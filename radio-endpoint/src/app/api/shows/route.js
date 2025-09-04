@@ -1,22 +1,10 @@
 export const runtime = 'edge';
 
 import { neon } from '@neondatabase/serverless';
-
 const sql = neon(process.env.NEON_DATABASE_URL);
 
-/** Small helper to build safe ILIKE patterns */
-const like = (v) => v ? `%${v}%` : null;
-
-export async function GET(request) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url);
-    const frequency = searchParams.get('frequency');          // exact
-    const genre     = like(searchParams.get('genre'));        // ilike
-    const search    = like(searchParams.get('search'));       // ilike (name/desc)
-    const offset    = Number(searchParams.get('offset') ?? 0);
-    const limitReq  = Number(searchParams.get('limit') ?? 50);
-    const limit     = Math.min(Math.max(limitReq, 1), 200);
-
     const rows = await sql/*sql*/`
       SELECT
         s.show_id,
@@ -36,12 +24,12 @@ export async function GET(request) {
         s.style,
         s.perspective,
         s.artwork,
-        COALESCE(h.hosts, '{}')      AS hosts,
-        COALESCE(g.genres, '{}')     AS genres,
-        COALESCE(t.themes, '{}')     AS themes,
-        COALESCE(f.features, '{}')   AS features,
-        COALESCE(a.artists, '{}')    AS featured_artists,
-        COALESCE(seg.segments, '[]') AS segments
+        COALESCE(h.hosts, ARRAY[]::text[])        AS hosts,
+        COALESCE(g.genres, ARRAY[]::text[])       AS genres,
+        COALESCE(t.themes, ARRAY[]::text[])       AS themes,
+        COALESCE(f.features, ARRAY[]::text[])     AS features,
+        COALESCE(a.artists, ARRAY[]::text[])      AS featured_artists,
+        COALESCE(seg.segments, '[]'::json)        AS segments
       FROM shows s
       LEFT JOIN (
         SELECT show_id, ARRAY_AGG(host ORDER BY host) AS hosts
@@ -64,22 +52,65 @@ export async function GET(request) {
         FROM show_featured_artists GROUP BY show_id
       ) a ON a.show_id = s.show_id
       LEFT JOIN (
-        SELECT show_id, JSON_AGG(JSON_BUILD_OBJECT('name', name, 'description', descr) ORDER BY name) AS segments
+        SELECT show_id,
+               JSON_AGG(JSON_BUILD_OBJECT('name', name, 'description', descr) ORDER BY name) AS segments
         FROM show_segments GROUP BY show_id
       ) seg ON seg.show_id = s.show_id
-      WHERE
-        (${frequency}::text IS NULL OR s.frequency = ${frequency})
-        AND (${genre}::text IS NULL OR EXISTS (
-              SELECT 1 FROM show_genres gg
-              WHERE gg.show_id = s.show_id AND gg.genre ILIKE ${genre}
-            ))
-        AND (${search}::text IS NULL OR s.name ILIKE ${search} OR s.description ILIKE ${search})
-      ORDER BY s.name
-      OFFSET ${offset}
-      LIMIT ${limit}
+      ORDER BY s.name;
     `;
 
-    return new Response(JSON.stringify(rows), {
+    // Shape each record to match your original JSON (omit empty/null fields)
+    const result = rows.map(r => {
+      const obj = {
+        showId: r.show_id,
+        name: r.name
+      };
+
+      // host/hosts (single host => "host", multiple => "hosts"; zero => omit)
+      if (Array.isArray(r.hosts) && r.hosts.length === 1) obj.host = r.hosts[0];
+      else if (Array.isArray(r.hosts) && r.hosts.length > 1) obj.hosts = r.hosts;
+
+      // Simple string fields (skip empty strings)
+      const addIfStr = (key, val) => {
+        if (val !== null && val !== undefined && String(val).trim() !== '') obj[key] = val;
+      };
+      addIfStr('frequency', r.frequency);
+      addIfStr('duration', r.duration);
+      addIfStr('description', r.description);
+      addIfStr('scope', r.scope);
+      addIfStr('tagline', r.tagline);
+      addIfStr('approach', r.approach);
+      addIfStr('mix', r.mix);
+      addIfStr('schedule', r.schedule);
+      addIfStr('type', r.type);
+      addIfStr('demographic', r.demographic);
+      addIfStr('perspective', r.perspective);
+      addIfStr('style', r.style);
+      addIfStr('established', r.established);
+      addIfStr('focus', r.focus);
+      addIfStr('artwork', r.artwork);
+
+      // Arrays (skip if empty)
+      if (Array.isArray(r.genres) && r.genres.length) obj.genres = r.genres;
+      if (Array.isArray(r.features) && r.features.length) obj.features = r.features;
+      if (Array.isArray(r.themes) && r.themes.length) obj.themes = r.themes;
+      if (Array.isArray(r.featured_artists) && r.featured_artists.length) {
+        obj.featuredArtists = r.featured_artists;
+      }
+
+      // specialSegments from segments JSON
+      if (Array.isArray(r.segments) && r.segments.length) {
+        // Ensure keys are exactly { name, description }
+        obj.specialSegments = r.segments.map(s => ({
+          name: s.name,
+          description: s.description
+        }));
+      }
+
+      return obj;
+    });
+
+    return new Response(JSON.stringify(result), {
       headers: { 'content-type': 'application/json' }
     });
   } catch (err) {
