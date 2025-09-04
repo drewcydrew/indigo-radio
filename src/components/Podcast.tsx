@@ -27,9 +27,26 @@ export default function Podcast({
   const playEpisode = async (episodeId: string) => {
     const episode = episodes.find((ep) => ep.id === episodeId);
     if (episode) {
-      setCurrentEpisode(episode);
-      onNowPlayingUpdate(episode.title);
-      // Additional platform-specific logic can be added here if needed
+      try {
+        // Reset the player and add the new episode
+        await TrackPlayer.reset();
+        await TrackPlayer.add({
+          id: episode.id,
+          url: episode.url,
+          title: episode.title,
+          artist: episode.show,
+          artwork: undefined, // Add artwork URL if available in your episode data
+        });
+
+        // Start playing
+        await TrackPlayer.play();
+
+        // Update state
+        setCurrentEpisode(episode);
+        onNowPlayingUpdate(episode.title);
+      } catch (error) {
+        console.error("Error playing episode:", error);
+      }
     }
   };
 

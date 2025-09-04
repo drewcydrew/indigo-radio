@@ -84,10 +84,6 @@ export default function LiveRadioPlayer({
       {/* Header with collapse button */}
       <View style={styles.headerContainer}>
         <View style={styles.headerContent}>
-          <View style={styles.liveIndicatorContainer}>
-            <View style={styles.liveDot} />
-            <Text style={styles.nowPlayingLabel}>LIVE RADIO</Text>
-          </View>
           <TouchableOpacity
             onPress={toggleCollapsed}
             style={styles.collapseButton}
@@ -202,27 +198,9 @@ const styles = StyleSheet.create({
   },
   headerContent: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     alignItems: "center",
     marginBottom: 8,
-  },
-  liveIndicatorContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  liveDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "#ff0000",
-    marginRight: 8,
-  },
-  nowPlayingLabel: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: "#fff",
-    letterSpacing: 1,
-    textTransform: "uppercase",
   },
   collapseButton: {
     padding: 8,

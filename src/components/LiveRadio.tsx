@@ -68,21 +68,27 @@ export default function LiveRadio({
 
   const playLiveRadio = async () => {
     if (Platform.OS !== "web") {
-      await TrackPlayer.reset();
-      await TrackPlayer.add({
-        id: "live",
-        url: STREAM_URL,
-        title: "Indigo FM Live",
-        artist: "Live Radio",
-        isLiveStream: true,
-      });
-      await TrackPlayer.play();
+      try {
+        await TrackPlayer.reset();
+        await TrackPlayer.add({
+          id: "live",
+          url: STREAM_URL,
+          title: "Indigo FM Live",
+          artist: "Live Radio",
+          isLiveStream: true,
+        });
+        await TrackPlayer.play();
+      } catch (error) {
+        console.error("Error starting live radio:", error);
+      }
     }
   };
 
   useEffect(() => {
+    // Only auto-play live radio when component mounts
+    // Don't play automatically if switching from podcast mode
     playLiveRadio();
-  }, []);
+  }, []); // Remove dependencies to prevent auto-restart
 
   return (
     <View style={styles.container}>

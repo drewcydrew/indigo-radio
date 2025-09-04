@@ -59,10 +59,19 @@ export default function PlayingWindow({ currentEpisode }: PlayingWindowProps) {
   const isPlaying = playback.state === State.Playing;
 
   const togglePlayPause = async () => {
-    if (isPlaying) {
-      await TrackPlayer.pause();
-    } else {
-      await TrackPlayer.play();
+    try {
+      if (isPlaying) {
+        await TrackPlayer.pause();
+      } else {
+        // If no episode is loaded, don't try to play
+        if (!currentEpisode) {
+          console.log("No episode loaded");
+          return;
+        }
+        await TrackPlayer.play();
+      }
+    } catch (error) {
+      console.error("Error toggling play/pause:", error);
     }
   };
 
@@ -83,10 +92,6 @@ export default function PlayingWindow({ currentEpisode }: PlayingWindowProps) {
       {/* Header with collapse button */}
       <View style={styles.headerContainer}>
         <View style={styles.headerContent}>
-          <View style={styles.podcastIndicatorContainer}>
-            <View style={styles.podcastDot} />
-            <Text style={styles.nowPlayingLabel}>PODCAST PLAYER</Text>
-          </View>
           <TouchableOpacity
             onPress={toggleCollapsed}
             style={styles.collapseButton}
@@ -161,8 +166,10 @@ export default function PlayingWindow({ currentEpisode }: PlayingWindowProps) {
               style={[
                 styles.playButton,
                 isPlaying ? styles.pauseButton : styles.playButtonActive,
+                !currentEpisode && styles.disabledButton,
               ]}
               onPress={togglePlayPause}
+              disabled={!currentEpisode}
             >
               <Text
                 style={[
@@ -170,6 +177,7 @@ export default function PlayingWindow({ currentEpisode }: PlayingWindowProps) {
                   isPlaying
                     ? styles.pauseButtonText
                     : styles.playButtonActiveText,
+                  !currentEpisode && styles.disabledButtonText,
                 ]}
               >
                 {isPlaying ? "PAUSE" : "PLAY"}
@@ -218,27 +226,9 @@ const styles = StyleSheet.create({
   },
   headerContent: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     alignItems: "center",
     marginBottom: 8,
-  },
-  podcastIndicatorContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  podcastDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "#007AFF",
-    marginRight: 8,
-  },
-  nowPlayingLabel: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: "#fff",
-    letterSpacing: 1,
-    textTransform: "uppercase",
   },
   collapseButton: {
     padding: 8,
@@ -345,5 +335,12 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     textTransform: "uppercase",
     letterSpacing: 0.5,
+  },
+  disabledButton: {
+    opacity: 0.5,
+    borderColor: "#666",
+  },
+  disabledButtonText: {
+    color: "#666",
   },
 });
