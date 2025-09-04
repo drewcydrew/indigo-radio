@@ -6,7 +6,9 @@ import {
   FlatList,
   Image,
   StyleSheet,
+  Platform,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import { PodcastEpisode, ShowDefinition } from "../types/types";
 import useShowDetails from "../hooks/useShowDetails";
 
@@ -46,27 +48,6 @@ export default function EpisodeList({
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
-
-  const renderFilterButton = ({ item: show }: { item: string | null }) => (
-    <TouchableOpacity
-      style={[
-        styles.filterButton,
-        selectedShow === show ? styles.activeFilter : styles.inactiveFilter,
-      ]}
-      onPress={() => setSelectedShow(show)}
-    >
-      <Text
-        style={[
-          styles.filterText,
-          selectedShow === show
-            ? styles.activeFilterText
-            : styles.inactiveFilterText,
-        ]}
-      >
-        {show || "ALL SHOWS"}
-      </Text>
-    </TouchableOpacity>
-  );
 
   // Function to find show definition by show name
   const findShowDefinition = (showName: string): ShowDefinition | null => {
@@ -121,19 +102,26 @@ export default function EpisodeList({
   const renderHeader = () => (
     <View>
       {showTitle && <Text style={styles.title}>Podcast Episodes</Text>}
-      <FlatList
-        data={filterData}
-        renderItem={renderFilterButton}
-        keyExtractor={(item) => item || "all"}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.filterScrollView}
-        contentContainerStyle={styles.filterContainer}
-      />
+
+      {/* Show Filter Dropdown */}
+      <View style={styles.filterContainer}>
+        <Text style={styles.filterLabel}>Filter by Show:</Text>
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={selectedShow}
+            onValueChange={(itemValue) => setSelectedShow(itemValue)}
+            style={styles.picker}
+            itemStyle={Platform.OS === "ios" ? styles.pickerItem : undefined}
+          >
+            <Picker.Item label="All Shows" value={null} />
+            {shows.map((show) => (
+              <Picker.Item key={show} label={show} value={show} />
+            ))}
+          </Picker>
+        </View>
+      </View>
     </View>
   );
-
-  const filterData = [null, ...shows];
 
   return (
     <View style={styles.container}>
@@ -158,39 +146,31 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  filterScrollView: {
-    marginBottom: 16,
-    flexGrow: 0,
-  },
   filterContainer: {
-    gap: 8,
+    marginBottom: 16,
     paddingHorizontal: 16,
   },
-  filterButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 4,
+  filterLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 8,
+    letterSpacing: 0.3,
+  },
+  pickerContainer: {
+    backgroundColor: "#f8f8f8",
+    borderRadius: 8,
     borderWidth: 1,
+    borderColor: "#ddd",
+    overflow: "hidden",
   },
-  activeFilter: {
-    backgroundColor: "#000",
-    borderColor: "#000",
+  picker: {
+    height: Platform.OS === "ios" ? 120 : 50,
+    color: "#333",
   },
-  inactiveFilter: {
-    backgroundColor: "transparent",
-    borderColor: "#ccc",
-  },
-  filterText: {
-    fontWeight: "700",
-    fontSize: 11,
-    letterSpacing: 0.5,
-    textTransform: "uppercase",
-  },
-  activeFilterText: {
-    color: "#fff",
-  },
-  inactiveFilterText: {
-    color: "#666",
+  pickerItem: {
+    fontSize: 16,
+    color: "#333",
   },
   episodeItem: {
     padding: 16,
