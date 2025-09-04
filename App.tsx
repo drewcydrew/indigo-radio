@@ -13,10 +13,23 @@ import Podcast from "./src/components/Podcast";
 
 async function setupPlayer() {
   if (Platform.OS !== "web") {
-    await TrackPlayer.setupPlayer();
+    await TrackPlayer.setupPlayer({});
+    TrackPlayer.registerPlaybackService(() => require("./service"));
     await TrackPlayer.updateOptions({
-      capabilities: [Capability.Play, Capability.Pause, Capability.Stop],
-      compactCapabilities: [Capability.Play, Capability.Pause],
+      capabilities: [
+        Capability.Play,
+        Capability.Pause,
+        Capability.Stop,
+        Capability.SeekTo,
+        Capability.Skip,
+      ],
+      compactCapabilities: [Capability.Play, Capability.Pause, Capability.Skip],
+      // Add notification configuration for better lock screen display
+      notificationCapabilities: [
+        Capability.Play,
+        Capability.Pause,
+        Capability.Stop,
+      ],
     });
   }
 }
