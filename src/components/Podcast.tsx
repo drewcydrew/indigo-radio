@@ -100,7 +100,7 @@ export default function Podcast({ onNowPlayingUpdate }: PodcastProps) {
       </ScrollView>
 
       {/* Playing Window Component - Fixed at Bottom */}
-      <PlayingWindow showSkipControls={true} />
+      <PlayingWindow />
     </View>
   );
 }

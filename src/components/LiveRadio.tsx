@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
-import { View, Text, Platform } from "react-native";
+import { View, Text, Platform, Button } from "react-native";
 import TrackPlayer, {
   Event,
   useTrackPlayerEvents,
+  usePlaybackState,
+  State,
 } from "react-native-track-player";
-import PlayingWindow from "./PlayingWindow";
 
 // @ts-ignore
 import ReactAudioPlayer from "react-audio-player";
@@ -16,6 +17,8 @@ interface LiveRadioProps {
 }
 
 export default function LiveRadio({ onNowPlayingUpdate }: LiveRadioProps) {
+  const playback = usePlaybackState();
+
   // Only use track player events on mobile
   if (Platform.OS !== "web") {
     useTrackPlayerEvents(
@@ -44,6 +47,17 @@ export default function LiveRadio({ onNowPlayingUpdate }: LiveRadioProps) {
       await TrackPlayer.play();
     }
     onNowPlayingUpdate("Indigo FM - Live Radio");
+  };
+
+  const togglePlayPause = async () => {
+    if (Platform.OS === "web") return;
+
+    const isPlaying = playback.state === State.Playing;
+    if (isPlaying) {
+      await TrackPlayer.pause();
+    } else {
+      await TrackPlayer.play();
+    }
   };
 
   useEffect(() => {
@@ -88,6 +102,8 @@ export default function LiveRadio({ onNowPlayingUpdate }: LiveRadioProps) {
   }
 
   // Mobile implementation
+  const isPlaying = playback.state === State.Playing;
+
   return (
     <View style={{ flex: 1 }}>
       {/* Live Radio Content */}
@@ -122,8 +138,25 @@ export default function LiveRadio({ onNowPlayingUpdate }: LiveRadioProps) {
         </Text>
       </View>
 
-      {/* Playing Controls at Bottom */}
-      <PlayingWindow showSkipControls={false} />
+      {/* Live Radio Controls (Play/Pause only) */}
+      <View style={{ marginBottom: 20 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            marginBottom: 20,
+          }}
+        >
+          <Button
+            title={isPlaying ? "Pause" : "Play"}
+            onPress={togglePlayPause}
+          />
+        </View>
+
+        <Text style={{ opacity: 0.6, textAlign: "center" }}>
+          State: {String(playback?.state ?? "unknown")}
+        </Text>
+      </View>
     </View>
   );
 }

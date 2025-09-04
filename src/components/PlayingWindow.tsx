@@ -3,16 +3,13 @@ import { View, Text, Button } from "react-native";
 import TrackPlayer, {
   usePlaybackState,
   useProgress,
+  State,
 } from "react-native-track-player";
 import CustomSlider from "./CustomSlider";
 
-interface PlayingWindowProps {
-  showSkipControls?: boolean;
-}
+interface PlayingWindowProps {}
 
-export default function PlayingWindow({
-  showSkipControls = true,
-}: PlayingWindowProps) {
+export default function PlayingWindow({}: PlayingWindowProps) {
   const playback = usePlaybackState();
   const progress = useProgress();
 
@@ -24,6 +21,26 @@ export default function PlayingWindow({
 
   const handleSeek = async (value: number) => {
     await TrackPlayer.seekTo(value);
+  };
+
+  const skipBackward = async () => {
+    const newPosition = Math.max(0, progress.position - 15);
+    await TrackPlayer.seekTo(newPosition);
+  };
+
+  const skipForward = async () => {
+    const newPosition = Math.min(progress.duration, progress.position + 15);
+    await TrackPlayer.seekTo(newPosition);
+  };
+
+  const isPlaying = playback.state === State.Playing;
+
+  const togglePlayPause = async () => {
+    if (isPlaying) {
+      await TrackPlayer.pause();
+    } else {
+      await TrackPlayer.play();
+    }
   };
 
   return (
@@ -59,18 +76,12 @@ export default function PlayingWindow({
 
       {/* Playback Controls */}
       <View style={{ flexDirection: "row", gap: 12, marginBottom: 20 }}>
-        <Button title="Play" onPress={() => TrackPlayer.play()} />
-        <Button title="Pause" onPress={() => TrackPlayer.pause()} />
-        <Button title="Stop" onPress={() => TrackPlayer.stop()} />
-        {showSkipControls && (
-          <>
-            <Button
-              title="Previous"
-              onPress={() => TrackPlayer.skipToPrevious()}
-            />
-            <Button title="Next" onPress={() => TrackPlayer.skipToNext()} />
-          </>
-        )}
+        <Button title="← 15s" onPress={skipBackward} />
+        <Button
+          title={isPlaying ? "Pause" : "Play"}
+          onPress={togglePlayPause}
+        />
+        <Button title="15s →" onPress={skipForward} />
       </View>
 
       <Text style={{ opacity: 0.6 }}>

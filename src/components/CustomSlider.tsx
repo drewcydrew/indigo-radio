@@ -1,5 +1,5 @@
-import React from "react";
-import { View, TouchableOpacity } from "react-native";
+import React, { useRef, useState, useEffect } from "react";
+import { View, TouchableOpacity, PanResponder, Animated } from "react-native";
 
 interface CustomSliderProps {
   value: number;
@@ -20,23 +20,80 @@ export default function CustomSlider({
   thumbColor = "#007AFF",
   style,
 }: CustomSliderProps) {
+  const [containerWidth, setContainerWidth] = useState(300);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragValue, setDragValue] = useState(value);
+  const [containerX, setContainerX] = useState(0);
+
+  // Update dragValue when value prop changes and we're not dragging
+  useEffect(() => {
+    if (!isDragging) {
+      setDragValue(value);
+    }
+  }, [value, isDragging]);
+
   const progressPercentage =
-    maximumValue > 0 ? (value / maximumValue) * 100 : 0;
+    maximumValue > 0 ? (dragValue / maximumValue) * 100 : 0;
+
+  const calculateValueFromPosition = (positionX: number) => {
+    const progressRatio = Math.max(0, Math.min(1, positionX / containerWidth));
+    return maximumValue * progressRatio;
+  };
 
   const handleTouch = (event: any) => {
-    const { locationX } = event.nativeEvent;
-    const containerWidth = 300; // You could measure this dynamically with onLayout
-    const progressRatio = locationX / containerWidth;
-    const seekPosition = maximumValue * progressRatio;
+    if (isDragging) return; // Don't handle tap while dragging
 
-    if (seekPosition >= 0 && seekPosition <= maximumValue) {
-      onSlidingComplete(seekPosition);
-    }
+    const { locationX } = event.nativeEvent;
+    const seekPosition = calculateValueFromPosition(locationX);
+    setDragValue(seekPosition); // Update immediately for visual feedback
+    onSlidingComplete(seekPosition);
+  };
+
+  const panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: () => true,
+    onMoveShouldSetPanResponder: () => true,
+    onPanResponderGrant: (event) => {
+      setIsDragging(true);
+      setDragValue(value);
+    },
+    onPanResponderMove: (event) => {
+      const { pageX } = event.nativeEvent;
+      const relativeX = pageX - containerX;
+      const newValue = calculateValueFromPosition(relativeX);
+      setDragValue(newValue);
+    },
+    onPanResponderRelease: () => {
+      onSlidingComplete(dragValue); // Call this first
+      setIsDragging(false); // Then set dragging to false
+    },
+    onPanResponderTerminate: () => {
+      setIsDragging(false);
+      setDragValue(value); // Reset on termination
+    },
+  });
+
+  const handleLayout = (event: any) => {
+    const { width, x } = event.nativeEvent.layout;
+    setContainerWidth(width);
+
+    // Measure the container's absolute position
+    event.target.measure(
+      (
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        pageX: number,
+        pageY: number
+      ) => {
+        setContainerX(pageX);
+      }
+    );
   };
 
   return (
-    <TouchableOpacity
-      onPress={handleTouch}
+    <View
+      onLayout={handleLayout}
       style={[
         {
           height: 40,
@@ -45,25 +102,36 @@ export default function CustomSlider({
         style,
       ]}
     >
-      <View
+      <TouchableOpacity
+        onPress={handleTouch}
         style={{
-          height: 4,
-          backgroundColor: maximumTrackTintColor,
-          borderRadius: 2,
-          overflow: "hidden",
+          height: 40,
+          justifyContent: "center",
         }}
+        activeOpacity={1}
       >
         <View
           style={{
             height: 4,
-            backgroundColor: minimumTrackTintColor,
-            width: `${progressPercentage}%`,
+            backgroundColor: maximumTrackTintColor,
             borderRadius: 2,
+            overflow: "hidden",
           }}
-        />
-      </View>
-      {/* Thumb */}
-      <View
+        >
+          <View
+            style={{
+              height: 4,
+              backgroundColor: minimumTrackTintColor,
+              width: `${progressPercentage}%`,
+              borderRadius: 2,
+            }}
+          />
+        </View>
+      </TouchableOpacity>
+
+      {/* Draggable Thumb */}
+      <Animated.View
+        {...panResponder.panHandlers}
         style={{
           position: "absolute",
           left: `${progressPercentage}%`,
@@ -73,8 +141,17 @@ export default function CustomSlider({
           backgroundColor: thumbColor,
           borderRadius: 10,
           top: 10,
+          elevation: isDragging ? 8 : 2,
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: isDragging ? 4 : 1,
+          },
+          shadowOpacity: isDragging ? 0.3 : 0.2,
+          shadowRadius: isDragging ? 4 : 2,
+          transform: [{ scale: isDragging ? 1.2 : 1 }],
         }}
       />
-    </TouchableOpacity>
+    </View>
   );
 }
