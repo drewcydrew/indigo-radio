@@ -212,47 +212,39 @@
     "name": "Alternative Playlist",
     "description": "Alternative and indie music selection",
     "day": "thursday",
+    "startTime": "00:00",
+    "endTime": "09:00"
+  },
+  {
+    "id": "car-wheels-gravel-road",
+    "name": "Car Wheels on a Gravel Road",
+    "description": "Country and folk music show",
+    "day": "thursday",
     "startTime": "09:00",
-    "endTime": "12:00"
+    "endTime": "10:00"
   },
   {
     "id": "playlist-thu-12pm",
     "name": "Playlist",
     "description": "Curated music selection",
     "day": "thursday",
-    "startTime": "12:00",
-    "endTime": "14:00"
+    "startTime": "10:00",
+    "endTime": "18:00"
   },
   {
     "id": "oz-rock-hour-thu",
     "name": "Oz Rock Hour",
     "description": "Australian rock music",
     "day": "thursday",
-    "startTime": "12:00",
-    "endTime": "14:00"
-  },
-  {
-    "id": "playlist-thu-2pm",
-    "name": "Playlist",
-    "description": "Curated music selection",
-    "day": "thursday",
-    "startTime": "14:00",
-    "endTime": "16:00"
-  },
-  {
-    "id": "oz-rock-hour-thu-4pm",
-    "name": "Oz Rock Hour",
-    "description": "Australian rock music",
-    "day": "thursday",
-    "startTime": "16:00",
-    "endTime": "18:00"
+    "startTime": "18:00",
+    "endTime": "19:00"
   },
   {
     "id": "made-by-music-thu",
     "name": "Made by Music",
     "description": "Music production and artist stories",
     "day": "thursday",
-    "startTime": "18:00",
+    "startTime": "19:00",
     "endTime": "20:00"
   },
   {

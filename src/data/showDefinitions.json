@@ -154,5 +154,25 @@
     "type": "community program",
     "established": "late 2020",
     "focus": "community group updates"
+  },
+  {
+    "showId": "oz-rock-hour",
+    "name": "Oz Rock Hour",
+    "hosts": [],
+    "frequency": "",
+    "description": "No info available",
+    "type": "Unknown",
+    "established": "Unknown",
+    "focus": "Unknown"
+  },
+  {
+    "showId": "made-by-music",
+    "name": "Made by Music",
+    "hosts": [],
+    "frequency": "",
+    "description": "No info available",
+    "type": "Unknown",
+    "established": "Unknown",
+    "focus": "Unknown"
   }
 ]
