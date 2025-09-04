@@ -106,7 +106,7 @@ export default function App() {
                   { color: currentMode === "live" ? "white" : "#666" },
                 ]}
               >
-                📻 LIVE
+                Live
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -124,7 +124,7 @@ export default function App() {
                   { color: currentMode === "podcast" ? "white" : "#666" },
                 ]}
               >
-                🎧 POD
+                Podcast
               </Text>
             </TouchableOpacity>
           </View>
@@ -184,7 +184,7 @@ export default function App() {
           <View
             style={[
               styles.toggleTrack,
-              { left: currentMode === "live" ? 3 : 63 },
+              { left: currentMode === "live" ? 3 : 79 },
             ]}
           />
 
@@ -196,7 +196,7 @@ export default function App() {
                 { color: currentMode === "live" ? "white" : "#666" },
               ]}
             >
-              📻 LIVE
+              Live
             </Text>
           </View>
 
@@ -208,7 +208,7 @@ export default function App() {
                 { color: currentMode === "podcast" ? "white" : "#666" },
               ]}
             >
-              🎧 POD
+              Podcast
             </Text>
           </View>
         </TouchableOpacity>
@@ -250,23 +250,40 @@ const styles = StyleSheet.create({
   },
   webToggleContainer: {
     flexDirection: "row",
-    gap: 8,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 8,
+    padding: 2,
     marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    alignSelf: "flex-start",
   },
   webToggleButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 6,
+    minWidth: 80,
+    alignItems: "center",
   },
   webActiveToggle: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#000",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   webInactiveToggle: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "transparent",
   },
   webToggleText: {
     fontWeight: "600",
     fontSize: 14,
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
   },
   floatingToggle: {
     position: "absolute",
@@ -277,26 +294,36 @@ const styles = StyleSheet.create({
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 8,
     zIndex: 1000,
   },
   toggleSwitch: {
     flexDirection: "row",
-    backgroundColor: "#f0f0f0",
-    borderRadius: 25,
-    padding: 3,
-    width: 120,
-    height: 36,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 8,
+    padding: 2,
+    width: 160,
+    height: 40,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
   },
   toggleTrack: {
     position: "absolute",
-    top: 3,
-    backgroundColor: "#007AFF",
-    borderRadius: 22,
-    width: 57,
-    height: 30,
+    top: 2,
+    backgroundColor: "#000",
+    borderRadius: 6,
+    width: 78,
+    height: 36,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   toggleOption: {
     flex: 1,
@@ -306,6 +333,8 @@ const styles = StyleSheet.create({
   },
   toggleText: {
     fontWeight: "600",
-    fontSize: 11,
+    fontSize: 12,
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
   },
 });
