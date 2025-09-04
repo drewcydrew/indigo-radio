@@ -10,11 +10,8 @@ import {
   StyleSheet,
 } from "react-native";
 import { RadioProgram, ShowDefinition } from "../types/types";
-import showDefinitions from "../data/showDefinitions.json";
+import useShowDetails from "../hooks/useShowDetails";
 import ShowDetailsModal from "./ShowDetailsModal";
-
-// Cast the imported JSON to the proper type
-const SHOW_DEFINITIONS = showDefinitions as ShowDefinition[];
 
 interface ScheduleDisplayProps {
   programs: RadioProgram[];
@@ -30,6 +27,9 @@ export default function ScheduleDisplay({
   const [isVisible, setIsVisible] = useState(false);
   const [selectedShow, setSelectedShow] = useState<ShowDefinition | null>(null);
 
+  // Use the hook to get show details
+  const { findShowByName } = useShowDetails();
+
   const showSchedule = () => setIsVisible(true);
   const hideSchedule = () => {
     setIsVisible(false);
@@ -42,16 +42,7 @@ export default function ScheduleDisplay({
 
   // Function to find show definition by program name
   const findShowDefinition = (programName: string): ShowDefinition | null => {
-    return (
-      SHOW_DEFINITIONS.find(
-        (show) =>
-          show.name.toLowerCase().includes(programName.toLowerCase()) ||
-          programName.toLowerCase().includes(show.name.toLowerCase()) ||
-          show.showId
-            .toLowerCase()
-            .includes(programName.toLowerCase().replace(/\s+/g, "-"))
-      ) || null
-    );
+    return findShowByName(programName);
   };
 
   // Group programs by day

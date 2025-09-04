@@ -8,9 +8,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { PodcastEpisode, ShowDefinition } from "../types/types";
-import showDefinitions from "../data/showDefinitions.json";
-
-const SHOW_DEFINITIONS = showDefinitions as ShowDefinition[];
+import useShowDetails from "../hooks/useShowDetails";
 
 interface EpisodeListProps {
   episodes: PodcastEpisode[];
@@ -30,6 +28,9 @@ export default function EpisodeList({
   const [selectedShow, setSelectedShow] = useState<string | null>(
     initialFilter || null
   );
+
+  // Use the hook to get show details
+  const { findShowByName } = useShowDetails();
 
   // Get unique shows for filtering
   const shows = [...new Set(episodes.map((episode) => episode.show))];
@@ -69,15 +70,7 @@ export default function EpisodeList({
 
   // Function to find show definition by show name
   const findShowDefinition = (showName: string): ShowDefinition | null => {
-    return (
-      SHOW_DEFINITIONS.find(
-        (show) =>
-          show.name.toLowerCase() === showName.toLowerCase() ||
-          show.showId
-            .toLowerCase()
-            .includes(showName.toLowerCase().replace(/\s+/g, "-"))
-      ) || null
-    );
+    return findShowByName(showName);
   };
 
   const renderEpisode = ({ item: episode }: { item: PodcastEpisode }) => {

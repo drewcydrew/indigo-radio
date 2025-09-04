@@ -8,11 +8,9 @@ import {
   StyleSheet,
 } from "react-native";
 import { RadioProgram, ShowDefinition } from "../types/types";
-import showDefinitions from "../data/showDefinitions.json";
+import useShowDetails from "../hooks/useShowDetails";
 import ShowDetailsModal from "./ShowDetailsModal";
 import ScheduleDisplay from "./ScheduleDisplay";
-
-const SHOW_DEFINITIONS = showDefinitions as ShowDefinition[];
 
 interface TodaysScheduleProps {
   programs: RadioProgram[];
@@ -29,6 +27,9 @@ export default function TodaysSchedule({
 }: TodaysScheduleProps) {
   const [selectedShow, setSelectedShow] = useState<ShowDefinition | null>(null);
   const [showFullSchedule, setShowFullSchedule] = useState(false);
+
+  // Use the hook to get show details
+  const { findShowByName } = useShowDetails();
 
   // Get today's day name
   const getTodayName = (): RadioProgram["day"] => {
@@ -51,16 +52,7 @@ export default function TodaysSchedule({
 
   // Function to find show definition by program name
   const findShowDefinition = (programName: string): ShowDefinition | null => {
-    return (
-      SHOW_DEFINITIONS.find(
-        (show) =>
-          show.name.toLowerCase().includes(programName.toLowerCase()) ||
-          programName.toLowerCase().includes(show.name.toLowerCase()) ||
-          show.showId
-            .toLowerCase()
-            .includes(programName.toLowerCase().replace(/\s+/g, "-"))
-      ) || null
-    );
+    return findShowByName(programName);
   };
 
   const handleProgramPress = (program: RadioProgram) => {

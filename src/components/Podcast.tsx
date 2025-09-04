@@ -3,16 +3,15 @@ import { View, Text, Platform, StyleSheet } from "react-native";
 import TrackPlayer, { useProgress } from "react-native-track-player";
 import EpisodeList from "./EpisodeList";
 import PlayingWindow from "./PlayingWindow";
-import { PodcastEpisode, ShowDefinition } from "../types/types";
+import { PodcastEpisode } from "../types/types";
 import podcastEpisodes from "../data/podcastEpisodes.json";
-import showDefinitions from "../data/showDefinitions.json";
+import useShowDetails from "../hooks/useShowDetails";
 
 // @ts-ignore
 import ReactAudioPlayer from "react-audio-player";
 
 // Cast the imported JSON to the proper type
 const PODCAST_EPISODES: PodcastEpisode[] = podcastEpisodes;
-const SHOW_DEFINITIONS = showDefinitions as ShowDefinition[];
 
 interface PodcastProps {
   onNowPlayingUpdate: (title: string) => void;
@@ -29,6 +28,9 @@ export default function Podcast({
     null
   );
 
+  // Use the hook to get show details
+  const { showDefinitions } = useShowDetails();
+
   // Only use progress on mobile
   const progress = Platform.OS !== "web" ? useProgress() : { duration: 0 };
 
@@ -38,7 +40,7 @@ export default function Podcast({
 
       // Transform episodes to include artist information from show definitions
       const episodesWithArtist = PODCAST_EPISODES.map((episode) => {
-        const showDef = SHOW_DEFINITIONS.find(
+        const showDef = showDefinitions.find(
           (show) => show.name.toLowerCase() === episode.show.toLowerCase()
         );
         const artist =
