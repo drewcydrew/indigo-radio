@@ -163,14 +163,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ddd",
     overflow: "hidden",
+    height: Platform.OS === "ios" ? 50 : undefined,
   },
   picker: {
-    height: Platform.OS === "ios" ? 120 : 50,
+    height: Platform.OS === "ios" ? 50 : 50,
     color: "#333",
   },
   pickerItem: {
     fontSize: 16,
     color: "#333",
+    height: Platform.OS === "ios" ? 50 : undefined,
   },
   episodeItem: {
     padding: 16,
