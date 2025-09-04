@@ -2,11 +2,9 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  Button,
   Platform,
   StyleSheet,
   TouchableOpacity,
-  Animated,
 } from "react-native";
 import TrackPlayer, {
   usePlaybackState,
@@ -27,8 +25,7 @@ export default function LiveRadioPlayer({
   currentProgram,
 }: LiveRadioPlayerProps) {
   const playback = usePlaybackState();
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [animation] = useState(new Animated.Value(1));
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const [isStreamLoaded, setIsStreamLoaded] = useState(false);
 
   // Ensure stream is loaded when component mounts
@@ -58,14 +55,6 @@ export default function LiveRadioPlayer({
   }, []);
 
   const toggleCollapsed = () => {
-    const toValue = isCollapsed ? 1 : 0.3;
-
-    Animated.timing(animation, {
-      toValue,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
-
     setIsCollapsed(!isCollapsed);
   };
 
@@ -125,20 +114,45 @@ export default function LiveRadioPlayer({
     );
   };
 
+  // Minimized display
+  if (isCollapsed) {
+    return (
+      <View style={styles.minimizedContainer}>
+        <View style={styles.minimizedContent}>
+          <TouchableOpacity
+            onPress={toggleCollapsed}
+            style={styles.minimizedInfo}
+          >
+            <Text style={styles.minimizedTitle} numberOfLines={1}>
+              {currentProgram ? currentProgram.name : "Indigo FM Live"}
+            </Text>
+            {currentProgram && (
+              <Text style={styles.minimizedShow} numberOfLines={1}>
+                {currentProgram.host
+                  ? `Hosted by ${currentProgram.host}`
+                  : "Live Radio"}
+              </Text>
+            )}
+          </TouchableOpacity>
+
+          {Platform.OS !== "web" && (
+            <TouchableOpacity
+              style={styles.minimizedPlayButton}
+              onPress={togglePlayPause}
+            >
+              <Text style={styles.minimizedPlayButtonText}>
+                {isPlaying ? "||" : "▶"}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+    );
+  }
+
+  // Full expanded display
   return (
-    <Animated.View
-      style={[
-        styles.container,
-        {
-          transform: [
-            {
-              scaleY: animation,
-            },
-          ],
-          opacity: animation,
-        },
-      ]}
-    >
+    <View style={styles.expandedContainer}>
       {/* Header with collapse button */}
       <View style={styles.headerContainer}>
         <View style={styles.headerContent}>
@@ -146,91 +160,134 @@ export default function LiveRadioPlayer({
             onPress={toggleCollapsed}
             style={styles.collapseButton}
           >
-            <Text style={styles.collapseIcon}>{isCollapsed ? "⌃" : "⌄"}</Text>
+            <Text style={styles.collapseIcon}>-</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Always show current program title even when collapsed */}
-        {currentProgram ? (
-          <Text
-            style={[
-              styles.nowPlayingTitle,
-              isCollapsed && styles.collapsedTitle,
-            ]}
-            numberOfLines={1}
-          >
-            {currentProgram.name}
+        <View style={styles.titleRow}>
+          <Text style={styles.nowPlayingTitle} numberOfLines={1}>
+            {currentProgram ? currentProgram.name : "Indigo FM Live"}
           </Text>
-        ) : (
-          <Text
-            style={[
-              styles.nowPlayingTitle,
-              isCollapsed && styles.collapsedTitle,
-            ]}
-          >
-            Indigo FM Live
+        </View>
+      </View>
+
+      <View style={styles.expandedContent}>
+        {/* Program details */}
+        {currentProgram && (
+          <View style={styles.programDetails}>
+            <Text style={styles.nowPlayingShow}>
+              {currentProgram.host
+                ? `Hosted by ${currentProgram.host}`
+                : "Indigo FM"}
+            </Text>
+            <Text style={styles.timeText}>
+              {currentProgram.startTime} - {currentProgram.endTime}
+            </Text>
+          </View>
+        )}
+
+        {/* Web Audio Player */}
+        <WebAudioPlayer />
+
+        {/* Playback Controls - Mobile only */}
+        {Platform.OS !== "web" && (
+          <View style={styles.controlsContainer}>
+            <TouchableOpacity
+              style={[
+                styles.playButton,
+                isPlaying ? styles.pauseButton : styles.playButtonActive,
+              ]}
+              onPress={togglePlayPause}
+            >
+              <Text
+                style={[
+                  styles.playButtonText,
+                  isPlaying
+                    ? styles.pauseButtonText
+                    : styles.playButtonActiveText,
+                ]}
+              >
+                {isPlaying ? "PAUSE" : "PLAY LIVE"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {Platform.OS !== "web" && (
+          <Text style={styles.stateText}>
+            Status: {String(playback?.state ?? "unknown")}{" "}
+            {!isStreamLoaded && "(Loading...)"}
           </Text>
         )}
       </View>
-
-      {/* Collapsible content */}
-      {!isCollapsed && (
-        <View style={styles.expandedContent}>
-          {/* Program details */}
-          {currentProgram && (
-            <View style={styles.programDetails}>
-              <Text style={styles.nowPlayingShow}>
-                {currentProgram.host
-                  ? `Hosted by ${currentProgram.host}`
-                  : "Indigo FM"}
-              </Text>
-              <Text style={styles.timeText}>
-                {currentProgram.startTime} - {currentProgram.endTime}
-              </Text>
-            </View>
-          )}
-
-          {/* Web Audio Player */}
-          <WebAudioPlayer />
-
-          {/* Playback Controls - Mobile only */}
-          {Platform.OS !== "web" && (
-            <View style={styles.controlsContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.playButton,
-                  isPlaying ? styles.pauseButton : styles.playButtonActive,
-                ]}
-                onPress={togglePlayPause}
-              >
-                <Text
-                  style={[
-                    styles.playButtonText,
-                    isPlaying
-                      ? styles.pauseButtonText
-                      : styles.playButtonActiveText,
-                  ]}
-                >
-                  {isPlaying ? "PAUSE" : "PLAY LIVE"}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
-          {Platform.OS !== "web" && (
-            <Text style={styles.stateText}>
-              Status: {String(playback?.state ?? "unknown")}{" "}
-              {!isStreamLoaded && "(Loading...)"}
-            </Text>
-          )}
-        </View>
-      )}
-    </Animated.View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  // Minimized styles
+  minimizedContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#000",
+    borderTopWidth: 1,
+    borderTopColor: "#333",
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 10,
+    zIndex: 1000,
+    height: 80,
+  },
+  minimizedContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    flex: 1,
+  },
+  minimizedInfo: {
+    flex: 1,
+    marginRight: 16,
+    justifyContent: "center",
+  },
+  minimizedTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#fff",
+    marginBottom: 2,
+  },
+  minimizedShow: {
+    fontSize: 12,
+    color: "#ccc",
+    fontWeight: "500",
+  },
+  minimizedPlayButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    backgroundColor: "#fff",
+    minWidth: 44,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  minimizedPlayButtonText: {
+    fontSize: 18,
+    color: "#000",
+    fontWeight: "600",
+  },
+
+  // Expanded styles
+  expandedContainer: {
     position: "absolute",
     bottom: 0,
     left: 0,
@@ -250,7 +307,6 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 10,
     zIndex: 1000,
-    transformOrigin: "bottom",
   },
   headerContainer: {
     marginBottom: 8,
@@ -271,6 +327,11 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
   expandedContent: {
     paddingTop: 12,
     borderTopWidth: 1,
@@ -285,10 +346,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     marginBottom: 4,
     letterSpacing: 0.5,
-  },
-  collapsedTitle: {
-    fontSize: 16,
-    marginBottom: 0,
   },
   nowPlayingShow: {
     fontSize: 14,

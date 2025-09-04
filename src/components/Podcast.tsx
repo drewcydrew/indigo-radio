@@ -53,7 +53,9 @@ export default function Podcast({
   return (
     <View style={styles.container}>
       {/* Podcast Content */}
-      <View style={styles.content}>
+      <View
+        style={[styles.content, { paddingBottom: currentEpisode ? 120 : 0 }]}
+      >
         {/* Episodes List Component */}
         <EpisodeList
           episodes={episodes}
@@ -64,8 +66,8 @@ export default function Podcast({
         />
       </View>
 
-      {/* Playing Window Component - Fixed at Bottom */}
-      <PlayingWindow currentEpisode={currentEpisode} />
+      {/* Playing Window Component - Only show if episode is selected */}
+      {currentEpisode && <PlayingWindow currentEpisode={currentEpisode} />}
     </View>
   );
 }
@@ -73,7 +75,6 @@ export default function Podcast({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingBottom: 120, // Space for player at bottom
   },
   content: {
     flex: 1,
