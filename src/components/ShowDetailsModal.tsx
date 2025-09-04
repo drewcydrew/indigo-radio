@@ -9,6 +9,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { ShowDefinition } from "../types/types";
+import usePodcastEpisodes from "../hooks/usePodcastEpisodes";
 
 interface ShowDetailsModalProps {
   show: ShowDefinition;
@@ -22,6 +23,12 @@ export default function ShowDetailsModal({
   onGoToShow,
 }: ShowDetailsModalProps) {
   const hostDisplay = show.hosts ? show.hosts.join(", ") : show.host;
+  const { episodes } = usePodcastEpisodes();
+
+  // Count episodes for this show
+  const episodeCount = episodes.filter(
+    (episode) => episode.show === show.name
+  ).length;
 
   const handleGoToShow = () => {
     if (onGoToShow) {
@@ -122,7 +129,9 @@ export default function ShowDetailsModal({
               style={styles.goToShowButton}
               onPress={handleGoToShow}
             >
-              <Text style={styles.goToShowText}>VIEW EPISODES</Text>
+              <Text style={styles.goToShowText}>
+                VIEW EPISODES ({episodeCount})
+              </Text>
             </TouchableOpacity>
           )}
         </ScrollView>
