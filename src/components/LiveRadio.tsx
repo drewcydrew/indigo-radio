@@ -17,9 +17,13 @@ const RADIO_PROGRAMS = radioPrograms as RadioProgram[];
 
 interface LiveRadioProps {
   onNowPlayingUpdate: (title: string) => void;
+  onGoToShow?: (showName: string) => void;
 }
 
-export default function LiveRadio({ onNowPlayingUpdate }: LiveRadioProps) {
+export default function LiveRadio({
+  onNowPlayingUpdate,
+  onGoToShow,
+}: LiveRadioProps) {
   const [currentProgram, setCurrentProgram] = useState<RadioProgram | null>(
     null
   );
@@ -128,6 +132,7 @@ export default function LiveRadio({ onNowPlayingUpdate }: LiveRadioProps) {
           programs={RADIO_PROGRAMS}
           currentProgram={currentProgram}
           showTitle={true}
+          onGoToShow={onGoToShow}
         />
       </View>
 

@@ -25,6 +25,9 @@ export default function App() {
   const [now, setNow] = useState<string>("Indigo FM");
   const [currentMode, setCurrentMode] = useState<"live" | "podcast">("podcast");
   const [isPlayerReady, setIsPlayerReady] = useState(false);
+  const [podcastFilter, setPodcastFilter] = useState<string | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     const initializePlayer = async () => {
@@ -47,6 +50,11 @@ export default function App() {
 
   const handleNowPlayingUpdate = (title: string) => {
     setNow(title);
+  };
+
+  const handleGoToShow = (showName: string) => {
+    setPodcastFilter(showName);
+    setCurrentMode("podcast");
   };
 
   // Don't render components until player is ready
@@ -110,9 +118,15 @@ export default function App() {
 
           {/* Content */}
           {currentMode === "live" ? (
-            <LiveRadio onNowPlayingUpdate={handleNowPlayingUpdate} />
+            <LiveRadio
+              onNowPlayingUpdate={handleNowPlayingUpdate}
+              onGoToShow={handleGoToShow}
+            />
           ) : (
-            <Podcast onNowPlayingUpdate={handleNowPlayingUpdate} />
+            <Podcast
+              onNowPlayingUpdate={handleNowPlayingUpdate}
+              initialFilter={podcastFilter}
+            />
           )}
         </View>
       </View>
@@ -132,9 +146,15 @@ export default function App() {
         {/* Full Screen Component */}
         <View style={styles.content}>
           {currentMode === "live" ? (
-            <LiveRadio onNowPlayingUpdate={handleNowPlayingUpdate} />
+            <LiveRadio
+              onNowPlayingUpdate={handleNowPlayingUpdate}
+              onGoToShow={handleGoToShow}
+            />
           ) : (
-            <Podcast onNowPlayingUpdate={handleNowPlayingUpdate} />
+            <Podcast
+              onNowPlayingUpdate={handleNowPlayingUpdate}
+              initialFilter={podcastFilter}
+            />
           )}
         </View>
       </View>

@@ -9,6 +9,7 @@ import {
 import { RadioProgram, ShowDefinition } from "../types/types";
 import showDefinitions from "../data/showDefinitions.json";
 import ShowDetailsModal from "./ShowDetailsModal";
+import ScheduleDisplay from "./ScheduleDisplay";
 
 const SHOW_DEFINITIONS = showDefinitions as ShowDefinition[];
 
@@ -16,14 +17,17 @@ interface TodaysScheduleProps {
   programs: RadioProgram[];
   currentProgram?: RadioProgram | null;
   showTitle?: boolean;
+  onGoToShow?: (showName: string) => void;
 }
 
 export default function TodaysSchedule({
   programs,
   currentProgram,
   showTitle = false,
+  onGoToShow,
 }: TodaysScheduleProps) {
   const [selectedShow, setSelectedShow] = useState<ShowDefinition | null>(null);
+  const [showFullSchedule, setShowFullSchedule] = useState(false);
 
   // Get today's day name
   const getTodayName = (): RadioProgram["day"] => {
@@ -137,6 +141,17 @@ export default function TodaysSchedule({
     </View>
   );
 
+  const renderFooter = () => (
+    <View style={styles.footerContainer}>
+      <TouchableOpacity
+        style={styles.fullScheduleButton}
+        onPress={() => setShowFullSchedule(true)}
+      >
+        <Text style={styles.fullScheduleText}>📅 Show Full Schedule</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   const dayNames = {
     monday: "Monday",
     tuesday: "Tuesday",
@@ -157,6 +172,7 @@ export default function TodaysSchedule({
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={renderHeader}
+        ListFooterComponent={renderFooter}
         ListEmptyComponent={
           <Text style={styles.noPrograms}>
             No programs scheduled for {todayName}
@@ -167,7 +183,20 @@ export default function TodaysSchedule({
 
       {/* Show Details Modal */}
       {selectedShow && (
-        <ShowDetailsModal show={selectedShow} onClose={hideDetails} />
+        <ShowDetailsModal
+          show={selectedShow}
+          onClose={hideDetails}
+          onGoToShow={onGoToShow}
+        />
+      )}
+
+      {/* Full Schedule Modal */}
+      {showFullSchedule && (
+        <ScheduleDisplay
+          programs={programs}
+          onGoToShow={onGoToShow}
+          onClose={() => setShowFullSchedule(false)}
+        />
       )}
     </View>
   );
@@ -260,5 +289,23 @@ const styles = StyleSheet.create({
     opacity: 0.6,
     marginTop: 20,
     paddingHorizontal: 16,
+  },
+  footerContainer: {
+    marginTop: 16,
+    paddingHorizontal: 16,
+  },
+  fullScheduleButton: {
+    backgroundColor: "#f0f0f0",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#007AFF",
+  },
+  fullScheduleText: {
+    color: "#007AFF",
+    fontSize: 14,
+    fontWeight: "600",
   },
 });

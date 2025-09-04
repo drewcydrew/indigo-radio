@@ -17,14 +17,25 @@ const SHOW_DEFINITIONS = showDefinitions as ShowDefinition[];
 
 interface ScheduleDisplayProps {
   programs: RadioProgram[];
+  onGoToShow?: (showName: string) => void;
+  onClose?: () => void;
 }
 
-export default function ScheduleDisplay({ programs }: ScheduleDisplayProps) {
+export default function ScheduleDisplay({
+  programs,
+  onGoToShow,
+  onClose,
+}: ScheduleDisplayProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [selectedShow, setSelectedShow] = useState<ShowDefinition | null>(null);
 
   const showSchedule = () => setIsVisible(true);
-  const hideSchedule = () => setIsVisible(false);
+  const hideSchedule = () => {
+    setIsVisible(false);
+    if (onClose) {
+      onClose();
+    }
+  };
   const showDetails = (show: ShowDefinition) => setSelectedShow(show);
   const hideDetails = () => setSelectedShow(null);
 
@@ -75,6 +86,92 @@ export default function ScheduleDisplay({ programs }: ScheduleDisplayProps) {
     sunday: "Sunday",
   };
 
+  // If onClose is provided, show modal immediately (used by TodaysSchedule)
+  if (onClose) {
+    return (
+      <>
+        <Modal
+          visible={true}
+          animationType="slide"
+          presentationStyle="pageSheet"
+          onRequestClose={hideSchedule}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.header}>
+              <Text style={styles.headerTitle}>Program Schedule</Text>
+              <TouchableOpacity onPress={hideSchedule}>
+                <Text style={styles.doneButton}>Done</Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView
+              style={styles.scrollView}
+              contentContainerStyle={styles.scrollContent}
+            >
+              {dayOrder.map(
+                (day) =>
+                  programsByDay[day] && (
+                    <View key={day} style={styles.daySection}>
+                      <Text style={styles.dayTitle}>
+                        {dayNames[day as keyof typeof dayNames]}
+                      </Text>
+                      {programsByDay[day].map((program) => {
+                        const showDef = findShowDefinition(program.name);
+                        return (
+                          <TouchableOpacity
+                            key={program.id}
+                            onPress={() => showDef && showDetails(showDef)}
+                            style={[
+                              styles.programCard,
+                              { opacity: showDef ? 1 : 0.8 },
+                            ]}
+                            disabled={!showDef}
+                          >
+                            <View style={styles.programContent}>
+                              <View style={styles.programLeft}>
+                                <View style={styles.programTitleRow}>
+                                  <Text style={styles.programTitle}>
+                                    {program.name}
+                                  </Text>
+                                  {showDef && (
+                                    <Text style={styles.infoIcon}>ℹ️</Text>
+                                  )}
+                                </View>
+                                {program.host && (
+                                  <Text style={styles.hostText}>
+                                    with {program.host}
+                                  </Text>
+                                )}
+                                <Text style={styles.descriptionText}>
+                                  {program.description}
+                                </Text>
+                              </View>
+                              <Text style={styles.timeText}>
+                                {program.startTime} - {program.endTime}
+                              </Text>
+                            </View>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  )
+              )}
+            </ScrollView>
+          </View>
+        </Modal>
+
+        {selectedShow && (
+          <ShowDetailsModal
+            show={selectedShow}
+            onClose={hideDetails}
+            onGoToShow={onGoToShow}
+          />
+        )}
+      </>
+    );
+  }
+
+  // Original implementation for button-triggered modal
   return (
     <>
       <View style={styles.buttonContainer}>
@@ -152,7 +249,11 @@ export default function ScheduleDisplay({ programs }: ScheduleDisplayProps) {
       </Modal>
 
       {selectedShow && (
-        <ShowDetailsModal show={selectedShow} onClose={hideDetails} />
+        <ShowDetailsModal
+          show={selectedShow}
+          onClose={hideDetails}
+          onGoToShow={onGoToShow}
+        />
       )}
     </>
   );

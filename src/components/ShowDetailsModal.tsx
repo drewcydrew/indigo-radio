@@ -12,13 +12,22 @@ import { ShowDefinition } from "../types/types";
 interface ShowDetailsModalProps {
   show: ShowDefinition;
   onClose: () => void;
+  onGoToShow?: (showName: string) => void;
 }
 
 export default function ShowDetailsModal({
   show,
   onClose,
+  onGoToShow,
 }: ShowDetailsModalProps) {
   const hostDisplay = show.hosts ? show.hosts.join(", ") : show.host;
+
+  const handleGoToShow = () => {
+    if (onGoToShow) {
+      onGoToShow(show.name);
+      onClose();
+    }
+  };
 
   return (
     <Modal
@@ -88,6 +97,16 @@ export default function ShowDetailsModal({
                 </View>
               ))}
             </View>
+          )}
+
+          {/* Go to Show Button */}
+          {onGoToShow && (
+            <TouchableOpacity
+              style={styles.goToShowButton}
+              onPress={handleGoToShow}
+            >
+              <Text style={styles.goToShowText}>🎧 Go to Show Episodes</Text>
+            </TouchableOpacity>
           )}
         </ScrollView>
       </View>
@@ -183,5 +202,18 @@ const styles = StyleSheet.create({
   segmentDescription: {
     fontSize: 13,
     opacity: 0.7,
+  },
+  goToShowButton: {
+    backgroundColor: "#007AFF",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginTop: 20,
+    alignItems: "center",
+  },
+  goToShowText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });

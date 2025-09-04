@@ -14,9 +14,13 @@ const PODCAST_EPISODES: PodcastEpisode[] = podcastEpisodes;
 
 interface PodcastProps {
   onNowPlayingUpdate: (title: string) => void;
+  initialFilter?: string;
 }
 
-export default function Podcast({ onNowPlayingUpdate }: PodcastProps) {
+export default function Podcast({
+  onNowPlayingUpdate,
+  initialFilter,
+}: PodcastProps) {
   const [currentEpisodeUrl, setCurrentEpisodeUrl] = useState<string>("");
   const [currentEpisodeTitle, setCurrentEpisodeTitle] = useState<string>("");
   const [currentEpisode, setCurrentEpisode] = useState<PodcastEpisode | null>(
@@ -99,6 +103,7 @@ export default function Podcast({ onNowPlayingUpdate }: PodcastProps) {
         onEpisodePress={playEpisode}
         currentTrackDuration={progress.duration}
         showTitle={true}
+        initialFilter={initialFilter}
       />
 
       {/* Playing Window Component - Fixed at Bottom */}

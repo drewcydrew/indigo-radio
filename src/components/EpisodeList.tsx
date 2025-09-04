@@ -14,6 +14,7 @@ interface EpisodeListProps {
   onEpisodePress: (episodeId: string) => void;
   currentTrackDuration?: number;
   showTitle?: boolean;
+  initialFilter?: string;
 }
 
 export default function EpisodeList({
@@ -21,8 +22,11 @@ export default function EpisodeList({
   onEpisodePress,
   currentTrackDuration,
   showTitle = false,
+  initialFilter,
 }: EpisodeListProps) {
-  const [selectedShow, setSelectedShow] = useState<string | null>(null);
+  const [selectedShow, setSelectedShow] = useState<string | null>(
+    initialFilter || null
+  );
 
   // Get unique shows for filtering
   const shows = [...new Set(episodes.map((episode) => episode.show))];
