@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -29,6 +29,33 @@ export default function LiveRadioPlayer({
   const playback = usePlaybackState();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [animation] = useState(new Animated.Value(1));
+  const [isStreamLoaded, setIsStreamLoaded] = useState(false);
+
+  // Ensure stream is loaded when component mounts
+  useEffect(() => {
+    const initializeStream = async () => {
+      if (Platform.OS !== "web") {
+        try {
+          // Check if there's already a track loaded
+          const queue = await TrackPlayer.getQueue();
+          if (queue.length === 0) {
+            await TrackPlayer.add({
+              id: "live",
+              url: STREAM_URL,
+              title: "Indigo FM Live",
+              artist: "Live Radio",
+              isLiveStream: true,
+            });
+          }
+          setIsStreamLoaded(true);
+        } catch (error) {
+          console.error("Error initializing stream:", error);
+        }
+      }
+    };
+
+    initializeStream();
+  }, []);
 
   const toggleCollapsed = () => {
     const toValue = isCollapsed ? 1 : 0.3;
@@ -45,11 +72,42 @@ export default function LiveRadioPlayer({
   const togglePlayPause = async () => {
     if (Platform.OS === "web") return;
 
-    const isPlaying = playback.state === State.Playing;
-    if (isPlaying) {
-      await TrackPlayer.pause();
-    } else {
-      await TrackPlayer.play();
+    try {
+      // Ensure stream is loaded before trying to control it
+      if (!isStreamLoaded) {
+        await TrackPlayer.add({
+          id: "live",
+          url: STREAM_URL,
+          title: "Indigo FM Live",
+          artist: "Live Radio",
+          isLiveStream: true,
+        });
+        setIsStreamLoaded(true);
+      }
+
+      const isPlaying = playback.state === State.Playing;
+      if (isPlaying) {
+        await TrackPlayer.pause();
+      } else {
+        await TrackPlayer.play();
+      }
+    } catch (error) {
+      console.error("Error toggling playback:", error);
+      // Reset and try again
+      try {
+        await TrackPlayer.reset();
+        await TrackPlayer.add({
+          id: "live",
+          url: STREAM_URL,
+          title: "Indigo FM Live",
+          artist: "Live Radio",
+          isLiveStream: true,
+        });
+        await TrackPlayer.play();
+        setIsStreamLoaded(true);
+      } catch (resetError) {
+        console.error("Error resetting player:", resetError);
+      }
     }
   };
 
@@ -161,7 +219,8 @@ export default function LiveRadioPlayer({
 
           {Platform.OS !== "web" && (
             <Text style={styles.stateText}>
-              Status: {String(playback?.state ?? "unknown")}
+              Status: {String(playback?.state ?? "unknown")}{" "}
+              {!isStreamLoaded && "(Loading...)"}
             </Text>
           )}
         </View>
@@ -288,12 +347,5 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     textTransform: "uppercase",
     letterSpacing: 0.5,
-  },
-  // Remove unused styles
-  nowPlayingContainer: {
-    marginBottom: 12,
-    paddingBottom: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
   },
 });

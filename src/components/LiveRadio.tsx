@@ -77,16 +77,15 @@ export default function LiveRadio({
           artist: "Live Radio",
           isLiveStream: true,
         });
-        await TrackPlayer.play();
+        // Don't auto-play, let the user control it via the player
       } catch (error) {
-        console.error("Error starting live radio:", error);
+        console.error("Error setting up live radio:", error);
       }
     }
   };
 
   useEffect(() => {
-    // Only auto-play live radio when component mounts
-    // Don't play automatically if switching from podcast mode
+    // Set up the stream but don't auto-play
     playLiveRadio();
   }, []); // Remove dependencies to prevent auto-restart
 
