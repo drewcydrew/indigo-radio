@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Platform, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import TrackPlayer, { useProgress } from "react-native-track-player";
 import EpisodeList from "./EpisodeList";
 import PlayingWindow from "./PlayingWindow";
 import { PodcastEpisode } from "../types/types";
 import useShowDetails from "../hooks/useShowDetails";
 import usePodcastEpisodes from "../hooks/usePodcastEpisodes";
-
-// @ts-ignore
-import ReactAudioPlayer from "react-audio-player";
 
 interface PodcastProps {
   onNowPlayingUpdate: (title: string) => void;
@@ -19,8 +16,6 @@ export default function Podcast({
   onNowPlayingUpdate,
   initialFilter,
 }: PodcastProps) {
-  const [currentEpisodeUrl, setCurrentEpisodeUrl] = useState<string>("");
-  const [currentEpisodeTitle, setCurrentEpisodeTitle] = useState<string>("");
   const [currentEpisode, setCurrentEpisode] = useState<PodcastEpisode | null>(
     null
   );
@@ -29,101 +24,28 @@ export default function Podcast({
   const { showDefinitions } = useShowDetails();
   const { episodes } = usePodcastEpisodes();
 
-  // Only use progress on mobile
-  const progress = Platform.OS !== "web" ? useProgress() : { duration: 0 };
-
-  const loadPodcasts = async () => {
-    if (Platform.OS !== "web") {
-      await TrackPlayer.reset();
-
-      // Transform episodes to include artist information from show definitions
-      const episodesWithArtist = episodes.map((episode) => {
-        const showDef = showDefinitions.find(
-          (show) => show.name.toLowerCase() === episode.show.toLowerCase()
-        );
-        const artist =
-          showDef?.host ||
-          (showDef?.hosts ? showDef.hosts.join(", ") : "Indigo FM Podcast");
-
-        return {
-          id: episode.id,
-          url: episode.url,
-          title: episode.title,
-          artist,
-          artwork: showDef?.artwork,
-        };
-      });
-
-      await TrackPlayer.add(episodesWithArtist);
-    }
-    onNowPlayingUpdate("Podcast Episodes Loaded");
-  };
-
   const playEpisode = async (episodeId: string) => {
     const episode = episodes.find((ep) => ep.id === episodeId);
     if (episode) {
       setCurrentEpisode(episode);
-      if (Platform.OS === "web") {
-        setCurrentEpisodeUrl(episode.url);
-        setCurrentEpisodeTitle(episode.title);
-        onNowPlayingUpdate(episode.title);
-      } else {
-        const episodeIndex = episodes.findIndex((ep) => ep.id === episodeId);
-        if (episodeIndex !== -1) {
-          await TrackPlayer.skip(episodeIndex);
-          await TrackPlayer.play();
-          onNowPlayingUpdate(episode.title);
-        }
-      }
+      onNowPlayingUpdate(episode.title);
+      // Additional platform-specific logic can be added here if needed
     }
   };
 
-  useEffect(() => {
-    loadPodcasts();
-  }, [episodes, showDefinitions]); // Add dependencies to reload when data changes
-
-  // Web audio player component
-  const WebAudioPlayer = () => {
-    if (Platform.OS !== "web" || !currentEpisodeUrl) return null;
-
-    return (
-      <View style={styles.webPlayerContainer}>
-        <Text style={styles.webPlayerTitle}>{currentEpisodeTitle}</Text>
-        <ReactAudioPlayer src={currentEpisodeUrl} controls />
-      </View>
-    );
-  };
-
-  // Web implementation
-  if (Platform.OS === "web") {
-    return (
-      <View style={styles.webContainer}>
-        <Text style={styles.webTitle}>Podcast Episodes</Text>
-
-        <View style={styles.webEpisodeList}>
-          <EpisodeList
-            episodes={episodes}
-            onEpisodePress={playEpisode}
-            currentTrackDuration={0}
-          />
-        </View>
-
-        <WebAudioPlayer />
-      </View>
-    );
-  }
-
-  // Mobile implementation - Remove ScrollView wrapper
   return (
     <View style={styles.container}>
-      {/* Episodes List Component with built-in header */}
-      <EpisodeList
-        episodes={episodes}
-        onEpisodePress={playEpisode}
-        currentTrackDuration={progress.duration}
-        showTitle={true}
-        initialFilter={initialFilter}
-      />
+      {/* Podcast Content */}
+      <View style={styles.content}>
+        {/* Episodes List Component */}
+        <EpisodeList
+          episodes={episodes}
+          onEpisodePress={playEpisode}
+          currentTrackDuration={0}
+          showTitle={true}
+          initialFilter={initialFilter}
+        />
+      </View>
 
       {/* Playing Window Component - Fixed at Bottom */}
       <PlayingWindow currentEpisode={currentEpisode} />
@@ -134,34 +56,10 @@ export default function Podcast({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingBottom: 120, // Reduced padding since player can now collapse
+    paddingBottom: 120, // Space for player at bottom
   },
-  title: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 16,
-  },
-  webContainer: {
+  content: {
     flex: 1,
-    height: "100%",
-  },
-  webTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 16,
-  },
-  webEpisodeList: {
-    flex: 1,
-    marginBottom: 20,
-  },
-  webPlayerContainer: {
-    borderTopWidth: 1,
-    borderTopColor: "#e0e0e0",
-    paddingTop: 16,
-  },
-  webPlayerTitle: {
-    fontSize: 16,
-    marginBottom: 8,
-    fontWeight: "500",
+    paddingHorizontal: 20,
   },
 });

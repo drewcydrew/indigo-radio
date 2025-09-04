@@ -5,6 +5,7 @@ import {
   ScrollView,
   Modal,
   TouchableOpacity,
+  Image,
   StyleSheet,
 } from "react-native";
 import { ShowDefinition } from "../types/types";
@@ -51,6 +52,17 @@ export default function ShowDetailsModal({
           style={styles.scrollView}
           contentContainerStyle={styles.content}
         >
+          {/* Artwork Section */}
+          {show.artwork && (
+            <View style={styles.artworkContainer}>
+              <Image
+                source={{ uri: show.artwork }}
+                style={styles.artwork}
+                resizeMode="cover"
+              />
+            </View>
+          )}
+
           {hostDisplay && (
             <Text style={styles.hostText}>
               HOSTED BY: {hostDisplay.toUpperCase()}
@@ -159,6 +171,16 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
+  },
+  artworkContainer: {
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  artwork: {
+    width: 200,
+    height: 200,
+    borderRadius: 0,
+    backgroundColor: "#333",
   },
   hostText: {
     fontSize: 14,
