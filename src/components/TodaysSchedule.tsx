@@ -100,7 +100,7 @@ export default function TodaysSchedule({
               />
             ) : (
               <View style={styles.placeholderThumbnail}>
-                <Text style={styles.placeholderIcon}>📻</Text>
+                <Text style={styles.placeholderIcon}>RADIO</Text>
               </View>
             )}
           </View>
@@ -116,9 +116,12 @@ export default function TodaysSchedule({
                 {program.name}
               </Text>
               {isCurrentProgram && (
-                <Text style={styles.liveIndicator}>🔴 LIVE</Text>
+                <View style={styles.liveIndicator}>
+                  <View style={styles.liveDotSmall} />
+                  <Text style={styles.liveText}>LIVE</Text>
+                </View>
               )}
-              {showDef && <Text style={styles.infoIcon}>ℹ️</Text>}
+              {showDef && <Text style={styles.infoIcon}>INFO</Text>}
             </View>
             {program.host && (
               <Text
@@ -127,7 +130,7 @@ export default function TodaysSchedule({
                   isCurrentProgram && styles.currentHostText,
                 ]}
               >
-                with {program.host}
+                Hosted by {program.host}
               </Text>
             )}
             <Text
@@ -166,7 +169,7 @@ export default function TodaysSchedule({
         style={styles.fullScheduleButton}
         onPress={() => setShowFullSchedule(true)}
       >
-        <Text style={styles.fullScheduleText}>📅 Show Full Schedule</Text>
+        <Text style={styles.fullScheduleText}>VIEW FULL SCHEDULE</Text>
       </TouchableOpacity>
     </View>
   );
@@ -235,16 +238,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   programItem: {
-    padding: 12,
-    backgroundColor: "#f5f5f5",
+    padding: 16,
+    backgroundColor: "#f8f8f8",
     marginBottom: 8,
-    borderRadius: 8,
-    borderLeftWidth: 4,
-    borderLeftColor: "#007AFF",
+    borderRadius: 0,
+    borderLeftWidth: 3,
+    borderLeftColor: "#000",
   },
   currentProgramItem: {
-    backgroundColor: "#e8f4fd",
-    borderLeftColor: "#ff4444",
+    backgroundColor: "#000",
+    borderLeftColor: "#fff",
   },
   programContent: {
     flexDirection: "row",
@@ -263,13 +266,16 @@ const styles = StyleSheet.create({
   placeholderThumbnail: {
     width: 50,
     height: 50,
-    borderRadius: 6,
-    backgroundColor: "#e0e0e0",
+    borderRadius: 0,
+    backgroundColor: "#ddd",
     alignItems: "center",
     justifyContent: "center",
   },
   placeholderIcon: {
-    fontSize: 20,
+    fontSize: 8,
+    fontWeight: "700",
+    color: "#666",
+    letterSpacing: 0.5,
   },
   programInfo: {
     flex: 1,
@@ -283,28 +289,49 @@ const styles = StyleSheet.create({
   },
   programTitle: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
+    color: "#000",
   },
   currentProgramTitle: {
-    color: "#ff4444",
+    color: "#fff",
   },
   liveIndicator: {
-    fontSize: 12,
-    fontWeight: "600",
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#ff0000",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 2,
+  },
+  liveDotSmall: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#fff",
+    marginRight: 4,
+  },
+  liveText: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: "#fff",
+    letterSpacing: 0.5,
   },
   infoIcon: {
-    fontSize: 12,
+    fontSize: 10,
     opacity: 0.6,
+    fontWeight: "600",
+    color: "#666",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   hostText: {
     fontSize: 14,
     marginBottom: 4,
-    opacity: 0.8,
-    color: "#007AFF",
+    color: "#666",
     fontWeight: "500",
   },
   currentHostText: {
-    color: "#ff4444",
+    color: "#ccc",
   },
   descriptionText: {
     fontSize: 12,
@@ -317,11 +344,11 @@ const styles = StyleSheet.create({
   },
   timeText: {
     fontSize: 14,
-    fontWeight: "600",
-    color: "#007AFF",
+    fontWeight: "700",
+    color: "#000",
   },
   currentTimeText: {
-    color: "#ff4444",
+    color: "#fff",
   },
   noPrograms: {
     textAlign: "center",
@@ -334,17 +361,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   fullScheduleButton: {
-    backgroundColor: "#f0f0f0",
-    paddingVertical: 12,
+    backgroundColor: "#000",
+    paddingVertical: 16,
     paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: 0,
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#007AFF",
+    borderWidth: 0,
   },
   fullScheduleText: {
-    color: "#007AFF",
-    fontSize: 14,
-    fontWeight: "600",
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 1,
+    textTransform: "uppercase",
   },
 });

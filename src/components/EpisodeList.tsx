@@ -57,10 +57,12 @@ export default function EpisodeList({
       <Text
         style={[
           styles.filterText,
-          { color: selectedShow === show ? "white" : "#666" },
+          selectedShow === show
+            ? styles.activeFilterText
+            : styles.inactiveFilterText,
         ]}
       >
-        {show || "All Shows"}
+        {show || "ALL SHOWS"}
       </Text>
     </TouchableOpacity>
   );
@@ -100,16 +102,16 @@ export default function EpisodeList({
             />
           ) : (
             <View style={styles.placeholderArtwork}>
-              <Text style={styles.placeholderIcon}>🎧</Text>
+              <Text style={styles.placeholderIcon}>PODCAST</Text>
             </View>
           )}
         </View>
 
         {/* Episode Info */}
         <View style={styles.episodeInfo}>
-          <Text style={styles.showName}>{episode.show}</Text>
+          <Text style={styles.showName}>{episode.show.toUpperCase()}</Text>
           <Text style={styles.episodeTitle}>{episode.title}</Text>
-          <Text style={styles.artistName}>{artist}</Text>
+          <Text style={styles.artistName}>Hosted by {artist}</Text>
           <Text style={styles.duration}>
             Duration: {formatDuration(currentTrackDuration)}
           </Text>
@@ -169,29 +171,44 @@ const styles = StyleSheet.create({
   },
   filterContainer: {
     gap: 8,
+    paddingHorizontal: 16,
   },
   filterButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 20,
+    borderRadius: 4,
+    borderWidth: 1,
   },
   activeFilter: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#000",
+    borderColor: "#000",
   },
   inactiveFilter: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "transparent",
+    borderColor: "#ccc",
   },
   filterText: {
-    fontWeight: "600",
-    fontSize: 12,
+    fontWeight: "700",
+    fontSize: 11,
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+  },
+  activeFilterText: {
+    color: "#fff",
+  },
+  inactiveFilterText: {
+    color: "#666",
   },
   episodeItem: {
-    padding: 12,
-    backgroundColor: "#f5f5f5",
+    padding: 16,
+    backgroundColor: "#f8f8f8",
     marginBottom: 8,
-    borderRadius: 8,
+    borderRadius: 0,
     flexDirection: "row",
     alignItems: "flex-start",
+    borderLeftWidth: 3,
+    borderLeftColor: "#000",
+    marginHorizontal: 16,
   },
   artworkContainer: {
     marginRight: 12,
@@ -199,59 +216,75 @@ const styles = StyleSheet.create({
   artwork: {
     width: 60,
     height: 60,
-    borderRadius: 8,
+    borderRadius: 0,
     backgroundColor: "#e0e0e0",
   },
   placeholderArtwork: {
     width: 60,
     height: 60,
-    borderRadius: 8,
-    backgroundColor: "#e0e0e0",
+    borderRadius: 0,
+    backgroundColor: "#ddd",
     alignItems: "center",
     justifyContent: "center",
   },
   placeholderIcon: {
-    fontSize: 24,
+    fontSize: 8,
+    fontWeight: "700",
+    color: "#666",
+    letterSpacing: 0.5,
   },
   episodeInfo: {
     flex: 1,
   },
   showName: {
-    fontWeight: "600",
-    color: "#007AFF",
-    fontSize: 12,
-    marginBottom: 2,
+    fontWeight: "700",
+    color: "#000",
+    fontSize: 10,
+    marginBottom: 4,
+    letterSpacing: 1,
   },
   episodeTitle: {
-    fontWeight: "600",
+    fontWeight: "700",
+    fontSize: 16,
     marginBottom: 4,
+    color: "#000",
+    letterSpacing: 0.3,
   },
   artistName: {
     fontSize: 12,
-    opacity: 0.7,
+    color: "#666",
     marginBottom: 4,
-    fontStyle: "italic",
+    fontWeight: "500",
   },
   duration: {
-    opacity: 0.7,
-    fontSize: 12,
+    color: "#888",
+    fontSize: 11,
     marginBottom: 4,
+    fontWeight: "500",
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
   },
   description: {
-    opacity: 0.6,
+    color: "#666",
     fontSize: 12,
     lineHeight: 16,
     marginTop: 4,
+    fontStyle: "italic",
   },
   noEpisodes: {
     textAlign: "center",
-    opacity: 0.6,
+    color: "#666",
     marginTop: 20,
+    paddingHorizontal: 16,
+    fontSize: 14,
+    fontWeight: "500",
   },
   title: {
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: "700",
     marginBottom: 16,
     paddingHorizontal: 16,
+    color: "#000",
+    letterSpacing: 0.5,
   },
 });

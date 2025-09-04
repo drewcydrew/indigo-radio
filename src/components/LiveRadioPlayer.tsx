@@ -1,5 +1,13 @@
-import React from "react";
-import { View, Text, Button, Platform, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  Button,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  Animated,
+} from "react-native";
 import TrackPlayer, {
   usePlaybackState,
   State,
@@ -19,6 +27,20 @@ export default function LiveRadioPlayer({
   currentProgram,
 }: LiveRadioPlayerProps) {
   const playback = usePlaybackState();
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [animation] = useState(new Animated.Value(1));
+
+  const toggleCollapsed = () => {
+    const toValue = isCollapsed ? 1 : 0.3;
+
+    Animated.timing(animation, {
+      toValue,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+
+    setIsCollapsed(!isCollapsed);
+  };
 
   const togglePlayPause = async () => {
     if (Platform.OS === "web") return;
@@ -46,48 +68,109 @@ export default function LiveRadioPlayer({
   };
 
   return (
-    <View style={styles.container}>
-      {/* Now Playing Section */}
-      <View style={styles.nowPlayingContainer}>
-        <Text style={styles.nowPlayingLabel}>📻 Live Radio</Text>
+    <Animated.View
+      style={[
+        styles.container,
+        {
+          transform: [
+            {
+              scaleY: animation,
+            },
+          ],
+          opacity: animation,
+        },
+      ]}
+    >
+      {/* Header with collapse button */}
+      <View style={styles.headerContainer}>
+        <View style={styles.headerContent}>
+          <View style={styles.liveIndicatorContainer}>
+            <View style={styles.liveDot} />
+            <Text style={styles.nowPlayingLabel}>LIVE RADIO</Text>
+          </View>
+          <TouchableOpacity
+            onPress={toggleCollapsed}
+            style={styles.collapseButton}
+          >
+            <Text style={styles.collapseIcon}>{isCollapsed ? "⌃" : "⌄"}</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Always show current program title even when collapsed */}
         {currentProgram ? (
-          <>
-            <Text style={styles.nowPlayingTitle} numberOfLines={1}>
-              {currentProgram.name}
-            </Text>
-            <Text style={styles.nowPlayingShow}>
-              {currentProgram.host
-                ? `with ${currentProgram.host}`
-                : "Indigo FM"}
-            </Text>
-            <Text style={styles.timeText}>
-              {currentProgram.startTime} - {currentProgram.endTime}
-            </Text>
-          </>
+          <Text
+            style={[
+              styles.nowPlayingTitle,
+              isCollapsed && styles.collapsedTitle,
+            ]}
+            numberOfLines={1}
+          >
+            {currentProgram.name}
+          </Text>
         ) : (
-          <Text style={styles.nowPlayingTitle}>Indigo FM Live</Text>
+          <Text
+            style={[
+              styles.nowPlayingTitle,
+              isCollapsed && styles.collapsedTitle,
+            ]}
+          >
+            Indigo FM Live
+          </Text>
         )}
       </View>
 
-      {/* Web Audio Player */}
-      <WebAudioPlayer />
+      {/* Collapsible content */}
+      {!isCollapsed && (
+        <View style={styles.expandedContent}>
+          {/* Program details */}
+          {currentProgram && (
+            <View style={styles.programDetails}>
+              <Text style={styles.nowPlayingShow}>
+                {currentProgram.host
+                  ? `Hosted by ${currentProgram.host}`
+                  : "Indigo FM"}
+              </Text>
+              <Text style={styles.timeText}>
+                {currentProgram.startTime} - {currentProgram.endTime}
+              </Text>
+            </View>
+          )}
 
-      {/* Playback Controls - Mobile only */}
-      {Platform.OS !== "web" && (
-        <View style={styles.controlsContainer}>
-          <Button
-            title={isPlaying ? "Pause Live" : "Play Live"}
-            onPress={togglePlayPause}
-          />
+          {/* Web Audio Player */}
+          <WebAudioPlayer />
+
+          {/* Playback Controls - Mobile only */}
+          {Platform.OS !== "web" && (
+            <View style={styles.controlsContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.playButton,
+                  isPlaying ? styles.pauseButton : styles.playButtonActive,
+                ]}
+                onPress={togglePlayPause}
+              >
+                <Text
+                  style={[
+                    styles.playButtonText,
+                    isPlaying
+                      ? styles.pauseButtonText
+                      : styles.playButtonActiveText,
+                  ]}
+                >
+                  {isPlaying ? "PAUSE" : "PLAY LIVE"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {Platform.OS !== "web" && (
+            <Text style={styles.stateText}>
+              Status: {String(playback?.state ?? "unknown")}
+            </Text>
+          )}
         </View>
       )}
-
-      {Platform.OS !== "web" && (
-        <Text style={styles.stateText}>
-          State: {String(playback?.state ?? "unknown")}
-        </Text>
-      )}
-    </View>
+    </Animated.View>
   );
 }
 
@@ -97,56 +180,142 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "#fff",
+    backgroundColor: "#000",
     borderTopWidth: 1,
-    borderTopColor: "#e0e0e0",
+    borderTopColor: "#333",
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
     padding: 16,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: -2,
+      height: -4,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 10,
     zIndex: 1000,
+    transformOrigin: "bottom",
   },
-  nowPlayingContainer: {
-    marginBottom: 12,
-    paddingBottom: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
+  headerContainer: {
+    marginBottom: 8,
+  },
+  headerContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  liveIndicatorContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  liveDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#ff0000",
+    marginRight: 8,
   },
   nowPlayingLabel: {
-    fontSize: 12,
-    opacity: 0.7,
-    marginBottom: 4,
+    fontSize: 11,
+    fontWeight: "600",
+    color: "#fff",
+    letterSpacing: 1,
+    textTransform: "uppercase",
+  },
+  collapseButton: {
+    padding: 8,
+    borderRadius: 4,
+    backgroundColor: "#333",
+  },
+  collapseIcon: {
+    fontSize: 16,
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  expandedContent: {
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#333",
+  },
+  programDetails: {
+    marginBottom: 16,
   },
   nowPlayingTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#fff",
+    marginBottom: 4,
+    letterSpacing: 0.5,
+  },
+  collapsedTitle: {
     fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 2,
+    marginBottom: 0,
   },
   nowPlayingShow: {
     fontSize: 14,
-    color: "#007AFF",
+    color: "#ccc",
     fontWeight: "500",
-    marginBottom: 2,
+    marginBottom: 4,
   },
   timeText: {
     fontSize: 12,
-    opacity: 0.7,
+    color: "#888",
+    fontWeight: "500",
+    letterSpacing: 0.5,
   },
   webPlayerContainer: {
-    marginBottom: 12,
+    marginBottom: 16,
+    backgroundColor: "#222",
+    borderRadius: 8,
+    padding: 8,
   },
   controlsContainer: {
     marginBottom: 12,
     alignItems: "center",
   },
-  stateText: {
-    opacity: 0.6,
+  playButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: "#fff",
+    backgroundColor: "transparent",
+    minWidth: 120,
+  },
+  playButtonActive: {
+    backgroundColor: "#fff",
+  },
+  pauseButton: {
+    borderColor: "#fff",
+    backgroundColor: "transparent",
+  },
+  playButtonText: {
+    fontSize: 14,
+    fontWeight: "700",
     textAlign: "center",
-    fontSize: 12,
+    letterSpacing: 1,
+  },
+  playButtonActiveText: {
+    color: "#000",
+  },
+  pauseButtonText: {
+    color: "#fff",
+  },
+  stateText: {
+    color: "#666",
+    textAlign: "center",
+    fontSize: 11,
+    fontWeight: "500",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  // Remove unused styles
+  nowPlayingContainer: {
+    marginBottom: 12,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
   },
 });

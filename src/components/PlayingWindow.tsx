@@ -1,5 +1,11 @@
-import React from "react";
-import { View, Text, Button, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Animated,
+} from "react-native";
 import TrackPlayer, {
   usePlaybackState,
   useProgress,
@@ -15,6 +21,20 @@ interface PlayingWindowProps {
 export default function PlayingWindow({ currentEpisode }: PlayingWindowProps) {
   const playback = usePlaybackState();
   const progress = useProgress();
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [animation] = useState(new Animated.Value(1));
+
+  const toggleCollapsed = () => {
+    const toValue = isCollapsed ? 1 : 0.4;
+
+    Animated.timing(animation, {
+      toValue,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+
+    setIsCollapsed(!isCollapsed);
+  };
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -47,51 +67,126 @@ export default function PlayingWindow({ currentEpisode }: PlayingWindowProps) {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Now Playing Section */}
-      {currentEpisode && (
-        <View style={styles.nowPlayingContainer}>
-          <Text style={styles.nowPlayingLabel}>Now Playing</Text>
-          <Text style={styles.nowPlayingTitle} numberOfLines={1}>
+    <Animated.View
+      style={[
+        styles.container,
+        {
+          transform: [
+            {
+              scaleY: animation,
+            },
+          ],
+          opacity: animation,
+        },
+      ]}
+    >
+      {/* Header with collapse button */}
+      <View style={styles.headerContainer}>
+        <View style={styles.headerContent}>
+          <View style={styles.podcastIndicatorContainer}>
+            <View style={styles.podcastDot} />
+            <Text style={styles.nowPlayingLabel}>PODCAST PLAYER</Text>
+          </View>
+          <TouchableOpacity
+            onPress={toggleCollapsed}
+            style={styles.collapseButton}
+          >
+            <Text style={styles.collapseIcon}>{isCollapsed ? "⌃" : "⌄"}</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Always show current episode title even when collapsed */}
+        {currentEpisode ? (
+          <Text
+            style={[
+              styles.nowPlayingTitle,
+              isCollapsed && styles.collapsedTitle,
+            ]}
+            numberOfLines={1}
+          >
             {currentEpisode.title}
           </Text>
-          <Text style={styles.nowPlayingShow}>{currentEpisode.show}</Text>
-        </View>
-      )}
-
-      {/* Progress Bar and Time Display */}
-      {progress.duration > 0 && (
-        <View style={styles.progressContainer}>
-          <View style={styles.timeContainer}>
-            <Text style={styles.timeText}>{formatTime(progress.position)}</Text>
-            <Text style={styles.timeText}>{formatTime(progress.duration)}</Text>
-          </View>
-
-          <CustomSlider
-            value={progress.position}
-            maximumValue={progress.duration}
-            onSlidingComplete={handleSeek}
-            minimumTrackTintColor="#007AFF"
-            maximumTrackTintColor="#e0e0e0"
-            thumbColor="#007AFF"
-          />
-        </View>
-      )}
-
-      {/* Playback Controls */}
-      <View style={styles.controlsContainer}>
-        <Button title="← 15s" onPress={skipBackward} />
-        <Button
-          title={isPlaying ? "Pause" : "Play"}
-          onPress={togglePlayPause}
-        />
-        <Button title="15s →" onPress={skipForward} />
+        ) : (
+          <Text
+            style={[
+              styles.nowPlayingTitle,
+              isCollapsed && styles.collapsedTitle,
+            ]}
+          >
+            Select an Episode
+          </Text>
+        )}
       </View>
 
-      <Text style={styles.stateText}>
-        State: {String(playback?.state ?? "unknown")}
-      </Text>
-    </View>
+      {/* Collapsible content */}
+      {!isCollapsed && (
+        <View style={styles.expandedContent}>
+          {/* Episode details */}
+          {currentEpisode && (
+            <View style={styles.episodeDetails}>
+              <Text style={styles.nowPlayingShow}>{currentEpisode.show}</Text>
+            </View>
+          )}
+
+          {/* Progress Bar and Time Display */}
+          {progress.duration > 0 && (
+            <View style={styles.progressContainer}>
+              <View style={styles.timeContainer}>
+                <Text style={styles.timeText}>
+                  {formatTime(progress.position)}
+                </Text>
+                <Text style={styles.timeText}>
+                  {formatTime(progress.duration)}
+                </Text>
+              </View>
+
+              <CustomSlider
+                value={progress.position}
+                maximumValue={progress.duration}
+                onSlidingComplete={handleSeek}
+                minimumTrackTintColor="#fff"
+                maximumTrackTintColor="#444"
+                thumbColor="#fff"
+              />
+            </View>
+          )}
+
+          {/* Playback Controls */}
+          <View style={styles.controlsContainer}>
+            <TouchableOpacity style={styles.skipButton} onPress={skipBackward}>
+              <Text style={styles.skipButtonText}>← 15S</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.playButton,
+                isPlaying ? styles.pauseButton : styles.playButtonActive,
+              ]}
+              onPress={togglePlayPause}
+            >
+              <Text
+                style={[
+                  styles.playButtonText,
+                  isPlaying
+                    ? styles.pauseButtonText
+                    : styles.playButtonActiveText,
+                ]}
+              >
+                {isPlaying ? "PAUSE" : "PLAY"}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.skipButton} onPress={skipForward}>
+              <Text style={styles.skipButtonText}>15S →</Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.stateText}>
+            Status: {String(playback?.state ?? "unknown")}
+          </Text>
+        </View>
+      )}
+    </Animated.View>
   );
 }
 
@@ -101,40 +196,84 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "#fff",
+    backgroundColor: "#000",
     borderTopWidth: 1,
-    borderTopColor: "#e0e0e0",
+    borderTopColor: "#333",
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
     padding: 16,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: -2,
+      height: -4,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 10,
     zIndex: 1000,
+    transformOrigin: "bottom",
   },
-  nowPlayingContainer: {
-    marginBottom: 12,
-    paddingBottom: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
+  headerContainer: {
+    marginBottom: 8,
+  },
+  headerContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  podcastIndicatorContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  podcastDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#007AFF",
+    marginRight: 8,
   },
   nowPlayingLabel: {
-    fontSize: 12,
-    opacity: 0.7,
-    marginBottom: 4,
+    fontSize: 11,
+    fontWeight: "600",
+    color: "#fff",
+    letterSpacing: 1,
+    textTransform: "uppercase",
+  },
+  collapseButton: {
+    padding: 8,
+    borderRadius: 4,
+    backgroundColor: "#333",
+  },
+  collapseIcon: {
+    fontSize: 16,
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  expandedContent: {
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#333",
+  },
+  episodeDetails: {
+    marginBottom: 16,
   },
   nowPlayingTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#fff",
+    marginBottom: 4,
+    letterSpacing: 0.5,
+  },
+  collapsedTitle: {
     fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 2,
+    marginBottom: 0,
   },
   nowPlayingShow: {
     fontSize: 14,
-    color: "#007AFF",
+    color: "#ccc",
     fontWeight: "500",
+    marginBottom: 4,
   },
   progressContainer: {
     marginBottom: 16,
@@ -145,18 +284,66 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   timeText: {
-    fontSize: 14,
-    opacity: 0.7,
+    fontSize: 12,
+    color: "#888",
+    fontWeight: "500",
+    letterSpacing: 0.5,
   },
   controlsContainer: {
     flexDirection: "row",
     gap: 12,
     marginBottom: 12,
     justifyContent: "center",
+    alignItems: "center",
+  },
+  skipButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+    backgroundColor: "#333",
+    minWidth: 60,
+  },
+  skipButtonText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "700",
+    textAlign: "center",
+    letterSpacing: 0.5,
+  },
+  playButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: "#fff",
+    backgroundColor: "transparent",
+    minWidth: 120,
+  },
+  playButtonActive: {
+    backgroundColor: "#fff",
+  },
+  pauseButton: {
+    borderColor: "#fff",
+    backgroundColor: "transparent",
+  },
+  playButtonText: {
+    fontSize: 14,
+    fontWeight: "700",
+    textAlign: "center",
+    letterSpacing: 1,
+  },
+  playButtonActiveText: {
+    color: "#000",
+  },
+  pauseButtonText: {
+    color: "#fff",
   },
   stateText: {
-    opacity: 0.6,
+    color: "#666",
     textAlign: "center",
-    fontSize: 12,
+    fontSize: 11,
+    fontWeight: "500",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
 });

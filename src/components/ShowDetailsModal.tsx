@@ -39,8 +39,11 @@ export default function ShowDetailsModal({
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>{show.name}</Text>
-          <TouchableOpacity onPress={onClose}>
-            <Text style={styles.doneButton}>Done</Text>
+          <TouchableOpacity
+            onPress={onClose}
+            style={styles.doneButtonContainer}
+          >
+            <Text style={styles.doneButton}>DONE</Text>
           </TouchableOpacity>
         </View>
 
@@ -49,7 +52,9 @@ export default function ShowDetailsModal({
           contentContainerStyle={styles.content}
         >
           {hostDisplay && (
-            <Text style={styles.hostText}>Hosted by: {hostDisplay}</Text>
+            <Text style={styles.hostText}>
+              HOSTED BY: {hostDisplay.toUpperCase()}
+            </Text>
           )}
 
           <Text style={styles.description}>{show.description}</Text>
@@ -61,24 +66,24 @@ export default function ShowDetailsModal({
           )}
 
           <View style={styles.infoSection}>
-            <Text style={styles.sectionLabel}>Frequency</Text>
+            <Text style={styles.sectionLabel}>FREQUENCY</Text>
             <Text style={styles.sectionValue}>{show.frequency}</Text>
           </View>
 
           {show.duration && (
             <View style={styles.infoSection}>
-              <Text style={styles.sectionLabel}>Duration</Text>
+              <Text style={styles.sectionLabel}>DURATION</Text>
               <Text style={styles.sectionValue}>{show.duration}</Text>
             </View>
           )}
 
           {show.genres && show.genres.length > 0 && (
             <View style={styles.infoSection}>
-              <Text style={styles.sectionLabel}>Genres</Text>
+              <Text style={styles.sectionLabel}>GENRES</Text>
               <View style={styles.genresContainer}>
                 {show.genres.map((genre, index) => (
                   <View key={index} style={styles.genreTag}>
-                    <Text style={styles.genreText}>{genre}</Text>
+                    <Text style={styles.genreText}>{genre.toUpperCase()}</Text>
                   </View>
                 ))}
               </View>
@@ -87,7 +92,7 @@ export default function ShowDetailsModal({
 
           {show.specialSegments && show.specialSegments.length > 0 && (
             <View>
-              <Text style={styles.sectionLabel}>Special Segments</Text>
+              <Text style={styles.sectionLabel}>SPECIAL SEGMENTS</Text>
               {show.specialSegments.map((segment, index) => (
                 <View key={index} style={styles.segmentItem}>
                   <Text style={styles.segmentName}>{segment.name}</Text>
@@ -105,7 +110,7 @@ export default function ShowDetailsModal({
               style={styles.goToShowButton}
               onPress={handleGoToShow}
             >
-              <Text style={styles.goToShowText}>🎧 Go to Show Episodes</Text>
+              <Text style={styles.goToShowText}>VIEW EPISODES</Text>
             </TouchableOpacity>
           )}
         </ScrollView>
@@ -117,7 +122,7 @@ export default function ShowDetailsModal({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#000",
   },
   header: {
     flexDirection: "row",
@@ -126,94 +131,129 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 60,
     borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
+    borderBottomColor: "#333",
+    backgroundColor: "#000",
   },
   title: {
     fontSize: 20,
-    fontWeight: "600",
+    fontWeight: "700",
     flex: 1,
+    color: "#fff",
+    letterSpacing: 0.5,
+  },
+  doneButtonContainer: {
+    backgroundColor: "#333",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 4,
   },
   doneButton: {
-    fontSize: 18,
-    color: "#007AFF",
+    fontSize: 14,
+    color: "#fff",
+    fontWeight: "700",
+    letterSpacing: 0.5,
   },
   scrollView: {
     flex: 1,
+    backgroundColor: "#000",
   },
   content: {
     padding: 20,
   },
   hostText: {
-    fontSize: 16,
-    fontWeight: "500",
-    marginBottom: 8,
-    color: "#007AFF",
+    fontSize: 14,
+    fontWeight: "700",
+    marginBottom: 16,
+    color: "#fff",
+    letterSpacing: 1,
   },
   description: {
-    fontSize: 14,
-    marginBottom: 16,
-    lineHeight: 20,
+    fontSize: 16,
+    marginBottom: 24,
+    lineHeight: 24,
+    color: "#ccc",
   },
   taglineContainer: {
-    backgroundColor: "#f0f8ff",
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 16,
+    backgroundColor: "#111",
+    padding: 16,
+    borderRadius: 0,
+    marginBottom: 24,
+    borderLeftWidth: 3,
+    borderLeftColor: "#fff",
   },
   taglineText: {
-    fontSize: 14,
+    fontSize: 16,
     fontStyle: "italic",
-    color: "#007AFF",
+    color: "#fff",
+    letterSpacing: 0.3,
   },
   infoSection: {
-    marginBottom: 16,
+    marginBottom: 20,
   },
   sectionLabel: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: 12,
+    fontWeight: "700",
     marginBottom: 8,
-    color: "#666",
+    color: "#888",
+    letterSpacing: 1,
+    textTransform: "uppercase",
   },
   sectionValue: {
-    fontSize: 14,
+    fontSize: 16,
+    color: "#fff",
+    fontWeight: "500",
   },
   genresContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 4,
+    gap: 8,
   },
   genreTag: {
-    backgroundColor: "#e3f2fd",
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 12,
+    backgroundColor: "#333",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 0,
+    borderWidth: 1,
+    borderColor: "#555",
   },
   genreText: {
-    color: "#1976d2",
-    fontSize: 12,
+    color: "#fff",
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 0.5,
   },
   segmentItem: {
-    marginBottom: 8,
+    marginBottom: 16,
+    backgroundColor: "#111",
+    padding: 12,
+    borderRadius: 0,
   },
   segmentName: {
     fontSize: 14,
-    fontWeight: "500",
+    fontWeight: "700",
+    color: "#fff",
+    marginBottom: 4,
+    letterSpacing: 0.3,
   },
   segmentDescription: {
     fontSize: 13,
-    opacity: 0.7,
+    color: "#ccc",
+    lineHeight: 18,
   },
   goToShowButton: {
-    backgroundColor: "#007AFF",
-    paddingVertical: 12,
+    backgroundColor: "#fff",
+    paddingVertical: 16,
     paddingHorizontal: 20,
-    borderRadius: 8,
-    marginTop: 20,
+    borderRadius: 0,
+    marginTop: 24,
     alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#fff",
   },
   goToShowText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "600",
+    color: "#000",
+    fontSize: 14,
+    fontWeight: "700",
+    letterSpacing: 1,
   },
 });

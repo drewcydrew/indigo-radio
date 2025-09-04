@@ -145,7 +145,7 @@ export default function LiveRadio({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingBottom: 180, // Add padding to prevent content from being hidden behind floating player
+    paddingBottom: 120, // Reduced padding since player can now collapse
   },
   content: {
     flex: 1,

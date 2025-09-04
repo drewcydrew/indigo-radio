@@ -143,7 +143,7 @@ export default function ScheduleDisplay({
                                 ) : (
                                   <View style={styles.placeholderThumbnail}>
                                     <Text style={styles.placeholderIcon}>
-                                      📻
+                                      RADIO
                                     </Text>
                                   </View>
                                 )}
@@ -155,12 +155,12 @@ export default function ScheduleDisplay({
                                     {program.name}
                                   </Text>
                                   {showDef && (
-                                    <Text style={styles.infoIcon}>ℹ️</Text>
+                                    <Text style={styles.infoIcon}>INFO</Text>
                                   )}
                                 </View>
                                 {program.host && (
                                   <Text style={styles.hostText}>
-                                    with {program.host}
+                                    Hosted by {program.host}
                                   </Text>
                                 )}
                                 <Text style={styles.descriptionText}>
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#000",
   },
   header: {
     flexDirection: "row",
@@ -315,38 +315,54 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 60,
     borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
+    borderBottomColor: "#333",
+    backgroundColor: "#000",
   },
   headerTitle: {
     fontSize: 24,
-    fontWeight: "600",
+    fontWeight: "700",
+    color: "#fff",
+    letterSpacing: 0.5,
   },
   doneButton: {
-    fontSize: 18,
-    color: "#007AFF",
+    fontSize: 16,
+    color: "#fff",
+    fontWeight: "700",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: "#333",
+    borderRadius: 4,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   scrollView: {
     flex: 1,
+    backgroundColor: "#000",
   },
   scrollContent: {
     padding: 20,
   },
   daySection: {
-    marginBottom: 24,
+    marginBottom: 32,
   },
   dayTitle: {
     fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 12,
-    color: "#007AFF",
+    fontWeight: "700",
+    marginBottom: 16,
+    color: "#fff",
+    letterSpacing: 1,
+    textTransform: "uppercase",
+    borderBottomWidth: 2,
+    borderBottomColor: "#333",
+    paddingBottom: 8,
   },
   programCard: {
-    padding: 12,
+    padding: 16,
     marginBottom: 8,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 8,
-    borderLeftWidth: 4,
-    borderLeftColor: "#007AFF",
+    backgroundColor: "#111",
+    borderRadius: 0,
+    borderLeftWidth: 3,
+    borderLeftColor: "#fff",
   },
   programContent: {
     flexDirection: "row",
@@ -359,19 +375,22 @@ const styles = StyleSheet.create({
   thumbnail: {
     width: 50,
     height: 50,
-    borderRadius: 6,
-    backgroundColor: "#e0e0e0",
+    borderRadius: 0,
+    backgroundColor: "#333",
   },
   placeholderThumbnail: {
     width: 50,
     height: 50,
-    borderRadius: 6,
-    backgroundColor: "#e0e0e0",
+    borderRadius: 0,
+    backgroundColor: "#333",
     alignItems: "center",
     justifyContent: "center",
   },
   placeholderIcon: {
-    fontSize: 20,
+    fontSize: 8,
+    fontWeight: "700",
+    color: "#888",
+    letterSpacing: 0.5,
   },
   programLeft: {
     flex: 1,
@@ -381,30 +400,38 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
+    marginBottom: 4,
   },
   programTitle: {
     fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 4,
+    fontWeight: "700",
+    color: "#fff",
+    letterSpacing: 0.3,
   },
   infoIcon: {
-    fontSize: 12,
-    opacity: 0.6,
+    fontSize: 10,
+    color: "#888",
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   hostText: {
     fontSize: 14,
     marginBottom: 4,
-    opacity: 0.8,
+    color: "#ccc",
+    fontWeight: "500",
   },
   descriptionText: {
-    fontSize: 14,
+    fontSize: 12,
     marginBottom: 8,
-    opacity: 0.6,
+    color: "#888",
     fontStyle: "italic",
+    lineHeight: 16,
   },
   timeText: {
     fontSize: 14,
-    fontWeight: "600",
-    color: "#007AFF",
+    fontWeight: "700",
+    color: "#fff",
+    letterSpacing: 0.5,
   },
 });
