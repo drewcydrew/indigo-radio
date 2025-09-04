@@ -6,6 +6,7 @@ import {
   FlatList,
   Image,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import { RadioProgram, ShowDefinition } from "../types/types";
 import useShowDetails from "../hooks/useShowDetails";
@@ -17,6 +18,7 @@ interface TodaysScheduleProps {
   currentProgram?: RadioProgram | null;
   showTitle?: boolean;
   onGoToShow?: (showName: string) => void;
+  programsLoading?: boolean;
 }
 
 export default function TodaysSchedule({
@@ -24,12 +26,16 @@ export default function TodaysSchedule({
   currentProgram,
   showTitle = false,
   onGoToShow,
+  programsLoading = false,
 }: TodaysScheduleProps) {
   const [selectedShow, setSelectedShow] = useState<ShowDefinition | null>(null);
   const [showFullSchedule, setShowFullSchedule] = useState(false);
 
   // Use the hook to get show details
-  const { findShowByName } = useShowDetails();
+  const { findShowByName, loading: showDetailsLoading } = useShowDetails();
+
+  // Check if any data is still loading
+  const isLoading = programsLoading || showDetailsLoading;
 
   // Get today's day name
   const getTodayName = (): RadioProgram["day"] => {
@@ -176,6 +182,28 @@ export default function TodaysSchedule({
   };
 
   const todayName = dayNames[getTodayName()];
+
+  // Loading component
+  const renderLoading = () => (
+    <View style={styles.loadingContainer}>
+      <ActivityIndicator size="large" color="#000" />
+      <Text style={styles.loadingText}>Loading today's schedule...</Text>
+    </View>
+  );
+
+  // If loading, show loading indicator
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        {showTitle && (
+          <View style={styles.headerContainer}>
+            <Text style={styles.title}>Today's Schedule</Text>
+          </View>
+        )}
+        {renderLoading()}
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -359,5 +387,21 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     letterSpacing: 1,
     textTransform: "uppercase",
+  },
+  headerContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 40,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
   },
 });

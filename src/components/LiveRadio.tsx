@@ -26,7 +26,11 @@ export default function LiveRadio({
   );
 
   // Use the hook to get program data
-  const { programs, getCurrentProgram } = usePrograms();
+  const {
+    programs,
+    getCurrentProgram,
+    loading: programsLoading,
+  } = usePrograms();
 
   // Update current program every minute
   useEffect(() => {
@@ -99,6 +103,7 @@ export default function LiveRadio({
           currentProgram={currentProgram}
           showTitle={true}
           onGoToShow={onGoToShow}
+          programsLoading={programsLoading}
         />
       </View>
 
