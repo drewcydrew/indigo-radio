@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Platform } from "react-native";
-import TrackPlayer, { useProgress } from "react-native-track-player";
+import { audioService } from "../services/AudioService";
 import EpisodeList from "./EpisodeList";
 import PlayingWindow from "./PlayingWindow";
 import { PodcastEpisode } from "../types/types";
@@ -28,18 +28,27 @@ export default function Podcast({
     const episode = episodes.find((ep) => ep.id === episodeId);
     if (episode) {
       try {
+        // Get show definition for artwork
+        const showDef = showDefinitions.find(
+          (show) => show.name === episode.show
+        );
+        const artwork = showDef?.artwork;
+
         // Reset the player and add the new episode
-        await TrackPlayer.reset();
-        await TrackPlayer.add({
-          id: episode.id,
-          url: episode.url,
-          title: episode.title,
-          artist: episode.show,
-          artwork: undefined, // Add artwork URL if available in your episode data
-        });
+        await audioService.reset();
+
+        if (Platform.OS !== "web") {
+          await audioService.add({
+            id: episode.id,
+            url: episode.url,
+            title: episode.title,
+            artist: episode.show,
+            artwork: artwork, // Add artwork URL
+          });
+        }
 
         // Start playing
-        await TrackPlayer.play();
+        await audioService.play();
 
         // Update state
         setCurrentEpisode(episode);

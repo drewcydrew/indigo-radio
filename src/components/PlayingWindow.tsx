@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Platform,
+  Image,
 } from "react-native";
 import TrackPlayer, {
   usePlaybackState,
@@ -12,16 +13,59 @@ import TrackPlayer, {
   State,
 } from "react-native-track-player";
 import CustomSlider from "./CustomSlider";
+import WebAudioPlayer, {
+  AudioState,
+  WebAudioPlayerRef,
+} from "./WebAudioPlayer";
+import { audioService } from "../services/AudioService";
 import { PodcastEpisode } from "../types/types";
+import useShowDetails from "../hooks/useShowDetails";
 
 interface PlayingWindowProps {
   currentEpisode?: PodcastEpisode | null;
 }
 
 export default function PlayingWindow({ currentEpisode }: PlayingWindowProps) {
-  const playback = usePlaybackState();
-  const progress = useProgress();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const webAudioRef = useRef<WebAudioPlayerRef>(null);
+
+  // Mobile state
+  const mobilePlayback = usePlaybackState();
+  const mobileProgress = useProgress();
+
+  // Web state
+  const [webAudioState, setWebAudioState] = useState<AudioState>({
+    position: 0,
+    duration: 0,
+    isPlaying: false,
+    isLoading: false,
+  });
+
+  // Set up web audio state listener and player ref
+  useEffect(() => {
+    if (Platform.OS === "web") {
+      audioService.setWebAudioStateListener(setWebAudioState);
+      audioService.setWebAudioPlayerRef(webAudioRef.current);
+    }
+  }, []);
+
+  // Update audio service ref when it changes
+  useEffect(() => {
+    if (Platform.OS === "web") {
+      audioService.setWebAudioPlayerRef(webAudioRef.current);
+    }
+  }, [webAudioRef.current]);
+
+  // Get current state based on platform
+  const playback =
+    Platform.OS === "web"
+      ? { state: webAudioState.isPlaying ? State.Playing : State.Paused }
+      : mobilePlayback;
+
+  const progress =
+    Platform.OS === "web"
+      ? { position: webAudioState.position, duration: webAudioState.duration }
+      : mobileProgress;
 
   const toggleCollapsed = () => {
     setIsCollapsed(!isCollapsed);
@@ -34,17 +78,17 @@ export default function PlayingWindow({ currentEpisode }: PlayingWindowProps) {
   };
 
   const handleSeek = async (value: number) => {
-    await TrackPlayer.seekTo(value);
+    await audioService.seekTo(value);
   };
 
   const skipBackward = async () => {
     const newPosition = Math.max(0, progress.position - 15);
-    await TrackPlayer.seekTo(newPosition);
+    await audioService.seekTo(newPosition);
   };
 
   const skipForward = async () => {
     const newPosition = Math.min(progress.duration, progress.position + 15);
-    await TrackPlayer.seekTo(newPosition);
+    await audioService.seekTo(newPosition);
   };
 
   const isPlaying = playback.state === State.Playing;
@@ -52,18 +96,28 @@ export default function PlayingWindow({ currentEpisode }: PlayingWindowProps) {
   const togglePlayPause = async () => {
     try {
       if (isPlaying) {
-        await TrackPlayer.pause();
+        await audioService.pause();
       } else {
         // If no episode is loaded, don't try to play
         if (!currentEpisode) {
           console.log("No episode loaded");
           return;
         }
-        await TrackPlayer.play();
+        await audioService.play();
       }
     } catch (error) {
       console.error("Error toggling play/pause:", error);
     }
+  };
+
+  // Use the hook to get show details for artwork
+  const { findShowByName } = useShowDetails();
+
+  // Get artwork for current episode
+  const getEpisodeArtwork = (): string | undefined => {
+    if (!currentEpisode) return undefined;
+    const showDef = findShowByName(currentEpisode.show);
+    return showDef?.artwork;
   };
 
   // Minimized display
@@ -71,6 +125,21 @@ export default function PlayingWindow({ currentEpisode }: PlayingWindowProps) {
     return (
       <View style={styles.minimizedContainer}>
         <View style={styles.minimizedContent}>
+          {/* Artwork */}
+          <View style={styles.minimizedArtworkContainer}>
+            {getEpisodeArtwork() ? (
+              <Image
+                source={{ uri: getEpisodeArtwork()! }}
+                style={styles.minimizedArtwork}
+                resizeMode="cover"
+              />
+            ) : (
+              <View style={styles.minimizedPlaceholderArtwork}>
+                <Text style={styles.minimizedPlaceholderText}>♪</Text>
+              </View>
+            )}
+          </View>
+
           <TouchableOpacity
             onPress={toggleCollapsed}
             style={styles.minimizedInfo}
@@ -103,6 +172,18 @@ export default function PlayingWindow({ currentEpisode }: PlayingWindowProps) {
             </Text>
           </TouchableOpacity>
         </View>
+
+        {/* Web Audio Player Component */}
+        {Platform.OS === "web" && currentEpisode && (
+          <WebAudioPlayer
+            ref={webAudioRef}
+            src={currentEpisode.url}
+            onStateChange={(state) => audioService.updateWebAudioState(state)}
+            onLoad={() => console.log("Audio loaded")}
+            onError={(error) => console.error("Audio error:", error)}
+            autoPlay={true}
+          />
+        )}
       </View>
     );
   }
@@ -110,6 +191,18 @@ export default function PlayingWindow({ currentEpisode }: PlayingWindowProps) {
   // Full expanded display
   return (
     <View style={styles.expandedContainer}>
+      {/* Web Audio Player Component */}
+      {Platform.OS === "web" && currentEpisode && (
+        <WebAudioPlayer
+          ref={webAudioRef}
+          src={currentEpisode.url}
+          onStateChange={(state) => audioService.updateWebAudioState(state)}
+          onLoad={() => console.log("Audio loaded")}
+          onError={(error) => console.error("Audio error:", error)}
+          autoPlay={true}
+        />
+      )}
+
       {/* Header with collapse button */}
       <View style={styles.headerContainer}>
         <View style={styles.headerContent}>
@@ -133,10 +226,30 @@ export default function PlayingWindow({ currentEpisode }: PlayingWindowProps) {
       </View>
 
       <View style={styles.expandedContent}>
-        {/* Episode details */}
+        {/* Episode details with artwork */}
         {currentEpisode && (
           <View style={styles.episodeDetails}>
-            <Text style={styles.nowPlayingShow}>{currentEpisode.show}</Text>
+            <View style={styles.episodeHeader}>
+              {/* Large Artwork */}
+              <View style={styles.artworkContainer}>
+                {getEpisodeArtwork() ? (
+                  <Image
+                    source={{ uri: getEpisodeArtwork()! }}
+                    style={styles.artwork}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <View style={styles.placeholderArtwork}>
+                    <Text style={styles.placeholderText}>♪</Text>
+                  </View>
+                )}
+              </View>
+
+              {/* Episode Info */}
+              <View style={styles.episodeInfo}>
+                <Text style={styles.nowPlayingShow}>{currentEpisode.show}</Text>
+              </View>
+            </View>
           </View>
         )}
 
@@ -197,7 +310,7 @@ export default function PlayingWindow({ currentEpisode }: PlayingWindowProps) {
         </View>
 
         <Text style={styles.stateText}>
-          Status: {String(playback?.state ?? "unknown")}
+          Status: {isPlaying ? "playing" : "paused"}
         </Text>
       </View>
     </View>
@@ -238,6 +351,28 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     flex: 1,
     maxWidth: "100%",
+  },
+  minimizedArtworkContainer: {
+    marginRight: 12,
+  },
+  minimizedArtwork: {
+    width: 44,
+    height: 44,
+    borderRadius: 4,
+    backgroundColor: "#333",
+  },
+  minimizedPlaceholderArtwork: {
+    width: 44,
+    height: 44,
+    borderRadius: 4,
+    backgroundColor: "#333",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  minimizedPlaceholderText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
   },
   minimizedInfo: {
     flex: 1,
@@ -329,6 +464,36 @@ const styles = StyleSheet.create({
   },
   episodeDetails: {
     marginBottom: 16,
+  },
+  episodeHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  artworkContainer: {
+    marginRight: 16,
+  },
+  artwork: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    backgroundColor: "#333",
+  },
+  placeholderArtwork: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    backgroundColor: "#333",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  placeholderText: {
+    color: "#fff",
+    fontSize: 24,
+    fontWeight: "600",
+  },
+  episodeInfo: {
+    flex: 1,
   },
   nowPlayingTitle: {
     fontSize: 18,
