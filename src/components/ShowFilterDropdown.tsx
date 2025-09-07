@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Modal,
   ScrollView,
+  Platform,
 } from "react-native";
 
 interface ShowFilterDropdownProps {
@@ -165,7 +166,9 @@ export default function ShowFilterDropdown({
 const styles = StyleSheet.create({
   filterContainer: {
     marginBottom: 16,
-    paddingHorizontal: 16,
+    paddingHorizontal: Platform.OS === "web" ? 0 : 16,
+    width: "100%",
+    maxWidth: "100%",
   },
   filterHeader: {
     flexDirection: "row",
@@ -202,11 +205,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     minHeight: 50,
+    width: "100%",
+    maxWidth: "100%",
   },
   dropdownText: {
     fontSize: 16,
     color: "#333",
     flex: 1,
+    marginRight: 8,
   },
   placeholderText: {
     color: "#999",
@@ -221,6 +227,8 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     marginTop: 8,
     gap: 8,
+    width: "100%",
+    maxWidth: "100%",
   },
   showChip: {
     backgroundColor: "#000",
@@ -230,11 +238,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
+    maxWidth: Platform.OS === "web" ? 200 : "auto",
   },
   showChipText: {
     color: "#fff",
     fontSize: 12,
     fontWeight: "600",
+    flexShrink: 1,
   },
   removeChipButton: {
     backgroundColor: "#333",

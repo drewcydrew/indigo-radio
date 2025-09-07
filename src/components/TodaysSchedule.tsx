@@ -7,6 +7,7 @@ import {
   Image,
   StyleSheet,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import { RadioProgram, ShowDefinition } from "../types/types";
 import useShowDetails from "../hooks/useShowDetails";
@@ -246,15 +247,19 @@ export default function TodaysSchedule({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: "100%",
+    maxWidth: "100%",
   },
   listContent: {
     paddingBottom: 20,
+    width: "100%",
+    maxWidth: "100%",
   },
   title: {
     fontSize: 18,
     fontWeight: "600",
     marginBottom: 16,
-    paddingHorizontal: 16,
+    paddingHorizontal: Platform.OS === "web" ? 0 : 16,
   },
   programItem: {
     padding: 16,
@@ -263,6 +268,9 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     borderLeftWidth: 3,
     borderLeftColor: "#000",
+    marginHorizontal: Platform.OS === "web" ? 0 : 0,
+    width: "100%",
+    maxWidth: "100%",
   },
   currentProgramItem: {
     backgroundColor: "#000",
@@ -272,6 +280,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
+    width: "100%",
+    maxWidth: "100%",
   },
   thumbnailContainer: {
     marginRight: 12,
@@ -299,17 +309,20 @@ const styles = StyleSheet.create({
   programInfo: {
     flex: 1,
     marginRight: 12,
+    minWidth: 0, // Important for text truncation on web
   },
   programTitleRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
     marginBottom: 4,
+    flexWrap: Platform.OS === "web" ? "wrap" : "nowrap",
   },
   programTitle: {
     fontSize: 16,
     fontWeight: "700",
     color: "#000",
+    flexShrink: 1,
   },
   currentProgramTitle: {
     color: "#fff",
@@ -340,6 +353,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     color: "#666",
     fontWeight: "500",
+    flexWrap: Platform.OS === "web" ? "wrap" : "nowrap",
   },
   currentHostText: {
     color: "#ccc",
@@ -350,6 +364,7 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     lineHeight: 16,
     color: "#000",
+    flexWrap: Platform.OS === "web" ? "wrap" : "nowrap",
   },
   currentDescriptionText: {
     opacity: 0.8,
@@ -359,6 +374,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
     color: "#000",
+    minWidth: Platform.OS === "web" ? 80 : "auto",
+    textAlign: "right",
   },
   currentTimeText: {
     color: "#fff",
@@ -368,10 +385,14 @@ const styles = StyleSheet.create({
     opacity: 0.6,
     marginTop: 20,
     paddingHorizontal: 16,
+    width: "100%",
+    maxWidth: "100%",
   },
   footerContainer: {
     marginTop: 16,
-    paddingHorizontal: 16,
+    paddingHorizontal: Platform.OS === "web" ? 0 : 16,
+    width: "100%",
+    maxWidth: "100%",
   },
   fullScheduleButton: {
     backgroundColor: "#000",
@@ -380,6 +401,8 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     alignItems: "center",
     borderWidth: 0,
+    width: "100%",
+    maxWidth: "100%",
   },
   fullScheduleText: {
     color: "#fff",
@@ -389,19 +412,24 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   headerContainer: {
-    paddingHorizontal: 16,
+    paddingHorizontal: Platform.OS === "web" ? 0 : 16,
     paddingBottom: 16,
+    width: "100%",
+    maxWidth: "100%",
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     paddingVertical: 40,
+    width: "100%",
+    maxWidth: "100%",
   },
   loadingText: {
     marginTop: 16,
     fontSize: 16,
     color: "#666",
     textAlign: "center",
+    paddingHorizontal: 16,
   },
 });

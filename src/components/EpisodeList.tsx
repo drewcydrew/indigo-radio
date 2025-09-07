@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import {
   View,
   Text,
@@ -6,11 +6,13 @@ import {
   FlatList,
   Image,
   StyleSheet,
+  Platform,
 } from "react-native";
 import { PodcastEpisode, ShowDefinition } from "../types/types";
 import useShowDetails from "../hooks/useShowDetails";
 import ShowFilterDropdown from "./ShowFilterDropdown";
 import PodcastEpisodeDisplay from "./PodcastEpisodeDisplay";
+import TextSearch from "./TextSearch";
 
 interface EpisodeListProps {
   episodes: PodcastEpisode[];
@@ -34,18 +36,36 @@ export default function EpisodeList({
     null
   );
   const [showModal, setShowModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   // Use the hook to get show details
   const { findShowByName } = useShowDetails();
 
-  // Get unique shows for filtering
-  const shows = [...new Set(episodes.map((episode) => episode.show))];
+  // Get unique shows for filtering - memoize to prevent unnecessary recalculations
+  const shows = useMemo(
+    () => [...new Set(episodes.map((episode) => episode.show))],
+    [episodes]
+  );
 
-  // Filter episodes by selected shows
-  const filteredEpisodes =
-    selectedShows.length === 0
-      ? episodes
-      : episodes.filter((episode) => selectedShows.includes(episode.show));
+  // Filter episodes by selected shows and search query - memoize the filtering logic
+  const filteredEpisodes = useMemo(() => {
+    return episodes.filter((episode) => {
+      // Show filter
+      const showMatch =
+        selectedShows.length === 0 || selectedShows.includes(episode.show);
+
+      // Text search filter - only apply if there's an actual search query
+      const searchMatch =
+        searchQuery.length === 0 ||
+        episode.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (episode.description &&
+          episode.description
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()));
+
+      return showMatch && searchMatch;
+    });
+  }, [episodes, selectedShows, searchQuery]);
 
   const formatDuration = (seconds?: number) => {
     if (!seconds) return "Unknown";
@@ -59,89 +79,137 @@ export default function EpisodeList({
     return findShowByName(showName);
   };
 
-  const handleShowsChange = (showNames: string[]) => {
+  const handleShowsChange = useCallback((showNames: string[]) => {
     setSelectedShows(showNames);
-  };
+  }, []);
 
-  const handleClearFilter = () => {
+  const handleClearFilter = useCallback(() => {
     setSelectedShows([]);
-  };
+  }, []);
 
-  const handleEpisodePress = (episode: PodcastEpisode) => {
+  const handleEpisodePress = useCallback((episode: PodcastEpisode) => {
     setSelectedEpisode(episode);
     setShowModal(true);
-  };
+  }, []);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setShowModal(false);
     setSelectedEpisode(null);
-  };
+  }, []);
 
-  const renderEpisode = ({ item: episode }: { item: PodcastEpisode }) => {
-    const showDef = findShowDefinition(episode.show);
-    const artwork = showDef?.artwork;
-    const artist =
-      showDef?.host ||
-      (showDef?.hosts ? showDef.hosts.join(", ") : "Indigo FM Podcast");
+  const handleSearchChange = useCallback((query: string) => {
+    setSearchQuery(query);
+  }, []);
 
-    return (
-      <TouchableOpacity
-        style={styles.episodeItem}
-        onPress={() => handleEpisodePress(episode)}
-      >
-        {/* Artwork */}
-        <View style={styles.artworkContainer}>
-          {artwork ? (
-            <Image
-              source={{ uri: artwork }}
-              style={styles.artwork}
-              resizeMode="cover"
-            />
-          ) : (
-            <View style={styles.placeholderArtwork}>
-              <Text style={styles.placeholderIcon}>PODCAST</Text>
-            </View>
-          )}
-        </View>
+  const handleClearSearch = useCallback(() => {
+    setSearchQuery("");
+  }, []);
 
-        {/* Episode Info */}
-        <View style={styles.episodeInfo}>
-          <Text style={styles.showName}>{episode.show.toUpperCase()}</Text>
-          <Text style={styles.episodeTitle}>{episode.title}</Text>
-          <Text style={styles.artistName}>Hosted by {artist}</Text>
-          <Text style={styles.duration}>
-            Duration: {formatDuration(currentTrackDuration)}
-          </Text>
-          {episode.description && (
-            <Text style={styles.description} numberOfLines={2}>
-              {episode.description}
-            </Text>
-          )}
-        </View>
+  const renderEpisode = useCallback(
+    ({ item: episode }: { item: PodcastEpisode }) => {
+      const showDef = findShowDefinition(episode.show);
+      const artwork = showDef?.artwork;
+      const artist =
+        showDef?.host ||
+        (showDef?.hosts ? showDef.hosts.join(", ") : "Indigo FM Podcast");
 
-        {/* Play Button */}
+      return (
         <TouchableOpacity
-          style={styles.playButton}
-          onPress={() => onEpisodePress(episode.id)}
+          style={styles.episodeItem}
+          onPress={() => handleEpisodePress(episode)}
         >
-          <Text style={styles.playButtonText}>▶</Text>
+          {/* Artwork */}
+          <View style={styles.artworkContainer}>
+            {artwork ? (
+              <Image
+                source={{ uri: artwork }}
+                style={styles.artwork}
+                resizeMode="cover"
+              />
+            ) : (
+              <View style={styles.placeholderArtwork}>
+                <Text style={styles.placeholderIcon}>PODCAST</Text>
+              </View>
+            )}
+          </View>
+
+          {/* Episode Info */}
+          <View style={styles.episodeInfo}>
+            <Text style={styles.showName}>{episode.show.toUpperCase()}</Text>
+            <Text style={styles.episodeTitle}>{episode.title}</Text>
+            <Text style={styles.artistName}>Hosted by {artist}</Text>
+            <Text style={styles.duration}>
+              Duration: {formatDuration(currentTrackDuration)}
+            </Text>
+            {episode.description && (
+              <Text style={styles.description} numberOfLines={2}>
+                {episode.description}
+              </Text>
+            )}
+          </View>
+
+          {/* Play Button */}
+          <TouchableOpacity
+            style={styles.playButton}
+            onPress={() => onEpisodePress(episode.id)}
+          >
+            <Text style={styles.playButtonText}>▶</Text>
+          </TouchableOpacity>
         </TouchableOpacity>
-      </TouchableOpacity>
-    );
-  };
+      );
+    },
+    [
+      handleEpisodePress,
+      onEpisodePress,
+      currentTrackDuration,
+      findShowDefinition,
+    ]
+  );
 
-  const renderHeader = () => (
-    <View>
-      {showTitle && <Text style={styles.title}>Podcast Episodes</Text>}
+  const renderHeader = useCallback(
+    () => (
+      <View key="episode-list-header">
+        {showTitle && <Text style={styles.title}>Podcast Episodes</Text>}
 
-      {/* Show Filter Dropdown */}
-      <ShowFilterDropdown
-        shows={shows}
-        selectedShows={selectedShows}
-        onShowsChange={handleShowsChange}
-        onClearFilter={handleClearFilter}
-      />
-    </View>
+        {/* Text Search */}
+        <TextSearch
+          searchQuery={searchQuery}
+          onSearchChange={handleSearchChange}
+          onClearSearch={handleClearSearch}
+          placeholder="Type and press enter to search..."
+        />
+
+        {/* Show Filter Dropdown */}
+        <ShowFilterDropdown
+          shows={shows}
+          selectedShows={selectedShows}
+          onShowsChange={handleShowsChange}
+          onClearFilter={handleClearFilter}
+        />
+      </View>
+    ),
+    [
+      showTitle,
+      searchQuery,
+      handleSearchChange,
+      handleClearSearch,
+      shows,
+      selectedShows,
+      handleShowsChange,
+      handleClearFilter,
+    ]
+  );
+
+  const listEmptyComponent = useCallback(
+    () => (
+      <Text style={styles.noEpisodes}>
+        No episodes found
+        {selectedShows.length > 0 || searchQuery.length > 0
+          ? ` matching your search criteria`
+          : ""}
+      </Text>
+    ),
+    [selectedShows.length, searchQuery.length]
   );
 
   return (
@@ -153,12 +221,8 @@ export default function EpisodeList({
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={renderHeader}
-        ListEmptyComponent={
-          <Text style={styles.noEpisodes}>
-            No episodes found
-            {selectedShows.length > 0 ? ` for selected shows` : ""}
-          </Text>
-        }
+        ListEmptyComponent={listEmptyComponent}
+        keyboardShouldPersistTaps="handled"
       />
 
       {/* Episode Display Modal */}
@@ -175,6 +239,8 @@ export default function EpisodeList({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: "100%",
+    maxWidth: "100%",
   },
   episodeItem: {
     padding: 16,
@@ -185,7 +251,8 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     borderLeftWidth: 3,
     borderLeftColor: "#000",
-    marginHorizontal: 16,
+    marginHorizontal: Platform.OS === "web" ? 0 : 16,
+    maxWidth: "100%",
   },
   artworkContainer: {
     marginRight: 12,
@@ -213,6 +280,7 @@ const styles = StyleSheet.create({
   episodeInfo: {
     flex: 1,
     marginRight: 12,
+    minWidth: 0, // Important for text truncation on web
   },
   showName: {
     fontWeight: "700",
@@ -227,6 +295,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     color: "#000",
     letterSpacing: 0.3,
+    flexWrap: Platform.OS === "web" ? "wrap" : "nowrap",
   },
   artistName: {
     fontSize: 12,
@@ -248,6 +317,7 @@ const styles = StyleSheet.create({
     lineHeight: 16,
     marginTop: 4,
     fontStyle: "italic",
+    flexWrap: Platform.OS === "web" ? "wrap" : "nowrap",
   },
   noEpisodes: {
     textAlign: "center",

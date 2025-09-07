@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
 import TrackPlayer, {
   usePlaybackState,
   useProgress,
@@ -210,7 +216,7 @@ const styles = StyleSheet.create({
     borderTopColor: "#333",
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
-    paddingHorizontal: 16,
+    paddingHorizontal: Platform.OS === "web" ? 24 : 16,
     paddingVertical: 12,
     shadowColor: "#000",
     shadowOffset: {
@@ -222,28 +228,35 @@ const styles = StyleSheet.create({
     elevation: 10,
     zIndex: 1000,
     height: 80,
+    maxWidth: Platform.OS === "web" ? 1200 : "100%",
+    alignSelf: Platform.OS === "web" ? "center" : "auto",
+    width: "100%",
   },
   minimizedContent: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     flex: 1,
+    maxWidth: "100%",
   },
   minimizedInfo: {
     flex: 1,
     marginRight: 16,
     justifyContent: "center",
+    minWidth: 0, // Important for text truncation on web
   },
   minimizedTitle: {
     fontSize: 16,
     fontWeight: "700",
     color: "#fff",
     marginBottom: 2,
+    flexWrap: Platform.OS === "web" ? "wrap" : "nowrap",
   },
   minimizedShow: {
     fontSize: 12,
     color: "#ccc",
     fontWeight: "500",
+    flexWrap: Platform.OS === "web" ? "wrap" : "nowrap",
   },
   minimizedPlayButton: {
     paddingVertical: 8,
@@ -271,7 +284,7 @@ const styles = StyleSheet.create({
     borderTopColor: "#333",
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
-    padding: 16,
+    padding: Platform.OS === "web" ? 24 : 16,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -281,6 +294,9 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 10,
     zIndex: 1000,
+    maxWidth: Platform.OS === "web" ? 1200 : "100%",
+    alignSelf: Platform.OS === "web" ? "center" : "auto",
+    width: "100%",
   },
   headerContainer: {
     marginBottom: 8,
@@ -320,12 +336,14 @@ const styles = StyleSheet.create({
     color: "#fff",
     marginBottom: 4,
     letterSpacing: 0.5,
+    flexWrap: Platform.OS === "web" ? "wrap" : "nowrap",
   },
   nowPlayingShow: {
     fontSize: 14,
     color: "#ccc",
     fontWeight: "500",
     marginBottom: 4,
+    flexWrap: Platform.OS === "web" ? "wrap" : "nowrap",
   },
   progressContainer: {
     marginBottom: 16,
@@ -347,6 +365,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     justifyContent: "center",
     alignItems: "center",
+    flexWrap: Platform.OS === "web" ? "wrap" : "nowrap",
   },
   skipButton: {
     paddingVertical: 8,
@@ -369,7 +388,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#fff",
     backgroundColor: "transparent",
-    minWidth: 120,
+    minWidth: Platform.OS === "web" ? 140 : 120,
   },
   playButtonActive: {
     backgroundColor: "#fff",
