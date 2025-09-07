@@ -20,6 +20,8 @@ interface EpisodeListProps {
   currentTrackDuration?: number;
   showTitle?: boolean;
   initialFilter?: string;
+  onGoToShow?: (showName: string) => void;
+  onShowDetails?: (showName: string) => void;
 }
 
 export default function EpisodeList({
@@ -28,6 +30,8 @@ export default function EpisodeList({
   currentTrackDuration,
   showTitle = false,
   initialFilter,
+  onGoToShow,
+  onShowDetails,
 }: EpisodeListProps) {
   const [selectedShows, setSelectedShows] = useState<string[]>(
     initialFilter ? [initialFilter] : []
@@ -37,6 +41,7 @@ export default function EpisodeList({
   );
   const [showModal, setShowModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [isEpisodeModalClosing, setIsEpisodeModalClosing] = useState(false);
 
   // Use the hook to get show details
   const { findShowByName } = useShowDetails();
@@ -93,8 +98,17 @@ export default function EpisodeList({
   }, []);
 
   const handleCloseModal = useCallback(() => {
+    setIsEpisodeModalClosing(true);
     setShowModal(false);
-    setSelectedEpisode(null);
+
+    // Reset closing state after animation completes
+    setTimeout(
+      () => {
+        setSelectedEpisode(null);
+        setIsEpisodeModalClosing(false);
+      },
+      Platform.OS === "ios" ? 400 : 200
+    );
   }, []);
 
   const handleSearchChange = useCallback((query: string) => {
@@ -212,6 +226,16 @@ export default function EpisodeList({
     [selectedShows.length, searchQuery.length]
   );
 
+  // Pass the closing state to the episode display
+  const handleEpisodeShowDetails = useCallback(
+    (showName: string) => {
+      if (onShowDetails && !isEpisodeModalClosing) {
+        onShowDetails(showName);
+      }
+    },
+    [onShowDetails, isEpisodeModalClosing]
+  );
+
   return (
     <View style={styles.container}>
       {/* Episodes List with Header */}
@@ -231,6 +255,7 @@ export default function EpisodeList({
         visible={showModal}
         onClose={handleCloseModal}
         onPlay={onEpisodePress}
+        onShowDetails={handleEpisodeShowDetails}
       />
     </View>
   );

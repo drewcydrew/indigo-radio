@@ -2,29 +2,51 @@ import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Platform } from "react-native";
 import { audioService } from "../services/AudioService";
 import EpisodeList from "./EpisodeList";
-import { PodcastEpisode } from "../types/types";
+import { PodcastEpisode, ShowDefinition } from "../types/types";
 import useShowDetails from "../hooks/useShowDetails";
 import usePodcastEpisodes from "../hooks/usePodcastEpisodes";
 import { usePlayer } from "../contexts/PlayerContext";
 import UniversalPlayer from "./UniversalPlayer";
+import ShowDetailsModal from "./ShowDetailsModal";
 
 interface PodcastProps {
   onNowPlayingUpdate: (title: string) => void;
   initialFilter?: string;
+  onGoToShow?: (showName: string) => void;
 }
 
 export default function Podcast({
   onNowPlayingUpdate,
   initialFilter,
+  onGoToShow,
 }: PodcastProps) {
   const { setCurrentContent, setPlayerVisible } = usePlayer();
   const [currentEpisode, setCurrentEpisode] = useState<PodcastEpisode | null>(
     null
   );
+  const [episodeFilter, setEpisodeFilter] = useState<string | undefined>(
+    initialFilter
+  );
+  const [selectedShow, setSelectedShow] = useState<ShowDefinition | null>(null);
+  const [pendingShowName, setPendingShowName] = useState<string | null>(null);
 
   // Use the hooks to get show details and podcast episodes
-  const { showDefinitions } = useShowDetails();
+  const { showDefinitions, findShowByName } = useShowDetails();
   const { episodes } = usePodcastEpisodes();
+
+  // Update filter when initialFilter changes
+  useEffect(() => {
+    setEpisodeFilter(initialFilter);
+  }, [initialFilter]);
+
+  const handleFilterEpisodes = (showName: string) => {
+    setEpisodeFilter(showName);
+  };
+
+  const handleGoToShow = (showName: string) => {
+    // When already in podcast mode, just filter episodes
+    setEpisodeFilter(showName);
+  };
 
   const playEpisode = async (episodeId: string) => {
     const episode = episodes.find((ep) => ep.id === episodeId);
@@ -80,6 +102,39 @@ export default function Podcast({
     }
   };
 
+  const handleShowDetailsPress = (showName: string) => {
+    const showDef = findShowByName(showName);
+    if (showDef) {
+      // If there's already a modal open, queue this one
+      if (selectedShow) {
+        setPendingShowName(showName);
+        return;
+      }
+      setSelectedShow(showDef);
+    }
+  };
+
+  const hideShowDetails = () => {
+    setSelectedShow(null);
+
+    // Check if there's a pending show to display
+    if (pendingShowName) {
+      const showDef = findShowByName(pendingShowName);
+      if (showDef) {
+        // Use a longer delay for iOS to ensure proper modal transition
+        setTimeout(
+          () => {
+            setSelectedShow(showDef);
+            setPendingShowName(null);
+          },
+          Platform.OS === "ios" ? 600 : 300
+        );
+      } else {
+        setPendingShowName(null);
+      }
+    }
+  };
+
   return (
     <View
       style={[styles.container, Platform.OS === "web" && styles.webContainer]}
@@ -100,13 +155,24 @@ export default function Podcast({
             onEpisodePress={playEpisode}
             currentTrackDuration={0}
             showTitle={true}
-            initialFilter={initialFilter}
+            initialFilter={episodeFilter}
+            onGoToShow={handleGoToShow}
+            onShowDetails={handleShowDetailsPress}
           />
         </View>
       </View>
 
       {/* Universal Player */}
-      <UniversalPlayer />
+      <UniversalPlayer onShowDetails={handleShowDetailsPress} />
+
+      {/* Show Details Modal */}
+      {selectedShow && (
+        <ShowDetailsModal
+          show={selectedShow}
+          onClose={hideShowDetails}
+          onGoToShow={onGoToShow}
+        />
+      )}
     </View>
   );
 }

@@ -12,9 +12,7 @@ import TrackPlayer, {
 } from "react-native-track-player";
 import { RadioProgram } from "../types/types";
 import usePrograms from "../hooks/usePrograms";
-import ScheduleDisplay from "./ScheduleDisplay";
 import TodaysSchedule from "./TodaysSchedule";
-import LiveRadioPlayer from "./LiveRadioPlayer";
 import { usePlayer } from "../contexts/PlayerContext";
 import UniversalPlayer from "./UniversalPlayer";
 import { audioService } from "../services/AudioService";
@@ -144,7 +142,7 @@ export default function LiveRadio({
       </View>
 
       {/* Universal Player */}
-      <UniversalPlayer />
+      <UniversalPlayer onGoToShow={onGoToShow} />
     </View>
   );
 }

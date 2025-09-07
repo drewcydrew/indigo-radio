@@ -7,6 +7,7 @@ import {
   Image,
   StyleSheet,
   ScrollView,
+  Platform,
 } from "react-native";
 import { PodcastEpisode } from "../types/types";
 import useShowDetails from "../hooks/useShowDetails";
@@ -16,6 +17,7 @@ interface PodcastEpisodeDisplayProps {
   visible: boolean;
   onClose: () => void;
   onPlay: (episodeId: string) => void;
+  onShowDetails?: (showName: string) => void;
 }
 
 export default function PodcastEpisodeDisplay({
@@ -23,6 +25,7 @@ export default function PodcastEpisodeDisplay({
   visible,
   onClose,
   onPlay,
+  onShowDetails,
 }: PodcastEpisodeDisplayProps) {
   const { findShowByName } = useShowDetails();
 
@@ -37,6 +40,18 @@ export default function PodcastEpisodeDisplay({
   const handlePlay = () => {
     onPlay(episode.id);
     onClose();
+  };
+
+  const handleViewShow = () => {
+    if (showDef && onShowDetails) {
+      onClose(); // Close this modal first
+
+      // Use a platform-specific delay to ensure modal is fully closed
+      const delay = Platform.OS === "ios" ? 500 : 200;
+      setTimeout(() => {
+        onShowDetails(episode.show);
+      }, delay);
+    }
   };
 
   return (
@@ -83,6 +98,20 @@ export default function PodcastEpisodeDisplay({
               <View style={styles.descriptionContainer}>
                 <Text style={styles.descriptionLabel}>Description</Text>
                 <Text style={styles.description}>{episode.description}</Text>
+              </View>
+            )}
+
+            {/* View Show Button */}
+            {showDef && onShowDetails && (
+              <View style={styles.viewShowContainer}>
+                <TouchableOpacity
+                  style={styles.viewShowButton}
+                  onPress={handleViewShow}
+                >
+                  <Text style={styles.viewShowButtonText}>
+                    VIEW SHOW DETAILS
+                  </Text>
+                </TouchableOpacity>
               </View>
             )}
           </View>
@@ -238,6 +267,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700",
     letterSpacing: 1,
+    textTransform: "uppercase",
+  },
+  viewShowContainer: {
+    width: "100%",
+    marginTop: 24,
+    alignItems: "center",
+  },
+  viewShowButton: {
+    backgroundColor: "transparent",
+    borderWidth: 2,
+    borderColor: "#000",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+  },
+  viewShowButtonText: {
+    color: "#000",
+    fontSize: 14,
+    fontWeight: "700",
+    letterSpacing: 0.5,
     textTransform: "uppercase",
   },
 });

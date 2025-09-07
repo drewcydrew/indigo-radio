@@ -20,10 +20,19 @@ import WebAudioPlayer, {
 import { audioService } from "../services/AudioService";
 import { usePlayer } from "../contexts/PlayerContext";
 import useShowDetails from "../hooks/useShowDetails";
+import { ShowDefinition } from "../types/types";
 
 const STREAM_URL = "https://internetradio.indigofm.au:8032/stream";
 
-export default function UniversalPlayer() {
+interface UniversalPlayerProps {
+  onGoToShow?: (showName: string) => void;
+  onShowDetails?: (showName: string) => void;
+}
+
+export default function UniversalPlayer({
+  onGoToShow,
+  onShowDetails,
+}: UniversalPlayerProps) {
   const { currentContent, isPlayerVisible } = usePlayer();
   const [isCollapsed, setIsCollapsed] = useState(true);
   const webAudioRef = useRef<WebAudioPlayerRef>(null);
@@ -207,6 +216,42 @@ export default function UniversalPlayer() {
 
   const contentData = getContentData();
 
+  const handleShowDetailsPress = () => {
+    let showName = "";
+
+    if (currentContent?.type === "podcast") {
+      showName = currentContent.episode.show;
+    } else if (currentContent?.type === "live" && currentContent.program) {
+      showName = currentContent.program.name;
+    }
+
+    if (showName) {
+      // Use the appropriate callback based on context
+      if (onShowDetails) {
+        onShowDetails(showName);
+      } else if (onGoToShow) {
+        const showDef = findShowByName(showName);
+        if (showDef) {
+          onGoToShow(showName);
+        }
+      }
+    }
+  };
+
+  // Check if we should show the "go to show" button
+  const shouldShowGoToShowButton = () => {
+    if (!currentContent) return false;
+
+    let showName = "";
+    if (currentContent.type === "podcast") {
+      showName = currentContent.episode.show;
+    } else if (currentContent.type === "live" && currentContent.program) {
+      showName = currentContent.program.name;
+    }
+
+    return showName && findShowByName(showName);
+  };
+
   // Minimized display
   if (isCollapsed) {
     return (
@@ -336,6 +381,18 @@ export default function UniversalPlayer() {
                   {currentContent.program.startTime} -{" "}
                   {currentContent.program.endTime}
                 </Text>
+              )}
+
+              {/* Go to Show Button */}
+              {shouldShowGoToShowButton() && (
+                <TouchableOpacity
+                  style={styles.goToShowButton}
+                  onPress={handleShowDetailsPress}
+                >
+                  <Text style={styles.goToShowButtonText}>
+                    VIEW SHOW DETAILS
+                  </Text>
+                </TouchableOpacity>
               )}
             </View>
           </View>
@@ -691,5 +748,22 @@ const styles = StyleSheet.create({
   },
   disabledButtonText: {
     color: "#999",
+  },
+  goToShowButton: {
+    marginTop: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: "#fff",
+    borderRadius: 4,
+    alignSelf: "flex-start",
+  },
+  goToShowButtonText: {
+    color: "#fff",
+    fontSize: 10,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
   },
 });
