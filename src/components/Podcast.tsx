@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Platform } from "react-native";
 import { audioService } from "../services/AudioService";
 import EpisodeList from "./EpisodeList";
-import PlayingWindow from "./PlayingWindow";
 import { PodcastEpisode } from "../types/types";
 import useShowDetails from "../hooks/useShowDetails";
 import usePodcastEpisodes from "../hooks/usePodcastEpisodes";
+import { usePlayer } from "../contexts/PlayerContext";
+import UniversalPlayer from "./UniversalPlayer";
 
 interface PodcastProps {
   onNowPlayingUpdate: (title: string) => void;
@@ -16,6 +17,7 @@ export default function Podcast({
   onNowPlayingUpdate,
   initialFilter,
 }: PodcastProps) {
+  const { setCurrentContent, setPlayerVisible } = usePlayer();
   const [currentEpisode, setCurrentEpisode] = useState<PodcastEpisode | null>(
     null
   );
@@ -43,15 +45,18 @@ export default function Podcast({
             url: episode.url,
             title: episode.title,
             artist: episode.show,
-            artwork: artwork, // Add artwork URL
+            artwork: artwork,
           });
         }
+
+        // Update player context
+        setCurrentContent({ type: "podcast", episode });
+        setPlayerVisible(true);
 
         // Start playing
         await audioService.play();
 
-        // Update state
-        setCurrentEpisode(episode);
+        // Update app state
         onNowPlayingUpdate(episode.title);
       } catch (error) {
         console.error("Error playing episode:", error);
@@ -65,11 +70,7 @@ export default function Podcast({
     >
       {/* Podcast Content */}
       <View
-        style={[
-          styles.content,
-          Platform.OS === "web" && styles.webContent,
-          { paddingBottom: currentEpisode ? 120 : 0 },
-        ]}
+        style={[styles.content, Platform.OS === "web" && styles.webContent]}
       >
         {/* Episodes List Component */}
         <View
@@ -88,8 +89,8 @@ export default function Podcast({
         </View>
       </View>
 
-      {/* Playing Window Component - Only show if episode is selected */}
-      {currentEpisode && <PlayingWindow currentEpisode={currentEpisode} />}
+      {/* Universal Player */}
+      <UniversalPlayer />
     </View>
   );
 }

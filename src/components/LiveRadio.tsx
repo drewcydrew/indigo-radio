@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Platform, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import TrackPlayer, {
   Event,
   useTrackPlayerEvents,
@@ -9,6 +15,9 @@ import usePrograms from "../hooks/usePrograms";
 import ScheduleDisplay from "./ScheduleDisplay";
 import TodaysSchedule from "./TodaysSchedule";
 import LiveRadioPlayer from "./LiveRadioPlayer";
+import { usePlayer } from "../contexts/PlayerContext";
+import UniversalPlayer from "./UniversalPlayer";
+import { audioService } from "../services/AudioService";
 
 const STREAM_URL = "https://internetradio.indigofm.au:8032/stream";
 
@@ -24,6 +33,7 @@ export default function LiveRadio({
   const [currentProgram, setCurrentProgram] = useState<RadioProgram | null>(
     null
   );
+  const { setCurrentContent, setPlayerVisible } = usePlayer();
 
   // Use the hook to get program data
   const {
@@ -62,7 +72,6 @@ export default function LiveRadio({
         if (event.type === Event.MetadataCommonReceived) {
           const title = event.metadata.title || event.metadata.artist;
           if (title && title.trim() !== "" && title !== "no name") {
-            // Don't override program information with metadata
             console.log("Stream metadata:", title);
           }
         }
@@ -71,27 +80,39 @@ export default function LiveRadio({
   }
 
   const playLiveRadio = async () => {
-    if (Platform.OS !== "web") {
-      try {
-        await TrackPlayer.reset();
+    try {
+      // Reset the player and set up live stream
+      await audioService.reset();
+
+      if (Platform.OS !== "web") {
         await TrackPlayer.add({
           id: "live",
           url: STREAM_URL,
-          title: "Indigo FM Live",
-          artist: "Live Radio",
+          title: currentProgram?.name || "Indigo FM Live",
+          artist: currentProgram?.host || "Live Radio",
           isLiveStream: true,
         });
-        // Don't auto-play, let the user control it via the player
-      } catch (error) {
-        console.error("Error setting up live radio:", error);
       }
+
+      // Update player context
+      setCurrentContent({ type: "live", program: currentProgram });
+      setPlayerVisible(true);
+
+      // Start playing
+      await audioService.play();
+
+      // Update app state
+      if (currentProgram) {
+        onNowPlayingUpdate(
+          `${currentProgram.name} - ${currentProgram.host || "Indigo FM"}`
+        );
+      } else {
+        onNowPlayingUpdate("Indigo FM - Live Radio");
+      }
+    } catch (error) {
+      console.error("Error playing live radio:", error);
     }
   };
-
-  useEffect(() => {
-    // Set up the stream but don't auto-play
-    playLiveRadio();
-  }, []); // Remove dependencies to prevent auto-restart
 
   return (
     <View style={styles.container}>
@@ -105,10 +126,17 @@ export default function LiveRadio({
           onGoToShow={onGoToShow}
           programsLoading={programsLoading}
         />
+
+        {/* Play Live Radio Button */}
+        <View style={styles.liveButtonContainer}>
+          <TouchableOpacity style={styles.liveButton} onPress={playLiveRadio}>
+            <Text style={styles.liveButtonText}>▶ PLAY LIVE RADIO</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
-      {/* Live Radio Player - Fixed at Bottom */}
-      <LiveRadioPlayer currentProgram={currentProgram} />
+      {/* Universal Player */}
+      <UniversalPlayer />
     </View>
   );
 }
@@ -174,5 +202,28 @@ const styles = StyleSheet.create({
     opacity: 0.7,
     textAlign: "center",
     marginBottom: 32,
+  },
+  liveButtonContainer: {
+    padding: 20,
+    paddingBottom: 40,
+  },
+  liveButton: {
+    backgroundColor: "#000",
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  liveButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "700",
+    letterSpacing: 1,
+    textTransform: "uppercase",
   },
 });

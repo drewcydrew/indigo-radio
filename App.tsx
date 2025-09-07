@@ -10,6 +10,7 @@ import {
 import TrackPlayer, { Capability } from "react-native-track-player";
 import LiveRadio from "./src/components/LiveRadio";
 import Podcast from "./src/components/Podcast";
+import { PlayerProvider } from "./src/contexts/PlayerContext";
 
 async function setupPlayer() {
   if (Platform.OS !== "web") {
@@ -35,7 +36,7 @@ async function setupPlayer() {
 
 export default function App() {
   const [now, setNow] = useState<string>("Indigo FM");
-  const [currentMode, setCurrentMode] = useState<"live" | "podcast">("live");
+  const [currentMode, setCurrentMode] = useState<"live" | "podcast">("podcast");
   const [isPlayerReady, setIsPlayerReady] = useState(false);
   const [podcastFilter, setPodcastFilter] = useState<string | undefined>(
     undefined
@@ -79,74 +80,76 @@ export default function App() {
   }
 
   return (
-    <SafeAreaView
-      style={[styles.container, Platform.OS === "web" && styles.webContainer]}
-    >
-      {/* Main Content - Full Screen */}
-      <View style={styles.mainContent}>
-        {/* App Title */}
-        <View style={styles.header}>
-          <Text style={styles.title}>Indigo FM</Text>
-        </View>
-
-        {/* Full Screen Component */}
-        <View style={styles.content}>
-          {currentMode === "live" ? (
-            <LiveRadio
-              onNowPlayingUpdate={handleNowPlayingUpdate}
-              onGoToShow={handleGoToShow}
-            />
-          ) : (
-            <Podcast
-              onNowPlayingUpdate={handleNowPlayingUpdate}
-              initialFilter={podcastFilter}
-            />
-          )}
-        </View>
-      </View>
-
-      {/* Toggle Switch - Always floating */}
-      <View style={styles.toggleContainer}>
-        <TouchableOpacity
-          onPress={() =>
-            setCurrentMode(currentMode === "live" ? "podcast" : "live")
-          }
-          style={styles.toggleSwitch}
-        >
-          {/* Toggle Background Track */}
-          <View
-            style={[
-              styles.toggleTrack,
-              { left: currentMode === "live" ? 3 : 79 },
-            ]}
-          />
-
-          {/* Radio Option */}
-          <View style={styles.toggleOption}>
-            <Text
-              style={[
-                styles.toggleText,
-                { color: currentMode === "live" ? "white" : "#666" },
-              ]}
-            >
-              Live
-            </Text>
+    <PlayerProvider>
+      <SafeAreaView
+        style={[styles.container, Platform.OS === "web" && styles.webContainer]}
+      >
+        {/* Main Content - Full Screen */}
+        <View style={styles.mainContent}>
+          {/* App Title */}
+          <View style={styles.header}>
+            <Text style={styles.title}>Indigo FM</Text>
           </View>
 
-          {/* Podcast Option */}
-          <View style={styles.toggleOption}>
-            <Text
-              style={[
-                styles.toggleText,
-                { color: currentMode === "podcast" ? "white" : "#666" },
-              ]}
-            >
-              Podcast
-            </Text>
+          {/* Full Screen Component */}
+          <View style={styles.content}>
+            {currentMode === "live" ? (
+              <LiveRadio
+                onNowPlayingUpdate={handleNowPlayingUpdate}
+                onGoToShow={handleGoToShow}
+              />
+            ) : (
+              <Podcast
+                onNowPlayingUpdate={handleNowPlayingUpdate}
+                initialFilter={podcastFilter}
+              />
+            )}
           </View>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+        </View>
+
+        {/* Toggle Switch - Always floating */}
+        <View style={styles.toggleContainer}>
+          <TouchableOpacity
+            onPress={() =>
+              setCurrentMode(currentMode === "live" ? "podcast" : "live")
+            }
+            style={styles.toggleSwitch}
+          >
+            {/* Toggle Background Track */}
+            <View
+              style={[
+                styles.toggleTrack,
+                { left: currentMode === "live" ? 3 : 79 },
+              ]}
+            />
+
+            {/* Radio Option */}
+            <View style={styles.toggleOption}>
+              <Text
+                style={[
+                  styles.toggleText,
+                  { color: currentMode === "live" ? "white" : "#666" },
+                ]}
+              >
+                Live
+              </Text>
+            </View>
+
+            {/* Podcast Option */}
+            <View style={styles.toggleOption}>
+              <Text
+                style={[
+                  styles.toggleText,
+                  { color: currentMode === "podcast" ? "white" : "#666" },
+                ]}
+              >
+                Podcast
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </PlayerProvider>
   );
 }
 
@@ -158,6 +161,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    height: "100%",
     //height: Platform.OS === "web" ? "100vh" : "auto",
   },
   webContainer: {
