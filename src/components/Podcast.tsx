@@ -97,6 +97,7 @@ export default function Podcast({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    //minHeight: Platform.OS === "web" ? "100vh" : "auto",
   },
   webContainer: {
     maxWidth: "100%",
@@ -106,6 +107,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 20,
+    minHeight: 0, // Allow content to shrink
   },
   webContent: {
     maxWidth: 1200,
@@ -115,6 +117,7 @@ const styles = StyleSheet.create({
   },
   episodeListContainer: {
     flex: 1,
+    minHeight: 0, // Important for proper scrolling
   },
   webEpisodeListContainer: {
     width: "100%",

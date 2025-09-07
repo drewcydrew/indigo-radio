@@ -24,7 +24,6 @@ async function setupPlayer() {
         Capability.Skip,
       ],
       compactCapabilities: [Capability.Play, Capability.Pause, Capability.Skip],
-      // Add notification configuration for better lock screen display
       notificationCapabilities: [
         Capability.Play,
         Capability.Pause,
@@ -79,76 +78,10 @@ export default function App() {
     );
   }
 
-  // Web implementation using React Native components
-  if (Platform.OS === "web") {
-    return (
-      <View style={styles.webContainer}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>Indigo FM</Text>
-        </View>
-
-        {/* Toggle Switch */}
-        <View style={styles.webContent}>
-          <View style={styles.webToggleContainer}>
-            <TouchableOpacity
-              onPress={() => setCurrentMode("live")}
-              style={[
-                styles.webToggleButton,
-                currentMode === "live"
-                  ? styles.webActiveToggle
-                  : styles.webInactiveToggle,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.webToggleText,
-                  { color: currentMode === "live" ? "white" : "#666" },
-                ]}
-              >
-                Live
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setCurrentMode("podcast")}
-              style={[
-                styles.webToggleButton,
-                currentMode === "podcast"
-                  ? styles.webActiveToggle
-                  : styles.webInactiveToggle,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.webToggleText,
-                  { color: currentMode === "podcast" ? "white" : "#666" },
-                ]}
-              >
-                Podcast
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Content */}
-          {currentMode === "live" ? (
-            <LiveRadio
-              onNowPlayingUpdate={handleNowPlayingUpdate}
-              onGoToShow={handleGoToShow}
-            />
-          ) : (
-            <Podcast
-              onNowPlayingUpdate={handleNowPlayingUpdate}
-              initialFilter={podcastFilter}
-            />
-          )}
-        </View>
-      </View>
-    );
-  }
-
-  // Mobile implementation
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={[styles.container, Platform.OS === "web" && styles.webContainer]}
+    >
       {/* Main Content - Full Screen */}
       <View style={styles.mainContent}>
         {/* App Title */}
@@ -172,8 +105,8 @@ export default function App() {
         </View>
       </View>
 
-      {/* Floating Toggle Switch */}
-      <View style={styles.floatingToggle}>
+      {/* Toggle Switch - Always floating */}
+      <View style={styles.toggleContainer}>
         <TouchableOpacity
           onPress={() =>
             setCurrentMode(currentMode === "live" ? "podcast" : "live")
@@ -225,16 +158,26 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    //height: Platform.OS === "web" ? "100vh" : "auto",
   },
   webContainer: {
     backgroundColor: "#fff",
+    maxWidth: "100%",
+    width: "100%",
+    alignSelf: "center",
   },
   mainContent: {
     flex: 1,
+    minHeight: 0, // Allow content to shrink
   },
   header: {
     padding: 16,
     paddingTop: 8,
+    paddingHorizontal: Platform.OS === "web" ? 24 : 16,
+    maxWidth: Platform.OS === "web" ? 1200 : "100%",
+    alignSelf: Platform.OS === "web" ? "center" : "auto",
+    width: "100%",
+    flexShrink: 0, // Prevent header from shrinking
   },
   title: {
     fontSize: 24,
@@ -243,52 +186,13 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 16,
+    minHeight: 0, // Critical for proper scrolling
+    overflow: Platform.OS === "web" ? "hidden" : "visible",
   },
-  webContent: {
-    padding: 16,
-  },
-  webToggleContainer: {
-    flexDirection: "row",
-    backgroundColor: "#f5f5f5",
-    borderRadius: 8,
-    padding: 2,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-    alignSelf: "flex-start",
-  },
-  webToggleButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 6,
-    minWidth: 80,
-    alignItems: "center",
-  },
-  webActiveToggle: {
-    backgroundColor: "#000",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  webInactiveToggle: {
-    backgroundColor: "transparent",
-  },
-  webToggleText: {
-    fontWeight: "600",
-    fontSize: 14,
-    letterSpacing: 0.5,
-    textTransform: "uppercase",
-  },
-  floatingToggle: {
+  toggleContainer: {
     position: "absolute",
-    top: 50,
-    right: 16,
+    top: Platform.OS === "web" ? 20 : 50,
+    right: Platform.OS === "web" ? 24 : 16,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

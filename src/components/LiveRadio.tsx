@@ -119,6 +119,7 @@ const styles = StyleSheet.create({
     paddingBottom: 120, // Reduced padding since player can now collapse
     width: "100%",
     maxWidth: "100%",
+    //minHeight: Platform.OS === "web" ? "100vh" : "auto",
   },
   content: {
     flex: 1,
@@ -126,6 +127,7 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: Platform.OS === "web" ? 1200 : "100%",
     alignSelf: Platform.OS === "web" ? "center" : "auto",
+    minHeight: 0, // Allow content to shrink
   },
   radioIcon: {
     fontSize: 48,

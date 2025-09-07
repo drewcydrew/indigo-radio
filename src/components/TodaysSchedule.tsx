@@ -249,11 +249,13 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     maxWidth: "100%",
+    minHeight: 0, // Allow container to shrink
   },
   listContent: {
     paddingBottom: 20,
     width: "100%",
     maxWidth: "100%",
+    flexGrow: 1, // Allow content to grow but not force height
   },
   title: {
     fontSize: 18,
@@ -424,6 +426,7 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
     width: "100%",
     maxWidth: "100%",
+    minHeight: Platform.OS === "web" ? 200 : "auto", // Minimum height for web
   },
   loadingText: {
     marginTop: 16,
