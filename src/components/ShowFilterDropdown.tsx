@@ -10,38 +10,56 @@ import {
 
 interface ShowFilterDropdownProps {
   shows: string[];
-  selectedShow: string | null;
-  onShowChange: (showName: string | null) => void;
+  selectedShows: string[];
+  onShowsChange: (showNames: string[]) => void;
   onClearFilter: () => void;
 }
 
 export default function ShowFilterDropdown({
   shows,
-  selectedShow,
-  onShowChange,
+  selectedShows,
+  onShowsChange,
   onClearFilter,
 }: ShowFilterDropdownProps) {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
+  const handleShowToggle = (showName: string) => {
+    if (selectedShows.includes(showName)) {
+      // Remove show from selection
+      const newSelection = selectedShows.filter((s) => s !== showName);
+      onShowsChange(newSelection);
+    } else {
+      // Add show to selection
+      onShowsChange([...selectedShows, showName]);
+    }
+  };
+
   const handleShowSelect = (showName: string) => {
-    onShowChange(showName);
+    handleShowToggle(showName);
     setIsModalVisible(false);
   };
 
-  const displayText =
-    selectedShow && selectedShow !== "" ? selectedShow : "Select a show...";
+  const displayText = () => {
+    if (selectedShows.length === 0) {
+      return "Select shows...";
+    } else if (selectedShows.length === 1) {
+      return selectedShows[0];
+    } else {
+      return `${selectedShows.length} shows selected`;
+    }
+  };
 
   return (
     <>
       <View style={styles.filterContainer}>
         <View style={styles.filterHeader}>
-          <Text style={styles.filterLabel}>Filter by Show:</Text>
-          {selectedShow && selectedShow !== "" && (
+          <Text style={styles.filterLabel}>Filter by Shows:</Text>
+          {selectedShows.length > 0 && (
             <TouchableOpacity
               onPress={onClearFilter}
               style={styles.clearButton}
             >
-              <Text style={styles.clearButtonText}>CLEAR</Text>
+              <Text style={styles.clearButtonText}>CLEAR ALL</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -53,13 +71,30 @@ export default function ShowFilterDropdown({
           <Text
             style={[
               styles.dropdownText,
-              (!selectedShow || selectedShow === "") && styles.placeholderText,
+              selectedShows.length === 0 && styles.placeholderText,
             ]}
           >
-            {displayText}
+            {displayText()}
           </Text>
           <Text style={styles.dropdownArrow}>▼</Text>
         </TouchableOpacity>
+
+        {/* Show selected shows as chips */}
+        {selectedShows.length > 0 && (
+          <View style={styles.selectedShowsContainer}>
+            {selectedShows.map((show) => (
+              <View key={show} style={styles.showChip}>
+                <Text style={styles.showChipText}>{show}</Text>
+                <TouchableOpacity
+                  onPress={() => handleShowToggle(show)}
+                  style={styles.removeChipButton}
+                >
+                  <Text style={styles.removeChipText}>×</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        )}
       </View>
 
       <Modal
@@ -70,7 +105,7 @@ export default function ShowFilterDropdown({
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Select Show</Text>
+            <Text style={styles.modalTitle}>Select Shows</Text>
             <TouchableOpacity onPress={() => setIsModalVisible(false)}>
               <Text style={styles.doneButton}>Done</Text>
             </TouchableOpacity>
@@ -80,47 +115,46 @@ export default function ShowFilterDropdown({
             style={styles.scrollView}
             contentContainerStyle={styles.scrollContent}
           >
-            <TouchableOpacity
-              style={[
-                styles.showItem,
-                (!selectedShow || selectedShow === "") &&
-                  styles.selectedShowItem,
-              ]}
-              onPress={() => {
-                onShowChange("");
-                setIsModalVisible(false);
-              }}
-            >
-              <Text
-                style={[
-                  styles.showText,
-                  (!selectedShow || selectedShow === "") &&
-                    styles.selectedShowText,
-                ]}
-              >
-                All Shows
-              </Text>
-            </TouchableOpacity>
-
-            {shows.map((show) => (
-              <TouchableOpacity
-                key={show}
-                style={[
-                  styles.showItem,
-                  selectedShow === show && styles.selectedShowItem,
-                ]}
-                onPress={() => handleShowSelect(show)}
-              >
-                <Text
+            {shows.map((show) => {
+              const isSelected = selectedShows.includes(show);
+              return (
+                <View
+                  key={show}
                   style={[
-                    styles.showText,
-                    selectedShow === show && styles.selectedShowText,
+                    styles.showItem,
+                    isSelected && styles.selectedShowItem,
                   ]}
                 >
-                  {show}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                  <TouchableOpacity
+                    style={styles.showItemContent}
+                    onPress={() => handleShowSelect(show)}
+                  >
+                    <Text
+                      style={[
+                        styles.showText,
+                        isSelected && styles.selectedShowText,
+                      ]}
+                    >
+                      {show}
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.checkboxContainer}
+                    onPress={() => handleShowToggle(show)}
+                  >
+                    <View
+                      style={[
+                        styles.checkbox,
+                        isSelected && styles.checkedCheckbox,
+                      ]}
+                    >
+                      {isSelected && <Text style={styles.checkmark}>✓</Text>}
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
           </ScrollView>
         </View>
       </Modal>
@@ -182,6 +216,39 @@ const styles = StyleSheet.create({
     color: "#666",
     marginLeft: 8,
   },
+  selectedShowsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginTop: 8,
+    gap: 8,
+  },
+  showChip: {
+    backgroundColor: "#000",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  showChipText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  removeChipButton: {
+    backgroundColor: "#333",
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  removeChipText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "600",
+  },
   modalContainer: {
     flex: 1,
     backgroundColor: "#fff",
@@ -223,9 +290,14 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
+    flexDirection: "row",
+    alignItems: "center",
   },
   selectedShowItem: {
     backgroundColor: "#f8f8f8",
+  },
+  showItemContent: {
+    flex: 1,
   },
   showText: {
     fontSize: 16,
@@ -235,5 +307,27 @@ const styles = StyleSheet.create({
   selectedShowText: {
     fontWeight: "700",
     color: "#000",
+  },
+  checkboxContainer: {
+    padding: 8,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: "#ddd",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#fff",
+  },
+  checkedCheckbox: {
+    backgroundColor: "#000",
+    borderColor: "#000",
+  },
+  checkmark: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "700",
   },
 });

@@ -27,8 +27,8 @@ export default function EpisodeList({
   showTitle = false,
   initialFilter,
 }: EpisodeListProps) {
-  const [selectedShow, setSelectedShow] = useState<string | null>(
-    initialFilter || null
+  const [selectedShows, setSelectedShows] = useState<string[]>(
+    initialFilter ? [initialFilter] : []
   );
   const [selectedEpisode, setSelectedEpisode] = useState<PodcastEpisode | null>(
     null
@@ -41,11 +41,11 @@ export default function EpisodeList({
   // Get unique shows for filtering
   const shows = [...new Set(episodes.map((episode) => episode.show))];
 
-  // Filter episodes by selected show
+  // Filter episodes by selected shows
   const filteredEpisodes =
-    !selectedShow || selectedShow === ""
+    selectedShows.length === 0
       ? episodes
-      : episodes.filter((episode) => episode.show === selectedShow);
+      : episodes.filter((episode) => selectedShows.includes(episode.show));
 
   const formatDuration = (seconds?: number) => {
     if (!seconds) return "Unknown";
@@ -59,12 +59,12 @@ export default function EpisodeList({
     return findShowByName(showName);
   };
 
-  const handleShowChange = (showName: string | null) => {
-    setSelectedShow(showName);
+  const handleShowsChange = (showNames: string[]) => {
+    setSelectedShows(showNames);
   };
 
   const handleClearFilter = () => {
-    setSelectedShow(null);
+    setSelectedShows([]);
   };
 
   const handleEpisodePress = (episode: PodcastEpisode) => {
@@ -137,8 +137,8 @@ export default function EpisodeList({
       {/* Show Filter Dropdown */}
       <ShowFilterDropdown
         shows={shows}
-        selectedShow={selectedShow}
-        onShowChange={handleShowChange}
+        selectedShows={selectedShows}
+        onShowsChange={handleShowsChange}
         onClearFilter={handleClearFilter}
       />
     </View>
@@ -155,7 +155,8 @@ export default function EpisodeList({
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={
           <Text style={styles.noEpisodes}>
-            No episodes found{selectedShow ? ` for "${selectedShow}"` : ""}
+            No episodes found
+            {selectedShows.length > 0 ? ` for selected shows` : ""}
           </Text>
         }
       />
