@@ -21,6 +21,8 @@ interface TodaysScheduleProps {
   onGoToShow?: (showName: string) => void;
   programsLoading?: boolean;
   hideFooterButton?: boolean;
+  onPlayLive?: () => void;
+  onShowFullSchedule?: () => void;
 }
 
 export default function TodaysSchedule({
@@ -30,6 +32,8 @@ export default function TodaysSchedule({
   onGoToShow,
   programsLoading = false,
   hideFooterButton = false,
+  onPlayLive,
+  onShowFullSchedule,
 }: TodaysScheduleProps) {
   const [selectedShow, setSelectedShow] = useState<ShowDefinition | null>(null);
   const [showFullSchedule, setShowFullSchedule] = useState(false);
@@ -160,6 +164,26 @@ export default function TodaysSchedule({
   const renderHeader = () => (
     <View>
       {showTitle && <Text style={styles.title}>Today's Schedule</Text>}
+
+      {/* Action Buttons - only show if callbacks are provided */}
+      {(onPlayLive || onShowFullSchedule) && (
+        <View style={styles.actionButtonsContainer}>
+          {onPlayLive && (
+            <TouchableOpacity style={styles.liveButton} onPress={onPlayLive}>
+              <Text style={styles.liveButtonText}>▶ PLAY LIVE RADIO</Text>
+            </TouchableOpacity>
+          )}
+
+          {onShowFullSchedule && (
+            <TouchableOpacity
+              style={styles.scheduleButton}
+              onPress={onShowFullSchedule}
+            >
+              <Text style={styles.scheduleButtonText}>VIEW FULL SCHEDULE</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
     </View>
   );
 
@@ -442,5 +466,44 @@ const styles = StyleSheet.create({
     color: "#666",
     textAlign: "center",
     paddingHorizontal: 16,
+  },
+  actionButtonsContainer: {
+    marginBottom: 20,
+    gap: 12,
+  },
+  liveButton: {
+    backgroundColor: "#000",
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  liveButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "700",
+    letterSpacing: 1,
+    textTransform: "uppercase",
+  },
+  scheduleButton: {
+    backgroundColor: "transparent",
+    borderWidth: 2,
+    borderColor: "#000",
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  scheduleButtonText: {
+    color: "#000",
+    fontSize: 16,
+    fontWeight: "700",
+    letterSpacing: 1,
+    textTransform: "uppercase",
   },
 });

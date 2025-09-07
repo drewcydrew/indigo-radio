@@ -98,9 +98,51 @@ export default function App() {
       >
         {/* Main Content - Full Screen */}
         <View style={styles.mainContent}>
-          {/* App Title */}
+          {/* App Title with Toggle */}
           <View style={styles.header}>
             <Text style={styles.title}>Indigo FM</Text>
+
+            {/* Toggle Switch in Header */}
+            <View style={styles.headerToggleContainer}>
+              <TouchableOpacity
+                onPress={() =>
+                  setCurrentMode(currentMode === "live" ? "podcast" : "live")
+                }
+                style={styles.toggleSwitch}
+              >
+                {/* Toggle Background Track */}
+                <View
+                  style={[
+                    styles.toggleTrack,
+                    { left: currentMode === "live" ? 2 : 62 },
+                  ]}
+                />
+
+                {/* Radio Option */}
+                <View style={styles.toggleOption}>
+                  <Text
+                    style={[
+                      styles.toggleText,
+                      { color: currentMode === "live" ? "white" : "#666" },
+                    ]}
+                  >
+                    Live
+                  </Text>
+                </View>
+
+                {/* Podcast Option */}
+                <View style={styles.toggleOption}>
+                  <Text
+                    style={[
+                      styles.toggleText,
+                      { color: currentMode === "podcast" ? "white" : "#666" },
+                    ]}
+                  >
+                    Podcast
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Full Screen Component */}
@@ -118,48 +160,6 @@ export default function App() {
               />
             )}
           </View>
-        </View>
-
-        {/* Toggle Switch - Always floating */}
-        <View style={styles.toggleContainer}>
-          <TouchableOpacity
-            onPress={() =>
-              setCurrentMode(currentMode === "live" ? "podcast" : "live")
-            }
-            style={styles.toggleSwitch}
-          >
-            {/* Toggle Background Track */}
-            <View
-              style={[
-                styles.toggleTrack,
-                { left: currentMode === "live" ? 3 : 79 },
-              ]}
-            />
-
-            {/* Radio Option */}
-            <View style={styles.toggleOption}>
-              <Text
-                style={[
-                  styles.toggleText,
-                  { color: currentMode === "live" ? "white" : "#666" },
-                ]}
-              >
-                Live
-              </Text>
-            </View>
-
-            {/* Podcast Option */}
-            <View style={styles.toggleOption}>
-              <Text
-                style={[
-                  styles.toggleText,
-                  { color: currentMode === "podcast" ? "white" : "#666" },
-                ]}
-              >
-                Podcast
-              </Text>
-            </View>
-          </TouchableOpacity>
         </View>
 
         {/* Single Universal Player Instance */}
@@ -191,28 +191,28 @@ const styles = StyleSheet.create({
     minHeight: 0, // Allow content to shrink
   },
   header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 16,
     paddingTop: 8,
     paddingHorizontal: Platform.OS === "web" ? 24 : 16,
     maxWidth: Platform.OS === "web" ? 1200 : "100%",
     alignSelf: Platform.OS === "web" ? "center" : "auto",
     width: "100%",
-    flexShrink: 0, // Prevent header from shrinking
+    flexShrink: 0,
   },
   title: {
     fontSize: 24,
     fontWeight: "600",
-    marginBottom: 8,
+    flex: 1,
   },
   content: {
     flex: 1,
     minHeight: 0, // Critical for proper scrolling
     overflow: Platform.OS === "web" ? "hidden" : "visible",
   },
-  toggleContainer: {
-    position: "absolute",
-    top: Platform.OS === "web" ? 20 : 50,
-    right: Platform.OS === "web" ? 24 : 16,
+  headerToggleContainer: {
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -221,15 +221,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 8,
-    zIndex: 1000,
   },
   toggleSwitch: {
     flexDirection: "row",
     backgroundColor: "#f5f5f5",
-    borderRadius: 8,
+    borderRadius: 6,
     padding: 2,
-    width: 160,
-    height: 40,
+    width: 128,
+    height: 32,
     borderWidth: 1,
     borderColor: "#e0e0e0",
   },
@@ -237,9 +236,9 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 2,
     backgroundColor: "#000",
-    borderRadius: 6,
-    width: 78,
-    height: 36,
+    borderRadius: 4,
+    width: 62,
+    height: 28,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -257,7 +256,7 @@ const styles = StyleSheet.create({
   },
   toggleText: {
     fontWeight: "600",
-    fontSize: 12,
+    fontSize: 11,
     letterSpacing: 0.5,
     textTransform: "uppercase",
   },
