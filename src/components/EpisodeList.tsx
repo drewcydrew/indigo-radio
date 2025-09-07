@@ -42,6 +42,7 @@ export default function EpisodeList({
   const [showModal, setShowModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isEpisodeModalClosing, setIsEpisodeModalClosing] = useState(false);
+  const [isShowDetailsDisabled, setIsShowDetailsDisabled] = useState(false);
 
   // Use the hook to get show details
   const { findShowByName } = useShowDetails();
@@ -116,9 +117,30 @@ export default function EpisodeList({
         setSelectedEpisode(null);
         setIsEpisodeModalClosing(false);
       },
-      Platform.OS === "ios" ? 400 : 200
+      Platform.OS === "ios" ? 600 : 200
     );
   }, []);
+
+  // Pass the closing state to the episode display
+  const handleEpisodeShowDetails = useCallback(
+    (showName: string) => {
+      if (onShowDetails && !isEpisodeModalClosing && !isShowDetailsDisabled) {
+        // Disable further calls temporarily
+        setIsShowDetailsDisabled(true);
+
+        onShowDetails(showName);
+
+        // Re-enable after a delay
+        setTimeout(
+          () => {
+            setIsShowDetailsDisabled(false);
+          },
+          Platform.OS === "ios" ? 1000 : 500
+        );
+      }
+    },
+    [onShowDetails, isEpisodeModalClosing, isShowDetailsDisabled]
+  );
 
   const handleSearchChange = useCallback((query: string) => {
     setSearchQuery(query);
@@ -235,16 +257,6 @@ export default function EpisodeList({
     [selectedShows.length, searchQuery.length]
   );
 
-  // Pass the closing state to the episode display
-  const handleEpisodeShowDetails = useCallback(
-    (showName: string) => {
-      if (onShowDetails && !isEpisodeModalClosing) {
-        onShowDetails(showName);
-      }
-    },
-    [onShowDetails, isEpisodeModalClosing]
-  );
-
   return (
     <View style={styles.container}>
       {/* Episodes List with Header */}
@@ -259,13 +271,15 @@ export default function EpisodeList({
       />
 
       {/* Episode Display Modal */}
-      <PodcastEpisodeDisplay
-        episode={selectedEpisode}
-        visible={showModal}
-        onClose={handleCloseModal}
-        onPlay={onEpisodePress}
-        onShowDetails={handleEpisodeShowDetails}
-      />
+      {selectedEpisode && showModal && !isEpisodeModalClosing && (
+        <PodcastEpisodeDisplay
+          episode={selectedEpisode}
+          visible={showModal}
+          onClose={handleCloseModal}
+          onPlay={onEpisodePress}
+          onShowDetails={handleEpisodeShowDetails}
+        />
+      )}
     </View>
   );
 }

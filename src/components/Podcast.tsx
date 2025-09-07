@@ -27,7 +27,7 @@ export default function Podcast({
     initialFilter
   );
   const [selectedShow, setSelectedShow] = useState<ShowDefinition | null>(null);
-  const [pendingShowName, setPendingShowName] = useState<string | null>(null);
+  const [isModalClosing, setIsModalClosing] = useState(false);
 
   // Use the hooks to get show details and podcast episodes
   const { showDefinitions, findShowByName } = useShowDetails();
@@ -89,36 +89,29 @@ export default function Podcast({
   };
 
   const handleShowDetailsPress = (showName: string) => {
+    // Prevent opening modal if one is already closing or open
+    if (selectedShow || isModalClosing) {
+      console.log("Modal already open or closing, ignoring request");
+      return;
+    }
+
     const showDef = findShowByName(showName);
     if (showDef) {
-      // If there's already a modal open, queue this one
-      if (selectedShow) {
-        setPendingShowName(showName);
-        return;
-      }
+      console.log("Opening show details modal for:", showName);
       setSelectedShow(showDef);
     }
   };
 
   const hideShowDetails = () => {
+    console.log("Closing show details modal");
+    setIsModalClosing(true);
     setSelectedShow(null);
 
-    // Check if there's a pending show to display
-    if (pendingShowName) {
-      const showDef = findShowByName(pendingShowName);
-      if (showDef) {
-        // Use a longer delay for iOS to ensure proper modal transition
-        setTimeout(
-          () => {
-            setSelectedShow(showDef);
-            setPendingShowName(null);
-          },
-          Platform.OS === "ios" ? 600 : 300
-        );
-      } else {
-        setPendingShowName(null);
-      }
-    }
+    // Reset the closing state after animation completes
+    const delay = Platform.OS === "ios" ? 800 : 300;
+    setTimeout(() => {
+      setIsModalClosing(false);
+    }, delay);
   };
 
   return (
@@ -148,8 +141,8 @@ export default function Podcast({
         </View>
       </View>
 
-      {/* Show Details Modal */}
-      {selectedShow && (
+      {/* Show Details Modal - Only render when selectedShow exists and not closing */}
+      {selectedShow && !isModalClosing && (
         <ShowDetailsModal
           show={selectedShow}
           onClose={hideShowDetails}

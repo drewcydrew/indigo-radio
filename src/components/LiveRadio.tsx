@@ -15,6 +15,7 @@ import usePrograms from "../hooks/usePrograms";
 import TodaysSchedule from "./TodaysSchedule";
 import { usePlayer } from "../contexts/PlayerContext";
 import { audioService } from "../services/AudioService";
+import ScheduleDisplay from "./ScheduleDisplay";
 
 const STREAM_URL = "https://internetradio.indigofm.au:8032/stream";
 
@@ -31,6 +32,7 @@ export default function LiveRadio({
     null
   );
   const { setCurrentContent, setPlayerVisible } = usePlayer();
+  const [showFullSchedule, setShowFullSchedule] = useState(false);
 
   // Use the hook to get program data
   const {
@@ -110,22 +112,41 @@ export default function LiveRadio({
     <View style={styles.container}>
       {/* Live Radio Content */}
       <View style={styles.content}>
-        {/* Play Live Radio Button */}
-        <View style={styles.liveButtonContainer}>
+        {/* Action Buttons Container */}
+        <View style={styles.actionButtonsContainer}>
           <TouchableOpacity style={styles.liveButton} onPress={playLiveRadio}>
             <Text style={styles.liveButtonText}>▶ PLAY LIVE RADIO</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.scheduleButton}
+            onPress={() => setShowFullSchedule(true)}
+          >
+            <Text style={styles.scheduleButtonText}>VIEW FULL SCHEDULE</Text>
+          </TouchableOpacity>
         </View>
 
-        {/* Today's Schedule Component */}
-        <TodaysSchedule
-          programs={programs}
-          currentProgram={currentProgram}
-          showTitle={true}
-          onGoToShow={onGoToShow}
-          programsLoading={programsLoading}
-        />
+        {/* Today's Schedule Component - Now extends to bottom */}
+        <View style={styles.scheduleContainer}>
+          <TodaysSchedule
+            programs={programs}
+            currentProgram={currentProgram}
+            showTitle={true}
+            onGoToShow={onGoToShow}
+            programsLoading={programsLoading}
+            hideFooterButton={true}
+          />
+        </View>
       </View>
+
+      {/* Full Schedule Modal */}
+      {showFullSchedule && (
+        <ScheduleDisplay
+          programs={programs}
+          onGoToShow={onGoToShow}
+          onClose={() => setShowFullSchedule(false)}
+        />
+      )}
     </View>
   );
 }
@@ -133,7 +154,6 @@ export default function LiveRadio({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingBottom: 120, // Keep padding for player space
     width: "100%",
     maxWidth: "100%",
   },
@@ -191,10 +211,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 32,
   },
-  liveButtonContainer: {
+  actionButtonsContainer: {
     padding: 20,
     paddingTop: 0,
     paddingBottom: 20,
+    flexShrink: 0,
+    gap: 12,
   },
   liveButton: {
     backgroundColor: "#000",
@@ -214,5 +236,25 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     letterSpacing: 1,
     textTransform: "uppercase",
+  },
+  scheduleButton: {
+    backgroundColor: "transparent",
+    borderWidth: 2,
+    borderColor: "#000",
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  scheduleButtonText: {
+    color: "#000",
+    fontSize: 16,
+    fontWeight: "700",
+    letterSpacing: 1,
+    textTransform: "uppercase",
+  },
+  scheduleContainer: {
+    flex: 1,
+    minHeight: 0, // Important for proper scrolling
   },
 });

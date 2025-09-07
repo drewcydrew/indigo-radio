@@ -58,7 +58,7 @@ export default function PodcastEpisodeDisplay({
     <Modal
       visible={visible}
       animationType="slide"
-      presentationStyle="pageSheet"
+      presentationStyle={Platform.OS === "ios" ? "pageSheet" : "fullScreen"}
       onRequestClose={onClose}
     >
       <View style={styles.container}>
@@ -71,57 +71,74 @@ export default function PodcastEpisodeDisplay({
           <View style={styles.placeholder} />
         </View>
 
-        {/* Content */}
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          {/* Artwork */}
-          <View style={styles.artworkContainer}>
-            {artwork ? (
-              <Image
-                source={{ uri: artwork }}
-                style={styles.artwork}
-                resizeMode="cover"
-              />
-            ) : (
-              <View style={styles.placeholderArtwork}>
-                <Text style={styles.placeholderIcon}>PODCAST</Text>
-              </View>
-            )}
-          </View>
+        {/* Scrollable Content Container */}
+        <View style={styles.scrollContainer}>
+          <ScrollView
+            style={styles.content}
+            contentContainerStyle={styles.contentContainer}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            nestedScrollEnabled={true}
+          >
+            {/* Artwork */}
+            <View style={styles.artworkContainer}>
+              {artwork ? (
+                <Image
+                  source={{ uri: artwork }}
+                  style={styles.artwork}
+                  resizeMode="cover"
+                />
+              ) : (
+                <View style={styles.placeholderArtwork}>
+                  <Text style={styles.placeholderIcon}>PODCAST</Text>
+                </View>
+              )}
+            </View>
 
-          {/* Episode Info */}
-          <View style={styles.episodeInfo}>
-            <Text style={styles.showName}>{episode.show.toUpperCase()}</Text>
-            <Text style={styles.episodeTitle}>{episode.title}</Text>
-            <Text style={styles.artistName}>Hosted by {artist}</Text>
+            {/* Episode Info */}
+            <View style={styles.episodeInfo}>
+              <Text style={styles.showName}>{episode.show.toUpperCase()}</Text>
+              <Text style={styles.episodeTitle}>{episode.title}</Text>
+              <Text style={styles.artistName}>Hosted by {artist}</Text>
 
-            {/* View Show Button */}
-            {showDef && onShowDetails && (
-              <View style={styles.viewShowContainer}>
+              {/* Action Buttons Container */}
+              <View style={styles.actionButtonsContainer}>
+                {/* Play Episode Button */}
                 <TouchableOpacity
-                  style={styles.viewShowButton}
-                  onPress={handleViewShow}
+                  style={styles.playEpisodeButton}
+                  onPress={handlePlay}
                 >
-                  <Text style={styles.viewShowButtonText}>
-                    VIEW SHOW DETAILS
+                  <Text style={styles.playEpisodeButtonText}>
+                    ▶ PLAY EPISODE
                   </Text>
                 </TouchableOpacity>
-              </View>
-            )}
 
-            {episode.description && (
-              <View style={styles.descriptionContainer}>
-                <Text style={styles.descriptionLabel}>Description</Text>
-                <Text style={styles.description}>{episode.description}</Text>
+                {/* View Show Button */}
+                {showDef && onShowDetails && (
+                  <TouchableOpacity
+                    style={styles.viewShowButton}
+                    onPress={handleViewShow}
+                  >
+                    <Text style={styles.viewShowButtonText}>
+                      VIEW SHOW DETAILS
+                    </Text>
+                  </TouchableOpacity>
+                )}
               </View>
-            )}
-          </View>
-        </ScrollView>
 
-        {/* Play Button */}
-        <View style={styles.playButtonContainer}>
-          <TouchableOpacity style={styles.playButton} onPress={handlePlay}>
-            <Text style={styles.playButtonText}>▶ Play Episode</Text>
-          </TouchableOpacity>
+              {episode.description && (
+                <View style={styles.descriptionContainer}>
+                  <Text style={styles.descriptionLabel}>Description</Text>
+                  <Text style={styles.description}>{episode.description}</Text>
+                </View>
+              )}
+            </View>
+
+            {/* Add extra bottom padding for Android */}
+            {Platform.OS === "android" && (
+              <View style={styles.androidBottomSpacer} />
+            )}
+          </ScrollView>
         </View>
       </View>
     </Modal>
@@ -166,9 +183,18 @@ const styles = StyleSheet.create({
   placeholder: {
     width: 36,
   },
+  scrollContainer: {
+    flex: 1,
+    minHeight: 0, // Important for Android scroll behavior
+  },
   content: {
     flex: 1,
-    padding: 24,
+  },
+  contentContainer: {
+    flexGrow: 1,
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: Platform.OS === "android" ? 24 : 0,
   },
   artworkContainer: {
     alignItems: "center",
@@ -239,20 +265,21 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     textAlign: "left",
   },
-  playButtonContainer: {
-    padding: 24,
-    paddingBottom: 32,
-    borderTopWidth: 1,
-    borderTopColor: "#e0e0e0",
-    backgroundColor: "#f8f8f8",
+  actionButtonsContainer: {
+    width: "100%",
+    marginTop: 24,
+    marginBottom: 16,
+    gap: 12,
+    alignItems: "center",
   },
-  playButton: {
+  playEpisodeButton: {
     backgroundColor: "#000",
     paddingVertical: 16,
     paddingHorizontal: 32,
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
+    width: "100%",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -262,18 +289,12 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 4,
   },
-  playButtonText: {
+  playEpisodeButtonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "700",
     letterSpacing: 1,
     textTransform: "uppercase",
-  },
-  viewShowContainer: {
-    width: "100%",
-    marginTop: 16,
-    marginBottom: 8,
-    alignItems: "center",
   },
   viewShowButton: {
     backgroundColor: "transparent",
@@ -282,6 +303,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
+    width: "100%",
+    alignItems: "center",
   },
   viewShowButtonText: {
     color: "#000",
@@ -289,5 +312,8 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     letterSpacing: 0.5,
     textTransform: "uppercase",
+  },
+  androidBottomSpacer: {
+    height: 20,
   },
 });

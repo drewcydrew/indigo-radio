@@ -20,6 +20,7 @@ interface TodaysScheduleProps {
   showTitle?: boolean;
   onGoToShow?: (showName: string) => void;
   programsLoading?: boolean;
+  hideFooterButton?: boolean;
 }
 
 export default function TodaysSchedule({
@@ -28,6 +29,7 @@ export default function TodaysSchedule({
   showTitle = false,
   onGoToShow,
   programsLoading = false,
+  hideFooterButton = false,
 }: TodaysScheduleProps) {
   const [selectedShow, setSelectedShow] = useState<ShowDefinition | null>(null);
   const [showFullSchedule, setShowFullSchedule] = useState(false);
@@ -161,16 +163,22 @@ export default function TodaysSchedule({
     </View>
   );
 
-  const renderFooter = () => (
-    <View style={styles.footerContainer}>
-      <TouchableOpacity
-        style={styles.fullScheduleButton}
-        onPress={() => setShowFullSchedule(true)}
-      >
-        <Text style={styles.fullScheduleText}>VIEW FULL SCHEDULE</Text>
-      </TouchableOpacity>
-    </View>
-  );
+  const renderFooter = () => {
+    if (hideFooterButton) {
+      return null;
+    }
+
+    return (
+      <View style={styles.footerContainer}>
+        <TouchableOpacity
+          style={styles.fullScheduleButton}
+          onPress={() => setShowFullSchedule(true)}
+        >
+          <Text style={styles.fullScheduleText}>VIEW FULL SCHEDULE</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   const dayNames = {
     monday: "Monday",
@@ -232,8 +240,8 @@ export default function TodaysSchedule({
         />
       )}
 
-      {/* Full Schedule Modal */}
-      {showFullSchedule && (
+      {/* Full Schedule Modal - Only render if not hidden */}
+      {!hideFooterButton && showFullSchedule && (
         <ScheduleDisplay
           programs={programs}
           onGoToShow={onGoToShow}
