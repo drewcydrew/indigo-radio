@@ -10,6 +10,7 @@ import {
 import { PodcastEpisode, ShowDefinition } from "../types/types";
 import useShowDetails from "../hooks/useShowDetails";
 import ShowFilterDropdown from "./ShowFilterDropdown";
+import PodcastEpisodeDisplay from "./PodcastEpisodeDisplay";
 
 interface EpisodeListProps {
   episodes: PodcastEpisode[];
@@ -29,6 +30,10 @@ export default function EpisodeList({
   const [selectedShow, setSelectedShow] = useState<string | null>(
     initialFilter || null
   );
+  const [selectedEpisode, setSelectedEpisode] = useState<PodcastEpisode | null>(
+    null
+  );
+  const [showModal, setShowModal] = useState(false);
 
   // Use the hook to get show details
   const { findShowByName } = useShowDetails();
@@ -62,6 +67,16 @@ export default function EpisodeList({
     setSelectedShow(null);
   };
 
+  const handleEpisodePress = (episode: PodcastEpisode) => {
+    setSelectedEpisode(episode);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedEpisode(null);
+  };
+
   const renderEpisode = ({ item: episode }: { item: PodcastEpisode }) => {
     const showDef = findShowDefinition(episode.show);
     const artwork = showDef?.artwork;
@@ -72,7 +87,7 @@ export default function EpisodeList({
     return (
       <TouchableOpacity
         style={styles.episodeItem}
-        onPress={() => onEpisodePress(episode.id)}
+        onPress={() => handleEpisodePress(episode)}
       >
         {/* Artwork */}
         <View style={styles.artworkContainer}>
@@ -103,6 +118,14 @@ export default function EpisodeList({
             </Text>
           )}
         </View>
+
+        {/* Play Button */}
+        <TouchableOpacity
+          style={styles.playButton}
+          onPress={() => onEpisodePress(episode.id)}
+        >
+          <Text style={styles.playButtonText}>▶</Text>
+        </TouchableOpacity>
       </TouchableOpacity>
     );
   };
@@ -135,6 +158,14 @@ export default function EpisodeList({
             No episodes found{selectedShow ? ` for "${selectedShow}"` : ""}
           </Text>
         }
+      />
+
+      {/* Episode Display Modal */}
+      <PodcastEpisodeDisplay
+        episode={selectedEpisode}
+        visible={showModal}
+        onClose={handleCloseModal}
+        onPlay={onEpisodePress}
       />
     </View>
   );
@@ -180,6 +211,7 @@ const styles = StyleSheet.create({
   },
   episodeInfo: {
     flex: 1,
+    marginRight: 12,
   },
   showName: {
     fontWeight: "700",
@@ -231,5 +263,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     color: "#000",
     letterSpacing: 0.5,
+  },
+  playButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "#000",
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 8,
+  },
+  playButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
