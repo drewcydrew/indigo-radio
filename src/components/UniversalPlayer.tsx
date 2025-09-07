@@ -21,6 +21,7 @@ import { audioService } from "../services/AudioService";
 import { usePlayer } from "../contexts/PlayerContext";
 import useShowDetails from "../hooks/useShowDetails";
 import { ShowDefinition } from "../types/types";
+import ShowDetailsModal from "./ShowDetailsModal";
 
 const STREAM_URL = "https://internetradio.indigofm.au:8032/stream";
 
@@ -40,6 +41,9 @@ export default function UniversalPlayer({
   const [webError, setWebError] = useState<string | null>(null);
   const [shouldAutoPlay, setShouldAutoPlay] = useState(false);
   const [lastContentId, setLastContentId] = useState<string>("");
+
+  // Add state for show details modal
+  const [selectedShow, setSelectedShow] = useState<ShowDefinition | null>(null);
 
   // Mobile state
   const mobilePlayback = usePlaybackState();
@@ -367,10 +371,20 @@ export default function UniversalPlayer({
     }
 
     if (showName) {
-      // Always use onGoToShow since we're now at the App level
-      if (onGoToShow) {
-        onGoToShow(showName);
+      const showDef = findShowByName(showName);
+      if (showDef) {
+        setSelectedShow(showDef);
       }
+    }
+  };
+
+  const handleShowDetailsClose = () => {
+    setSelectedShow(null);
+  };
+
+  const handleGoToShowFromModal = (showName: string) => {
+    if (onGoToShow) {
+      onGoToShow(showName);
     }
   };
 
@@ -614,6 +628,15 @@ export default function UniversalPlayer({
           Status: {webError ? "error" : isPlaying ? "playing" : "paused"}
         </Text>
       </View>
+
+      {/* Show Details Modal */}
+      {selectedShow && (
+        <ShowDetailsModal
+          show={selectedShow}
+          onClose={handleShowDetailsClose}
+          onGoToShow={handleGoToShowFromModal}
+        />
+      )}
     </View>
   );
 }
