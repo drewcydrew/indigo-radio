@@ -124,6 +124,13 @@ export default function LiveRadio({
     <View style={styles.container}>
       {/* Live Radio Content */}
       <View style={styles.content}>
+        {/* Play Live Radio Button */}
+        <View style={styles.liveButtonContainer}>
+          <TouchableOpacity style={styles.liveButton} onPress={playLiveRadio}>
+            <Text style={styles.liveButtonText}>▶ PLAY LIVE RADIO</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Today's Schedule Component */}
         <TodaysSchedule
           programs={programs}
@@ -132,13 +139,6 @@ export default function LiveRadio({
           onGoToShow={onGoToShow}
           programsLoading={programsLoading}
         />
-
-        {/* Play Live Radio Button */}
-        <View style={styles.liveButtonContainer}>
-          <TouchableOpacity style={styles.liveButton} onPress={playLiveRadio}>
-            <Text style={styles.liveButtonText}>▶ PLAY LIVE RADIO</Text>
-          </TouchableOpacity>
-        </View>
       </View>
 
       {/* Universal Player */}
@@ -211,7 +211,8 @@ const styles = StyleSheet.create({
   },
   liveButtonContainer: {
     padding: 20,
-    paddingBottom: 40,
+    paddingTop: 0,
+    paddingBottom: 20,
   },
   liveButton: {
     backgroundColor: "#000",

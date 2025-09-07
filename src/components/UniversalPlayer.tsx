@@ -158,6 +158,35 @@ export default function UniversalPlayer({
       ? { position: webAudioState.position, duration: webAudioState.duration }
       : mobileProgress;
 
+  // Determine if we're in a loading/buffering state
+  const isLoading =
+    Platform.OS === "web"
+      ? webAudioState.isLoading
+      : playback.state === State.Loading || playback.state === State.Buffering;
+
+  const isPlaying = playback.state === State.Playing;
+
+  // Loading indicator component
+  const LoadingIndicator = ({ color = "#fff" }: { color?: string }) => (
+    <View style={styles.loadingContainer}>
+      <View style={[styles.loadingDot, { backgroundColor: color }]} />
+      <View
+        style={[
+          styles.loadingDot,
+          styles.loadingDot2,
+          { backgroundColor: color },
+        ]}
+      />
+      <View
+        style={[
+          styles.loadingDot,
+          styles.loadingDot3,
+          { backgroundColor: color },
+        ]}
+      />
+    </View>
+  );
+
   const toggleCollapsed = () => {
     setIsCollapsed(!isCollapsed);
   };
@@ -181,8 +210,6 @@ export default function UniversalPlayer({
     const newPosition = Math.min(progress.duration, progress.position + 15);
     await audioService.seekTo(newPosition);
   };
-
-  const isPlaying = playback.state === State.Playing;
 
   const togglePlayPause = async () => {
     try {
@@ -289,10 +316,15 @@ export default function UniversalPlayer({
           <TouchableOpacity
             style={styles.minimizedPlayButton}
             onPress={togglePlayPause}
+            disabled={isLoading}
           >
-            <Text style={styles.minimizedPlayButtonText}>
-              {isPlaying ? "||" : "▶"}
-            </Text>
+            {isLoading ? (
+              <LoadingIndicator color="#000" />
+            ) : (
+              <Text style={styles.minimizedPlayButtonText}>
+                {isPlaying ? "||" : "▶"}
+              </Text>
+            )}
           </TouchableOpacity>
         </View>
 
@@ -434,25 +466,32 @@ export default function UniversalPlayer({
               styles.playButton,
               isPlaying ? styles.pauseButton : styles.playButtonActive,
               Platform.OS === "web" && webError && styles.disabledButton,
+              isLoading && styles.loadingButton,
             ]}
             onPress={togglePlayPause}
-            disabled={Platform.OS === "web" && !!webError}
+            disabled={(Platform.OS === "web" && !!webError) || isLoading}
           >
-            <Text
-              style={[
-                styles.playButtonText,
-                isPlaying
-                  ? styles.pauseButtonText
-                  : styles.playButtonActiveText,
-                Platform.OS === "web" && webError && styles.disabledButtonText,
-              ]}
-            >
-              {isPlaying
-                ? "PAUSE"
-                : currentContent.type === "live"
-                ? "PLAY LIVE"
-                : "PLAY"}
-            </Text>
+            {isLoading ? (
+              <LoadingIndicator color={isPlaying ? "#fff" : "#000"} />
+            ) : (
+              <Text
+                style={[
+                  styles.playButtonText,
+                  isPlaying
+                    ? styles.pauseButtonText
+                    : styles.playButtonActiveText,
+                  Platform.OS === "web" &&
+                    webError &&
+                    styles.disabledButtonText,
+                ]}
+              >
+                {isPlaying
+                  ? "PAUSE"
+                  : currentContent.type === "live"
+                  ? "PLAY LIVE"
+                  : "PLAY"}
+              </Text>
+            )}
           </TouchableOpacity>
 
           {currentContent.type === "podcast" && (
@@ -748,6 +787,27 @@ const styles = StyleSheet.create({
   },
   disabledButtonText: {
     color: "#999",
+  },
+  loadingButton: {
+    opacity: 0.8,
+  },
+  loadingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 3,
+  },
+  loadingDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    opacity: 0.3,
+  },
+  loadingDot2: {
+    opacity: 0.6,
+  },
+  loadingDot3: {
+    opacity: 0.9,
   },
   goToShowButton: {
     marginTop: 8,

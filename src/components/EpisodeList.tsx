@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import {
   View,
   Text,
@@ -45,6 +45,15 @@ export default function EpisodeList({
 
   // Use the hook to get show details
   const { findShowByName } = useShowDetails();
+
+  // Update selectedShows when initialFilter changes
+  useEffect(() => {
+    if (initialFilter) {
+      setSelectedShows([initialFilter]);
+    } else {
+      setSelectedShows([]);
+    }
+  }, [initialFilter]);
 
   // Get unique shows for filtering - memoize to prevent unnecessary recalculations
   const shows = useMemo(

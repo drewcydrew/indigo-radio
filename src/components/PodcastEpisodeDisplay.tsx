@@ -94,13 +94,6 @@ export default function PodcastEpisodeDisplay({
             <Text style={styles.episodeTitle}>{episode.title}</Text>
             <Text style={styles.artistName}>Hosted by {artist}</Text>
 
-            {episode.description && (
-              <View style={styles.descriptionContainer}>
-                <Text style={styles.descriptionLabel}>Description</Text>
-                <Text style={styles.description}>{episode.description}</Text>
-              </View>
-            )}
-
             {/* View Show Button */}
             {showDef && onShowDetails && (
               <View style={styles.viewShowContainer}>
@@ -112,6 +105,13 @@ export default function PodcastEpisodeDisplay({
                     VIEW SHOW DETAILS
                   </Text>
                 </TouchableOpacity>
+              </View>
+            )}
+
+            {episode.description && (
+              <View style={styles.descriptionContainer}>
+                <Text style={styles.descriptionLabel}>Description</Text>
+                <Text style={styles.description}>{episode.description}</Text>
               </View>
             )}
           </View>
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
   },
   descriptionContainer: {
     width: "100%",
-    marginTop: 16,
+    marginTop: 8,
   },
   descriptionLabel: {
     fontSize: 14,
@@ -271,7 +271,8 @@ const styles = StyleSheet.create({
   },
   viewShowContainer: {
     width: "100%",
-    marginTop: 24,
+    marginTop: 16,
+    marginBottom: 8,
     alignItems: "center",
   },
   viewShowButton: {

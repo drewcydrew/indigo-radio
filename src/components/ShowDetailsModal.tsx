@@ -46,13 +46,11 @@ export default function ShowDetailsModal({
     >
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.title}>{show.name}</Text>
-          <TouchableOpacity
-            onPress={onClose}
-            style={styles.doneButtonContainer}
-          >
-            <Text style={styles.doneButton}>DONE</Text>
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <Text style={styles.closeButtonText}>✕</Text>
           </TouchableOpacity>
+          <Text style={styles.headerTitle}>Show Details</Text>
+          <View style={styles.placeholder} />
         </View>
 
         <ScrollView
@@ -143,95 +141,101 @@ export default function ShowDetailsModal({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000",
+    backgroundColor: "#fff",
   },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    padding: 20,
-    paddingTop: 60,
-    borderBottomWidth: 1,
-    borderBottomColor: "#333",
-    backgroundColor: "#000",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "700",
-    flex: 1,
-    color: "#fff",
-    letterSpacing: 0.5,
-  },
-  doneButtonContainer: {
-    backgroundColor: "#333",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 4,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+    backgroundColor: "#f8f8f8",
   },
-  doneButton: {
-    fontSize: 14,
+  closeButton: {
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: "#000",
+    width: 36,
+    height: 36,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  closeButtonText: {
     color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  headerTitle: {
+    fontSize: 18,
     fontWeight: "700",
+    color: "#000",
     letterSpacing: 0.5,
+  },
+  placeholder: {
+    width: 36,
   },
   scrollView: {
     flex: 1,
-    backgroundColor: "#000",
+    backgroundColor: "#fff",
   },
   content: {
-    padding: 20,
+    padding: 24,
   },
   artworkContainer: {
     alignItems: "center",
-    marginBottom: 24,
+    marginBottom: 32,
   },
   artwork: {
     width: 200,
     height: 200,
-    borderRadius: 0,
-    backgroundColor: "#333",
+    borderRadius: 8,
+    backgroundColor: "#e0e0e0",
   },
   hostText: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "700",
     marginBottom: 16,
-    color: "#fff",
-    letterSpacing: 1,
+    color: "#000",
+    letterSpacing: 2,
+    textAlign: "center",
   },
   description: {
     fontSize: 16,
     marginBottom: 24,
     lineHeight: 24,
-    color: "#ccc",
+    color: "#666",
+    textAlign: "center",
   },
   taglineContainer: {
-    backgroundColor: "#111",
+    backgroundColor: "#f8f8f8",
     padding: 16,
-    borderRadius: 0,
+    borderRadius: 8,
     marginBottom: 24,
     borderLeftWidth: 3,
-    borderLeftColor: "#fff",
+    borderLeftColor: "#000",
   },
   taglineText: {
     fontSize: 16,
     fontStyle: "italic",
-    color: "#fff",
+    color: "#000",
     letterSpacing: 0.3,
   },
   infoSection: {
     marginBottom: 20,
   },
   sectionLabel: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: "700",
     marginBottom: 8,
-    color: "#888",
-    letterSpacing: 1,
+    color: "#000",
+    letterSpacing: 0.5,
     textTransform: "uppercase",
   },
   sectionValue: {
     fontSize: 16,
-    color: "#fff",
+    color: "#666",
     fontWeight: "500",
   },
   genresContainer: {
@@ -240,51 +244,58 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   genreTag: {
-    backgroundColor: "#333",
+    backgroundColor: "transparent",
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 0,
-    borderWidth: 1,
-    borderColor: "#555",
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: "#000",
   },
   genreText: {
-    color: "#fff",
+    color: "#000",
     fontSize: 11,
     fontWeight: "700",
     letterSpacing: 0.5,
   },
   segmentItem: {
     marginBottom: 16,
-    backgroundColor: "#111",
-    padding: 12,
-    borderRadius: 0,
+    backgroundColor: "#f8f8f8",
+    padding: 16,
+    borderRadius: 8,
   },
   segmentName: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#fff",
+    color: "#000",
     marginBottom: 4,
     letterSpacing: 0.3,
   },
   segmentDescription: {
     fontSize: 13,
-    color: "#ccc",
+    color: "#666",
     lineHeight: 18,
   },
   goToShowButton: {
-    backgroundColor: "#fff",
+    backgroundColor: "#000",
     paddingVertical: 16,
-    paddingHorizontal: 20,
-    borderRadius: 0,
+    paddingHorizontal: 32,
+    borderRadius: 8,
     marginTop: 24,
     alignItems: "center",
-    borderWidth: 2,
-    borderColor: "#fff",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
   },
   goToShowText: {
-    color: "#000",
+    color: "#fff",
     fontSize: 14,
     fontWeight: "700",
     letterSpacing: 1,
+    textTransform: "uppercase",
   },
 });
