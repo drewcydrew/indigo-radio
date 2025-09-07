@@ -14,7 +14,6 @@ import { RadioProgram } from "../types/types";
 import usePrograms from "../hooks/usePrograms";
 import TodaysSchedule from "./TodaysSchedule";
 import { usePlayer } from "../contexts/PlayerContext";
-import UniversalPlayer from "./UniversalPlayer";
 import { audioService } from "../services/AudioService";
 
 const STREAM_URL = "https://internetradio.indigofm.au:8032/stream";
@@ -79,23 +78,12 @@ export default function LiveRadio({
 
   const playLiveRadio = async () => {
     try {
-      // Reset the player and set up live stream
-      await audioService.reset();
-
-      // Update player context first
+      // Update player context first - UniversalPlayer will handle TrackPlayer setup
       setCurrentContent({ type: "live", program: currentProgram });
       setPlayerVisible(true);
 
-      if (Platform.OS !== "web") {
-        await TrackPlayer.add({
-          id: "live",
-          url: STREAM_URL,
-          title: currentProgram?.name || "Indigo FM Live",
-          artist: currentProgram?.host || "Live Radio",
-          isLiveStream: true,
-        });
-      } else {
-        // For web, the UniversalPlayer will handle the audio URL change
+      // For web, set up the audio service track info
+      if (Platform.OS === "web") {
         await audioService.add({
           id: "live",
           url: STREAM_URL,
@@ -103,9 +91,7 @@ export default function LiveRadio({
           artist: currentProgram?.host || "Live Radio",
         });
       }
-
-      // Start playing
-      await audioService.play();
+      // Note: TrackPlayer setup now handled by UniversalPlayer
 
       // Update app state
       if (currentProgram) {
@@ -140,9 +126,6 @@ export default function LiveRadio({
           programsLoading={programsLoading}
         />
       </View>
-
-      {/* Universal Player */}
-      <UniversalPlayer onGoToShow={onGoToShow} />
     </View>
   );
 }
@@ -150,10 +133,9 @@ export default function LiveRadio({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingBottom: 120, // Reduced padding since player can now collapse
+    paddingBottom: 120, // Keep padding for player space
     width: "100%",
     maxWidth: "100%",
-    //minHeight: Platform.OS === "web" ? "100vh" : "auto",
   },
   content: {
     flex: 1,
@@ -161,7 +143,7 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: Platform.OS === "web" ? 1200 : "100%",
     alignSelf: Platform.OS === "web" ? "center" : "auto",
-    minHeight: 0, // Allow content to shrink
+    minHeight: 0,
   },
   radioIcon: {
     fontSize: 48,

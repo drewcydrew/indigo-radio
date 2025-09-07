@@ -42,12 +42,43 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
     setIsPlayerVisible(false);
   };
 
+  // Helper function to compare content
+  const isContentSame = (
+    content1: PlayerContent | null,
+    content2: PlayerContent | null
+  ): boolean => {
+    if (!content1 && !content2) return true;
+    if (!content1 || !content2) return false;
+
+    if (content1.type !== content2.type) return false;
+
+    if (content1.type === "podcast" && content2.type === "podcast") {
+      return content1.episode.id === content2.episode.id;
+    }
+
+    if (content1.type === "live" && content2.type === "live") {
+      // For live radio, consider it the same if both are live (regardless of program)
+      // since the stream URL is always the same
+      return true;
+    }
+
+    return false;
+  };
+
+  // Enhanced setCurrentContent that avoids unnecessary reloads
+  const handleSetCurrentContent = (content: PlayerContent | null) => {
+    // Only update if the content is actually different
+    if (!isContentSame(currentContent, content)) {
+      setCurrentContent(content);
+    }
+  };
+
   return (
     <PlayerContext.Provider
       value={{
         currentContent,
         isPlayerVisible,
-        setCurrentContent,
+        setCurrentContent: handleSetCurrentContent,
         setPlayerVisible,
         clearPlayer,
       }}

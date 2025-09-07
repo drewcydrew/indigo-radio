@@ -6,7 +6,6 @@ import { PodcastEpisode, ShowDefinition } from "../types/types";
 import useShowDetails from "../hooks/useShowDetails";
 import usePodcastEpisodes from "../hooks/usePodcastEpisodes";
 import { usePlayer } from "../contexts/PlayerContext";
-import UniversalPlayer from "./UniversalPlayer";
 import ShowDetailsModal from "./ShowDetailsModal";
 
 interface PodcastProps {
@@ -65,23 +64,12 @@ export default function Podcast({
         );
         const artwork = showDef?.artwork;
 
-        // Reset the player and add the new episode
-        await audioService.reset();
-
-        // Update player context first
+        // Update player context first - UniversalPlayer will handle TrackPlayer setup
         setCurrentContent({ type: "podcast", episode });
         setPlayerVisible(true);
 
-        if (Platform.OS !== "web") {
-          await audioService.add({
-            id: episode.id,
-            url: episode.url,
-            title: episode.title,
-            artist: episode.show,
-            artwork: artwork,
-          });
-        } else {
-          // For web, the UniversalPlayer will handle the audio URL change
+        // For web, set up the audio service track info
+        if (Platform.OS === "web") {
           await audioService.add({
             id: episode.id,
             url: episode.url,
@@ -90,9 +78,7 @@ export default function Podcast({
             artwork: artwork,
           });
         }
-
-        // Start playing
-        await audioService.play();
+        // Note: TrackPlayer setup now handled by UniversalPlayer
 
         // Update app state
         onNowPlayingUpdate(episode.title);
@@ -161,9 +147,6 @@ export default function Podcast({
           />
         </View>
       </View>
-
-      {/* Universal Player */}
-      <UniversalPlayer onShowDetails={handleShowDetailsPress} />
 
       {/* Show Details Modal */}
       {selectedShow && (

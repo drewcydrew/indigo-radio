@@ -38,6 +38,8 @@ export default function UniversalPlayer({
   const webAudioRef = useRef<WebAudioPlayerRef>(null);
   const [currentAudioUrl, setCurrentAudioUrl] = useState<string>("");
   const [webError, setWebError] = useState<string | null>(null);
+  const [shouldAutoPlay, setShouldAutoPlay] = useState(false);
+  const [lastContentId, setLastContentId] = useState<string>("");
 
   // Mobile state
   const mobilePlayback = usePlaybackState();
@@ -104,35 +106,58 @@ export default function UniversalPlayer({
     }
   }, [webAudioRef.current]);
 
+  // Helper function to get a unique ID for the current content
+  const getCurrentContentId = () => {
+    if (!currentContent) return "";
+
+    if (currentContent.type === "podcast") {
+      return `podcast-${currentContent.episode.id}`;
+    } else {
+      return "live-radio"; // Live radio always has the same ID
+    }
+  };
+
   // Handle content changes and audio URL updates
   useEffect(() => {
     if (!currentContent) {
       setCurrentAudioUrl("");
       setWebError(null);
+      setShouldAutoPlay(false);
+      setLastContentId("");
       return;
     }
 
     const contentData = getContentData();
     const newAudioUrl = contentData.audioUrl;
+    const currentContentId = getCurrentContentId();
 
-    // Only update audio URL if it's actually different
-    if (newAudioUrl !== currentAudioUrl) {
+    // Only update if the content ID has actually changed (not just mode switch)
+    if (currentContentId !== lastContentId) {
       console.log(
-        "Audio URL changing from",
-        currentAudioUrl,
+        "Content ID changing from",
+        lastContentId,
         "to",
+        currentContentId,
+        "- Audio URL:",
         newAudioUrl
       );
 
       // Clear any previous errors
       setWebError(null);
 
-      // Signal that we're transitioning
+      // Signal that we're transitioning and should auto-play
       if (Platform.OS === "web") {
         audioService.setTransitioning(true);
       }
+      setShouldAutoPlay(true);
 
       setCurrentAudioUrl(newAudioUrl);
+      setLastContentId(currentContentId);
+
+      // Set up TrackPlayer for mobile background support
+      if (Platform.OS !== "web") {
+        setupTrackForBackground(contentData);
+      }
 
       // Clear transitioning flag after a short delay
       setTimeout(() => {
@@ -140,8 +165,75 @@ export default function UniversalPlayer({
           audioService.setTransitioning(false);
         }
       }, 100);
+    } else if (newAudioUrl !== currentAudioUrl) {
+      // Handle URL changes without content ID changes (shouldn't happen normally)
+      console.log(
+        "Audio URL changed without content ID change - updating URL only"
+      );
+      setCurrentAudioUrl(newAudioUrl);
     }
-  }, [currentContent, currentAudioUrl]);
+  }, [currentContent, lastContentId]);
+
+  // Auto-play effect - separate from content change effect
+  useEffect(() => {
+    const startPlayback = async () => {
+      if (shouldAutoPlay && currentAudioUrl && !webError) {
+        try {
+          console.log("Auto-starting playback for:", currentAudioUrl);
+
+          // Small delay to ensure everything is set up
+          setTimeout(async () => {
+            try {
+              if (Platform.OS !== "web") {
+                await TrackPlayer.play();
+              } else {
+                await audioService.play();
+              }
+              setShouldAutoPlay(false);
+            } catch (error) {
+              console.error("Error auto-starting playback:", error);
+              setShouldAutoPlay(false);
+            }
+          }, 200);
+        } catch (error) {
+          console.error("Error in auto-play setup:", error);
+          setShouldAutoPlay(false);
+        }
+      }
+    };
+
+    startPlayback();
+  }, [shouldAutoPlay, currentAudioUrl, webError]);
+
+  // New function to set up track for background support
+  const setupTrackForBackground = async (contentData: any) => {
+    try {
+      // Reset TrackPlayer
+      await TrackPlayer.reset();
+
+      // Add the track with proper metadata for background controls
+      const track = {
+        id:
+          currentContent?.type === "podcast"
+            ? currentContent.episode.id
+            : "live-radio",
+        url: contentData.audioUrl,
+        title: contentData.title,
+        artist: contentData.subtitle,
+        artwork: contentData.artwork || undefined,
+        // Add additional metadata for better background support
+        album:
+          currentContent?.type === "live" ? "Indigo FM" : contentData.subtitle,
+        genre: currentContent?.type === "live" ? "Radio" : "Podcast",
+        isLiveStream: currentContent?.type === "live",
+      };
+
+      await TrackPlayer.add(track);
+      console.log("Track added to TrackPlayer for background support:", track);
+    } catch (error) {
+      console.error("Error setting up track for background:", error);
+    }
+  };
 
   if (!isPlayerVisible || !currentContent) {
     return null;
@@ -198,25 +290,47 @@ export default function UniversalPlayer({
   };
 
   const handleSeek = async (value: number) => {
-    await audioService.seekTo(value);
+    if (Platform.OS !== "web") {
+      await TrackPlayer.seekTo(value);
+    } else {
+      await audioService.seekTo(value);
+    }
   };
 
   const skipBackward = async () => {
     const newPosition = Math.max(0, progress.position - 15);
-    await audioService.seekTo(newPosition);
+    if (Platform.OS !== "web") {
+      await TrackPlayer.seekTo(newPosition);
+    } else {
+      await audioService.seekTo(newPosition);
+    }
   };
 
   const skipForward = async () => {
     const newPosition = Math.min(progress.duration, progress.position + 15);
-    await audioService.seekTo(newPosition);
+    if (Platform.OS !== "web") {
+      await TrackPlayer.seekTo(newPosition);
+    } else {
+      await audioService.seekTo(newPosition);
+    }
   };
 
   const togglePlayPause = async () => {
     try {
-      if (isPlaying) {
-        await audioService.pause();
+      if (Platform.OS !== "web") {
+        // Use TrackPlayer directly for better background support
+        if (isPlaying) {
+          await TrackPlayer.pause();
+        } else {
+          await TrackPlayer.play();
+        }
       } else {
-        await audioService.play();
+        // Use audioService for web
+        if (isPlaying) {
+          await audioService.pause();
+        } else {
+          await audioService.play();
+        }
       }
     } catch (error) {
       console.error("Error toggling play/pause:", error);
@@ -253,14 +367,9 @@ export default function UniversalPlayer({
     }
 
     if (showName) {
-      // Use the appropriate callback based on context
-      if (onShowDetails) {
-        onShowDetails(showName);
-      } else if (onGoToShow) {
-        const showDef = findShowByName(showName);
-        if (showDef) {
-          onGoToShow(showName);
-        }
+      // Always use onGoToShow since we're now at the App level
+      if (onGoToShow) {
+        onGoToShow(showName);
       }
     }
   };

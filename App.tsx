@@ -11,6 +11,7 @@ import TrackPlayer, { Capability } from "react-native-track-player";
 import LiveRadio from "./src/components/LiveRadio";
 import Podcast from "./src/components/Podcast";
 import { PlayerProvider } from "./src/contexts/PlayerContext";
+import UniversalPlayer from "./src/components/UniversalPlayer";
 
 async function setupPlayer() {
   if (Platform.OS !== "web") {
@@ -23,13 +24,24 @@ async function setupPlayer() {
         Capability.Stop,
         Capability.SeekTo,
         Capability.Skip,
+        Capability.SkipToNext,
+        Capability.SkipToPrevious,
       ],
-      compactCapabilities: [Capability.Play, Capability.Pause, Capability.Skip],
+      compactCapabilities: [
+        Capability.Play,
+        Capability.Pause,
+        Capability.SkipToNext,
+        Capability.SkipToPrevious,
+      ],
       notificationCapabilities: [
         Capability.Play,
         Capability.Pause,
         Capability.Stop,
+        Capability.SeekTo,
       ],
+      // Add forward/backward jump intervals for podcasts
+      forwardJumpInterval: 15,
+      backwardJumpInterval: 15,
     });
   }
 }
@@ -149,6 +161,9 @@ export default function App() {
             </View>
           </TouchableOpacity>
         </View>
+
+        {/* Single Universal Player Instance */}
+        <UniversalPlayer onGoToShow={handleGoToShow} />
       </SafeAreaView>
     </PlayerProvider>
   );

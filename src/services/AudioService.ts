@@ -34,8 +34,12 @@ class AudioService {
 
   async reset() {
     if (Platform.OS === 'web') {
-      // Don't pause during reset - let the new source handle playback
-      this.currentTrack = null;
+      // For web, pause current playback but don't clear track info immediately
+      this.webAudioPlayerRef?.pause();
+      // Clear current track after a brief delay to allow for smooth transitions
+      setTimeout(() => {
+        this.currentTrack = null;
+      }, 100);
       return;
     }
     return TrackPlayer.reset();
@@ -53,8 +57,8 @@ class AudioService {
   async play() {
     if (Platform.OS === 'web') {
       // Only call play if we're not already transitioning
-      if (!this.isTransitioning) {
-        return this.webAudioPlayerRef?.play();
+      if (!this.isTransitioning && this.webAudioPlayerRef) {
+        return this.webAudioPlayerRef.play();
       }
       return;
     }
