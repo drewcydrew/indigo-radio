@@ -27,6 +27,8 @@ export default function UniversalPlayer() {
   const { currentContent, isPlayerVisible } = usePlayer();
   const [isCollapsed, setIsCollapsed] = useState(true);
   const webAudioRef = useRef<WebAudioPlayerRef>(null);
+  const [currentAudioUrl, setCurrentAudioUrl] = useState<string>("");
+  const [webError, setWebError] = useState<string | null>(null);
 
   // Mobile state
   const mobilePlayback = usePlaybackState();
@@ -43,6 +45,41 @@ export default function UniversalPlayer() {
   // Use the hook to get show details for artwork
   const { findShowByName } = useShowDetails();
 
+  // Get content-specific data - MOVED UP BEFORE useEffects
+  const getContentData = () => {
+    if (!currentContent) {
+      return {
+        title: "",
+        subtitle: "",
+        artwork: undefined,
+        audioUrl: "",
+        icon: "♪",
+      };
+    }
+
+    if (currentContent.type === "podcast") {
+      const episode = currentContent.episode;
+      const showDef = findShowByName(episode.show);
+      return {
+        title: episode.title,
+        subtitle: episode.show,
+        artwork: showDef?.artwork,
+        audioUrl: episode.url,
+        icon: "♪",
+      };
+    } else {
+      const program = currentContent.program;
+      const showDef = program ? findShowByName(program.name) : null;
+      return {
+        title: program?.name || "Indigo FM Live",
+        subtitle: program?.host ? `Hosted by ${program.host}` : "Live Radio",
+        artwork: showDef?.artwork,
+        audioUrl: STREAM_URL,
+        icon: "📻",
+      };
+    }
+  };
+
   // Set up web audio state listener and player ref
   useEffect(() => {
     if (Platform.OS === "web") {
@@ -57,6 +94,45 @@ export default function UniversalPlayer() {
       audioService.setWebAudioPlayerRef(webAudioRef.current);
     }
   }, [webAudioRef.current]);
+
+  // Handle content changes and audio URL updates
+  useEffect(() => {
+    if (!currentContent) {
+      setCurrentAudioUrl("");
+      setWebError(null);
+      return;
+    }
+
+    const contentData = getContentData();
+    const newAudioUrl = contentData.audioUrl;
+
+    // Only update audio URL if it's actually different
+    if (newAudioUrl !== currentAudioUrl) {
+      console.log(
+        "Audio URL changing from",
+        currentAudioUrl,
+        "to",
+        newAudioUrl
+      );
+
+      // Clear any previous errors
+      setWebError(null);
+
+      // Signal that we're transitioning
+      if (Platform.OS === "web") {
+        audioService.setTransitioning(true);
+      }
+
+      setCurrentAudioUrl(newAudioUrl);
+
+      // Clear transitioning flag after a short delay
+      setTimeout(() => {
+        if (Platform.OS === "web") {
+          audioService.setTransitioning(false);
+        }
+      }, 100);
+    }
+  }, [currentContent, currentAudioUrl]);
 
   if (!isPlayerVisible || !currentContent) {
     return null;
@@ -111,28 +187,21 @@ export default function UniversalPlayer() {
     }
   };
 
-  // Get content-specific data
-  const getContentData = () => {
-    if (currentContent.type === "podcast") {
-      const episode = currentContent.episode;
-      const showDef = findShowByName(episode.show);
-      return {
-        title: episode.title,
-        subtitle: episode.show,
-        artwork: showDef?.artwork,
-        audioUrl: episode.url,
-        icon: "♪",
-      };
-    } else {
-      const program = currentContent.program;
-      const showDef = program ? findShowByName(program.name) : null;
-      return {
-        title: program?.name || "Indigo FM Live",
-        subtitle: program?.host ? `Hosted by ${program.host}` : "Live Radio",
-        artwork: showDef?.artwork,
-        audioUrl: STREAM_URL,
-        icon: "📻",
-      };
+  const handleWebAudioError = (error: string) => {
+    console.error("Web audio error:", error);
+    setWebError(error);
+
+    // If it's a CORS error and we're playing a podcast, show a helpful message
+    if (error.includes("CORS") || error.includes("not supported")) {
+      if (currentContent?.type === "podcast") {
+        setWebError(
+          "This podcast episode cannot be played in the web browser due to security restrictions. Please use the mobile app to listen to podcasts."
+        );
+      } else {
+        setWebError(
+          "Audio playback failed due to browser security restrictions."
+        );
+      }
     }
   };
 
@@ -200,14 +269,17 @@ export default function UniversalPlayer() {
   // Full expanded display
   return (
     <View style={styles.expandedContainer}>
-      {/* Web Audio Player Component */}
-      {Platform.OS === "web" && (
+      {/* Web Audio Player Component - Only render when we have an audio URL */}
+      {Platform.OS === "web" && currentAudioUrl && (
         <WebAudioPlayer
           ref={webAudioRef}
-          src={contentData.audioUrl}
+          src={currentAudioUrl}
           onStateChange={(state) => audioService.updateWebAudioState(state)}
-          onLoad={() => console.log("Audio loaded")}
-          onError={(error) => console.error("Audio error:", error)}
+          onLoad={() => {
+            console.log("Audio loaded:", currentAudioUrl);
+            setWebError(null);
+          }}
+          onError={handleWebAudioError}
           autoPlay={false}
         />
       )}
@@ -231,6 +303,13 @@ export default function UniversalPlayer() {
       </View>
 
       <View style={styles.expandedContent}>
+        {/* Error Message for Web */}
+        {Platform.OS === "web" && webError && (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>⚠️ {webError}</Text>
+          </View>
+        )}
+
         {/* Content details with artwork */}
         <View style={styles.contentDetails}>
           <View style={styles.contentHeader}>
@@ -297,8 +376,10 @@ export default function UniversalPlayer() {
             style={[
               styles.playButton,
               isPlaying ? styles.pauseButton : styles.playButtonActive,
+              Platform.OS === "web" && webError && styles.disabledButton,
             ]}
             onPress={togglePlayPause}
+            disabled={Platform.OS === "web" && !!webError}
           >
             <Text
               style={[
@@ -306,6 +387,7 @@ export default function UniversalPlayer() {
                 isPlaying
                   ? styles.pauseButtonText
                   : styles.playButtonActiveText,
+                Platform.OS === "web" && webError && styles.disabledButtonText,
               ]}
             >
               {isPlaying
@@ -324,7 +406,7 @@ export default function UniversalPlayer() {
         </View>
 
         <Text style={styles.stateText}>
-          Status: {isPlaying ? "playing" : "paused"}
+          Status: {webError ? "error" : isPlaying ? "playing" : "paused"}
         </Text>
       </View>
     </View>
@@ -588,5 +670,26 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     textTransform: "uppercase",
     letterSpacing: 0.5,
+  },
+  errorContainer: {
+    backgroundColor: "#ff4444",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  errorText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "500",
+    textAlign: "center",
+    lineHeight: 18,
+  },
+  disabledButton: {
+    opacity: 0.5,
+    backgroundColor: "#666",
+    borderColor: "#666",
+  },
+  disabledButtonText: {
+    color: "#999",
   },
 });

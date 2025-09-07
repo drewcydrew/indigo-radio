@@ -84,6 +84,10 @@ export default function LiveRadio({
       // Reset the player and set up live stream
       await audioService.reset();
 
+      // Update player context first
+      setCurrentContent({ type: "live", program: currentProgram });
+      setPlayerVisible(true);
+
       if (Platform.OS !== "web") {
         await TrackPlayer.add({
           id: "live",
@@ -92,11 +96,15 @@ export default function LiveRadio({
           artist: currentProgram?.host || "Live Radio",
           isLiveStream: true,
         });
+      } else {
+        // For web, the UniversalPlayer will handle the audio URL change
+        await audioService.add({
+          id: "live",
+          url: STREAM_URL,
+          title: currentProgram?.name || "Indigo FM Live",
+          artist: currentProgram?.host || "Live Radio",
+        });
       }
-
-      // Update player context
-      setCurrentContent({ type: "live", program: currentProgram });
-      setPlayerVisible(true);
 
       // Start playing
       await audioService.play();

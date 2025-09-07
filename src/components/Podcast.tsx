@@ -30,6 +30,13 @@ export default function Podcast({
     const episode = episodes.find((ep) => ep.id === episodeId);
     if (episode) {
       try {
+        // Check if we're on web and warn about potential CORS issues
+        if (Platform.OS === "web") {
+          console.warn(
+            "Playing podcasts on web may be limited due to CORS policies"
+          );
+        }
+
         // Get show definition for artwork
         const showDef = showDefinitions.find(
           (show) => show.name === episode.show
@@ -39,6 +46,10 @@ export default function Podcast({
         // Reset the player and add the new episode
         await audioService.reset();
 
+        // Update player context first
+        setCurrentContent({ type: "podcast", episode });
+        setPlayerVisible(true);
+
         if (Platform.OS !== "web") {
           await audioService.add({
             id: episode.id,
@@ -47,11 +58,16 @@ export default function Podcast({
             artist: episode.show,
             artwork: artwork,
           });
+        } else {
+          // For web, the UniversalPlayer will handle the audio URL change
+          await audioService.add({
+            id: episode.id,
+            url: episode.url,
+            title: episode.title,
+            artist: episode.show,
+            artwork: artwork,
+          });
         }
-
-        // Update player context
-        setCurrentContent({ type: "podcast", episode });
-        setPlayerVisible(true);
 
         // Start playing
         await audioService.play();

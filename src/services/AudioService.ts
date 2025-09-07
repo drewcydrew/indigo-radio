@@ -14,6 +14,8 @@ class AudioService {
   private webAudioState: AudioState | null = null;
   private webAudioStateCallback: ((state: AudioState) => void) | null = null;
   private webAudioPlayerRef: WebAudioPlayerRef | null = null;
+  private currentTrack: Track | null = null;
+  private isTransitioning: boolean = false;
 
   // Set up web audio player reference
   setWebAudioPlayerRef(ref: WebAudioPlayerRef | null) {
@@ -32,7 +34,8 @@ class AudioService {
 
   async reset() {
     if (Platform.OS === 'web') {
-      this.webAudioPlayerRef?.pause();
+      // Don't pause during reset - let the new source handle playback
+      this.currentTrack = null;
       return;
     }
     return TrackPlayer.reset();
@@ -40,7 +43,8 @@ class AudioService {
 
   async add(track: Track) {
     if (Platform.OS === 'web') {
-      // Web audio will be handled by WebAudioPlayer component
+      // Store track info for web
+      this.currentTrack = track;
       return;
     }
     return TrackPlayer.add(track);
@@ -48,7 +52,11 @@ class AudioService {
 
   async play() {
     if (Platform.OS === 'web') {
-      return this.webAudioPlayerRef?.play();
+      // Only call play if we're not already transitioning
+      if (!this.isTransitioning) {
+        return this.webAudioPlayerRef?.play();
+      }
+      return;
     }
     return TrackPlayer.play();
   }
@@ -67,6 +75,15 @@ class AudioService {
       return;
     }
     return TrackPlayer.seekTo(position);
+  }
+
+  // Add method to handle smooth transitions
+  setTransitioning(transitioning: boolean) {
+    this.isTransitioning = transitioning;
+  }
+
+  getCurrentTrack(): Track | null {
+    return this.currentTrack;
   }
 
   getProgress() {

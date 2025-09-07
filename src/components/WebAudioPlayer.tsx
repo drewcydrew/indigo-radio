@@ -35,6 +35,7 @@ const WebAudioPlayer = forwardRef<WebAudioPlayerRef, WebAudioPlayerProps>(
     const [isPlaying, setIsPlaying] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [shouldPlay, setShouldPlay] = useState(autoPlay);
+    const [currentSrc, setCurrentSrc] = useState<string | undefined>(src);
 
     // Expose methods via ref
     useImperativeHandle(
@@ -46,7 +47,11 @@ const WebAudioPlayer = forwardRef<WebAudioPlayerRef, WebAudioPlayerProps>(
 
           setShouldPlay(true);
           try {
-            await audio.play();
+            // If audio is ready, play immediately
+            if (audio.readyState >= 3) {
+              await audio.play();
+            }
+            // Otherwise, it will play when canplay event fires
           } catch (error) {
             console.error("Error playing audio:", error);
             onError?.("Failed to play audio");
@@ -61,7 +66,7 @@ const WebAudioPlayer = forwardRef<WebAudioPlayerRef, WebAudioPlayerProps>(
         },
         seekTo: (position: number) => {
           const audio = audioRef.current;
-          if (audio) {
+          if (audio && !isNaN(audio.duration) && audio.duration > 0) {
             audio.currentTime = position;
           }
         },
@@ -72,7 +77,7 @@ const WebAudioPlayer = forwardRef<WebAudioPlayerRef, WebAudioPlayerProps>(
           }
         },
       }),
-      [onError]
+      [onError, isLoading]
     );
 
     useEffect(() => {
@@ -83,9 +88,9 @@ const WebAudioPlayer = forwardRef<WebAudioPlayerRef, WebAudioPlayerProps>(
 
       const updateState = () => {
         onStateChange({
-          position: audio.currentTime,
-          duration: audio.duration || 0,
-          isPlaying: !audio.paused,
+          position: isNaN(audio.currentTime) ? 0 : audio.currentTime,
+          duration: isNaN(audio.duration) ? 0 : audio.duration,
+          isPlaying: !audio.paused && !audio.ended,
           isLoading: audio.readyState < 3,
         });
       };
@@ -100,8 +105,8 @@ const WebAudioPlayer = forwardRef<WebAudioPlayerRef, WebAudioPlayerProps>(
         updateState();
         onLoad?.();
 
-        // Auto-play if requested
-        if (shouldPlay) {
+        // Auto-play if requested and we're not already playing
+        if (shouldPlay && audio.paused) {
           try {
             await audio.play();
           } catch (error) {
@@ -125,9 +130,35 @@ const WebAudioPlayer = forwardRef<WebAudioPlayerRef, WebAudioPlayerProps>(
         updateState();
       };
 
-      const handleError = () => {
+      const handleError = (e: Event) => {
+        const audio = audioRef.current;
+        const error = audio?.error;
+
+        let errorMessage = "Failed to load audio";
+        if (error) {
+          switch (error.code) {
+            case error.MEDIA_ERR_ABORTED:
+              errorMessage = "Audio loading was aborted";
+              break;
+            case error.MEDIA_ERR_NETWORK:
+              errorMessage = "Network error occurred while loading audio";
+              break;
+            case error.MEDIA_ERR_DECODE:
+              errorMessage =
+                "Audio file is corrupted or in an unsupported format";
+              break;
+            case error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+              errorMessage =
+                "Audio format not supported or CORS policy blocked the request";
+              break;
+            default:
+              errorMessage = "Unknown audio error occurred";
+          }
+        }
+
+        console.error("Audio error:", errorMessage, e);
         setIsLoading(false);
-        onError?.("Failed to load audio");
+        onError?.(errorMessage);
         updateState();
       };
 
@@ -137,34 +168,64 @@ const WebAudioPlayer = forwardRef<WebAudioPlayerRef, WebAudioPlayerProps>(
         updateState();
       };
 
+      const handleWaiting = () => {
+        setIsLoading(true);
+        updateState();
+      };
+
+      const handleCanPlayThrough = () => {
+        setIsLoading(false);
+        updateState();
+      };
+
+      // Add all event listeners
       audio.addEventListener("loadstart", handleLoadStart);
       audio.addEventListener("canplay", handleCanPlay);
+      audio.addEventListener("canplaythrough", handleCanPlayThrough);
       audio.addEventListener("timeupdate", handleTimeUpdate);
       audio.addEventListener("play", handlePlay);
       audio.addEventListener("pause", handlePause);
       audio.addEventListener("error", handleError);
       audio.addEventListener("ended", handleEnded);
+      audio.addEventListener("waiting", handleWaiting);
 
       return () => {
         audio.removeEventListener("loadstart", handleLoadStart);
         audio.removeEventListener("canplay", handleCanPlay);
+        audio.removeEventListener("canplaythrough", handleCanPlayThrough);
         audio.removeEventListener("timeupdate", handleTimeUpdate);
         audio.removeEventListener("play", handlePlay);
         audio.removeEventListener("pause", handlePause);
         audio.removeEventListener("error", handleError);
         audio.removeEventListener("ended", handleEnded);
+        audio.removeEventListener("waiting", handleWaiting);
       };
     }, [src, onStateChange, onLoad, onError, shouldPlay]);
 
+    // Handle source changes
     useEffect(() => {
       if (Platform.OS !== "web") return;
 
       const audio = audioRef.current;
-      if (!audio || !src) return;
+      if (!audio || !src || src === currentSrc) return;
 
+      console.log("Changing audio source from", currentSrc, "to", src);
+
+      // Remember if we were playing
+      const wasPlaying = shouldPlay || !audio.paused;
+
+      // Update source
       audio.src = src;
+      setCurrentSrc(src);
+
+      // Load the new source
       audio.load();
-    }, [src]);
+
+      // Maintain playback state for new source
+      if (wasPlaying) {
+        setShouldPlay(true);
+      }
+    }, [src, currentSrc, shouldPlay]);
 
     if (Platform.OS !== "web") {
       return null;
