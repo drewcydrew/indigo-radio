@@ -599,20 +599,16 @@ export default function UniversalPlayer({
             ) : (
               <Text
                 style={[
-                  styles.playButtonText,
+                  styles.playButtonIcon,
                   isPlaying
-                    ? styles.pauseButtonText
-                    : styles.playButtonActiveText,
+                    ? styles.pauseButtonIcon
+                    : styles.playButtonActiveIcon,
                   Platform.OS === "web" &&
                     webError &&
-                    styles.disabledButtonText,
+                    styles.disabledButtonIcon,
                 ]}
               >
-                {isPlaying
-                  ? "PAUSE"
-                  : currentContent.type === "live"
-                  ? "PLAY LIVE"
-                  : "PLAY"}
+                {isPlaying ? "⏸" : "▶"}
               </Text>
             )}
           </TouchableOpacity>
@@ -624,19 +620,15 @@ export default function UniversalPlayer({
           )}
         </View>
 
-        <Text style={styles.stateText}>
-          Status: {webError ? "error" : isPlaying ? "playing" : "paused"}
-        </Text>
+        {/* Show Details Modal */}
+        {selectedShow && (
+          <ShowDetailsModal
+            show={selectedShow}
+            onClose={handleShowDetailsClose}
+            onGoToShow={handleGoToShowFromModal}
+          />
+        )}
       </View>
-
-      {/* Show Details Modal */}
-      {selectedShow && (
-        <ShowDetailsModal
-          show={selectedShow}
-          onClose={handleShowDetailsClose}
-          onGoToShow={handleGoToShowFromModal}
-        />
-      )}
     </View>
   );
 }
@@ -879,45 +871,23 @@ const styles = StyleSheet.create({
     borderColor: "#fff",
     backgroundColor: "transparent",
   },
-  playButtonText: {
-    fontSize: 14,
+  playButtonIcon: {
+    fontSize: 20,
     fontWeight: "700",
     textAlign: "center",
-    letterSpacing: 1,
   },
-  playButtonActiveText: {
+  playButtonActiveIcon: {
     color: "#000",
   },
-  pauseButtonText: {
+  pauseButtonIcon: {
     color: "#fff",
-  },
-  stateText: {
-    color: "#666",
-    textAlign: "center",
-    fontSize: 11,
-    fontWeight: "500",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
-  errorContainer: {
-    backgroundColor: "#ff4444",
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  errorText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "500",
-    textAlign: "center",
-    lineHeight: 18,
   },
   disabledButton: {
     opacity: 0.5,
     backgroundColor: "#666",
     borderColor: "#666",
   },
-  disabledButtonText: {
+  disabledButtonIcon: {
     color: "#999",
   },
   loadingButton: {
@@ -957,5 +927,18 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     letterSpacing: 0.5,
     textTransform: "uppercase",
+  },
+  errorContainer: {
+    backgroundColor: "#ff4444",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  errorText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "500",
+    textAlign: "center",
+    lineHeight: 18,
   },
 });
