@@ -1,42 +1,17 @@
 ﻿id,name,day,start_time,end_time
-acoustic-cafe-tue,Acoustic Cafe,tuesday,20:00:00,22:00:00
-alternative-playlist-thu,Alternative Playlist,thursday,0:00:00,9:00:00
-alternative-playlist-wed,Alternative Playlist,wednesday,9:00:00,12:00:00
-baby-boomers-revenge-tue,Baby Boomers Revenge,tuesday,12:00:00,14:00:00
-blues-hotel-wed,The Blues Hotel,wednesday,18:00:00,20:00:00
-bullfrogs-roadhouse-tue,Bullfrog's Roadhouse,tuesday,9:00:00,12:00:00
-car-wheels-gravel-road-mon,Car Wheels on a Gravel Road,monday,20:00:00,22:00:00
-car-wheels-gravel-road-thu,Car Wheels on a Gravel Road,thursday,9:00:00,10:00:00
-car-wheels-gravel-road-wed,Car Wheels on a Gravel Road,wednesday,9:00:00,12:00:00
-eclectic-avenue-wed,Eclectic Avenue,wednesday,20:00:00,22:00:00
-everyone-deserves-music-thu,Everyone Deserves Music,thursday,22:00:00,0:00:00
-indigenous-playlist-mon-9am,Indigenous Playlist,monday,9:00:00,12:00:00
-indigenous-playlist-tue-9am,Indigenous Playlist,tuesday,9:00:00,12:00:00
-made-by-music-thu,Made by Music,thursday,19:00:00,20:00:00
-oz-rock-hour-thu,Oz Rock Hour,thursday,18:00:00,19:00:00
-playlist-mon-12pm,Playlist,monday,12:00:00,14:00:00
-playlist-mon-2pm,Playlist,monday,14:00:00,16:00:00
-playlist-mon-6pm,Playlist,monday,18:00:00,20:00:00
-playlist-thu-12pm,Playlist,thursday,10:00:00,18:00:00
-playlist-tue-12pm,Playlist,tuesday,12:00:00,14:00:00
-playlist-tue-2pm,Playlist,tuesday,14:00:00,16:00:00
-playlist-wed-10pm,Playlist,wednesday,22:00:00,0:00:00
-playlist-wed-12pm,Playlist,wednesday,12:00:00,14:00:00
-playlist-wed-2pm,Playlist,wednesday,14:00:00,16:00:00
-playlist-wed-6pm,Playlist,wednesday,18:00:00,20:00:00
-the-vault-mon,The Vault,monday,22:00:00,0:00:00
-the-vault-tue,The Vault,tuesday,22:00:00,0:00:00
-uncut-unsigned-tue,Uncut and Unsigned,tuesday,16:00:00,18:00:00
-waste-alphabet-thu,Waste the Alphabet,thursday,20:00:00,22:00:00
-waste-alphabet-tue,Waste the Alphabet,tuesday,18:00:00,20:00:00
-yack-garden-club-mon,Yack Garden Club & Produce Market,monday,14:00:00,16:00:00
-yack-ps-mon,Yack PS,monday,16:00:00,18:00:00
-yack-ps-wed,Yack PS,wednesday,16:00:00,18:00:00
 alternative-playlist-fri,Alternative Playlist,friday,0:00:00,9:00:00
 playlist-fri,Playlist,friday,9:00:00,18:00:00
 uncut-unsigned-fri,Uncut and Unsigned,friday,18:00:00,20:00:00
 car-wheels-gravel-road-fri,Car Wheels on a Gravel Road,friday,20:00:00,22:00:00
 blues-hotel-fri,The Blues Hotel,friday,22:00:00,0:00:00
+car-wheels-gravel-road-mon,Car Wheels on a Gravel Road,monday,20:00:00,22:00:00
+indigenous-playlist-mon-9am,Indigenous Playlist,monday,9:00:00,12:00:00
+playlist-mon-12pm,Playlist,monday,12:00:00,14:00:00
+playlist-mon-2pm,Playlist,monday,14:00:00,16:00:00
+playlist-mon-6pm,Playlist,monday,18:00:00,20:00:00
+the-vault-mon,The Vault,monday,22:00:00,0:00:00
+yack-garden-club-mon,Yack Garden Club & Produce Market,monday,14:00:00,16:00:00
+yack-ps-mon,Yack PS,monday,16:00:00,18:00:00
 roots-playlist-sat,Roots / Americana Playlist,saturday,0:00:00,9:00:00
 toxic-sat,Toxic,saturday,9:00:00,10:00:00
 baby-revenge-sat,Baby Boomers Revenge,saturday,10:00:00,11:00:00
@@ -44,7 +19,7 @@ oz-hour-sat,Oz Rock Hour,saturday,11:00:00,12:00:00
 the-hotel-sat,The Blues Hotel,saturday,12:00:00,13:00:00
 everyone-music-sat,Everyone Deserves Music,saturday,13:00:00,14:00:00
 bullfrog's-sat,Bullfrog's Roadhouse,saturday,18:00:00,20:00:00
-waste-alphabet-sat,Waste the Alphabet,saturday,20:00:00,22:00:00
+waste-alphabet-sat,Waste The Alphabet,saturday,20:00:00,22:00:00
 eclectic-sat,Eclectic Avenue,saturday,22:00:00,0:00:00
 americana-playlist-sun,Americana / Country playlist,sunday,0:00:00,9:00:00
 primary-general-sun,Primary Schools General,sunday,9:00:00,10:00:00
@@ -57,3 +32,26 @@ uncut-unsigned-sun,Uncut and Unsigned,sunday,15:00:00,16:00:00
 atomic-sun,Atomic Countdown,sunday,18:00:00,20:00:00
 aussie-weekly-sun,Aussie Music Weekly,sunday,20:00:00,22:00:00
 beale-caravan-sun,Beale st Caravan,sunday,22:00:00,0:00:00
+alternative-playlist-thu,Alternative Playlist,thursday,0:00:00,9:00:00
+car-wheels-gravel-road-thu,Car Wheels on a Gravel Road,thursday,9:00:00,10:00:00
+everyone-deserves-music-thu,Everyone Deserves Music,thursday,22:00:00,0:00:00
+made-by-music-thu,Made by Music,thursday,19:00:00,20:00:00
+oz-rock-hour-thu,Oz Rock Hour,thursday,18:00:00,19:00:00
+playlist-thu-12pm,Playlist,thursday,10:00:00,18:00:00
+waste-alphabet-thu,Waste The Alphabet,thursday,20:00:00,22:00:00
+indigenous-playlist-tue-9am,Indigenous Playlist,tuesday,0:00:00,9:00:00
+playlist-tue-12pm,Playlist,tuesday,9:00:00,16:00:00
+uncut-unsigned-tue,Uncut and Unsigned,tuesday,16:00:00,18:00:00
+waste-alphabet-tue,Waste The Alphabet,tuesday,18:00:00,20:00:00
+acoustic-cafe-tue,Acoustic Cafe,tuesday,20:00:00,22:00:00
+the-vault-tue,The Vault,tuesday,22:00:00,0:00:00
+alternative-playlist-wed,Alternative Playlist,wednesday,0:00:00,9:00:00
+bullfrog's-wed,Bullfrog's Roadhouse,wednesday,9:00:00,11:00:00
+playlist-wed-12pm,Playlist,wednesday,11:00:00,13:00:00
+baby-revenge-wed,Baby Boomers Revenge,wednesday,13:00:00,15:00:00
+playlist-wed-3pm,Playlist,wednesday,15:00:00,16:00:00
+yack-ps-wed,Yack PS,wednesday,16:00:00,17:00:00
+playlist-wed-6pm,Playlist,wednesday,17:00:00,18:00:00
+blues-hotel-wed,The Blues Hotel,wednesday,18:00:00,20:00:00
+eclectic-avenue-wed,Eclectic Avenue,wednesday,20:00:00,22:00:00
+playlist-wed-10pm,Playlist,wednesday,22:00:00,0:00:00

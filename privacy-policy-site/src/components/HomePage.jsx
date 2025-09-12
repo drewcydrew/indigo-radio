@@ -1,0 +1,237 @@
+import { useState, useEffect } from 'react'
+import { 
+  IoLogoAndroid,
+  IoLogoApple,
+  IoGlobeOutline,
+  IoPeopleOutline,
+  IoCheckmarkCircleOutline,
+  IoLibraryOutline,
+  IoChevronBackOutline,
+  IoChevronForwardOutline
+} from 'react-icons/io5'
+import './HomePage.css'
+
+function HomePage({ heroImage }) {
+  const [showAndroidPrompt, setShowAndroidPrompt] = useState(false);
+  const [showAndroidInstall, setShowAndroidInstall] = useState(false);
+  const [featuresCarouselIndex, setFeaturesCarouselIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const androidUrl = "#";
+  const androidTestersGroupUrl = "#";
+  const iosUrl = "#";
+  const webAppurl = "#";
+
+  const features = [
+    {
+      image: "/live-radio.png",
+      title: "Live Radio",
+      description: "Stream live radio content."
+    },
+    {
+      image: "/podcast.png",
+      title: "Podcasts",
+      description: "Listen to your favorite podcasts."
+    }
+  ];
+
+  return (
+    <div className="homepage-container">
+      {/* Hero Section */}
+      <section className={`hero-section ${isMobile ? 'mobile' : ''}`}>
+        <div className={`hero-card ${isMobile ? 'mobile' : ''}`}>
+          {heroImage ? (
+            <img 
+              src={heroImage} 
+              alt="Application Logo" 
+              className={`hero-logo ${isMobile ? 'mobile' : ''}`}
+            />
+          ) : (
+            <IoLibraryOutline 
+              size={isMobile ? 60 : 80} 
+              className="hero-icon"
+            />
+          )}
+          <h1 className="hero-title">
+            Indigo Radio
+          </h1>
+          <p className={`hero-description ${isMobile ? 'mobile' : ''}`}>
+            This application connects to Indigo FM, to stream live radio and podcast content.
+          </p>
+          
+          {/* CTA Buttons */}
+          <div className={`cta-buttons ${isMobile ? 'mobile' : ''}`}>
+            <button
+              className={`button-base button-android ${isMobile ? 'mobile' : ''}`}
+              onClick={() => setShowAndroidPrompt(true)}
+            >
+              <IoLogoAndroid size={22} /> Install on Android
+            </button>
+            <a
+              href={iosUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`button-base button-ios ${isMobile ? 'mobile' : ''}`}
+            >
+              <IoLogoApple size={22} /> Install on iOS
+            </a>
+            <a
+              href={webAppurl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`button-base button-demo ${isMobile ? 'mobile' : ''}`}
+            >
+              <IoGlobeOutline size={22} /> Try Demo
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="features-section">
+        <div className="features-container">
+          <h2 className="features-title">
+            Key Features
+          </h2>
+          
+          {/* Desktop: Grid Layout */}
+          {!isMobile ? (
+            <div className="features-grid">
+              {features.map((feature, index) => (
+                <div key={index} className="feature-card">
+                  <img 
+                    src={feature.image} 
+                    alt={feature.title}
+                    className="feature-image"
+                  />
+                  <div className="feature-overlay">
+                    <h3 className="feature-title">
+                      {feature.title}
+                    </h3>
+                    <p className="feature-description">
+                      {feature.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            /* Mobile: Carousel Layout */
+            <div className="features-carousel">
+              <div 
+                className="carousel-track"
+                style={{ transform: `translateX(-${featuresCarouselIndex * 100}%)` }}
+              >
+                {features.map((feature, index) => (
+                  <div key={index} className="carousel-slide">
+                    <div className="carousel-card">
+                      <img 
+                        src={feature.image} 
+                        alt={feature.title}
+                        className="feature-image"
+                      />
+                      <div className="feature-overlay">
+                        <h3 className="feature-title">
+                          {feature.title}
+                        </h3>
+                        <p className="carousel-description">
+                          {feature.description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Navigation Overlay Buttons */}
+              {featuresCarouselIndex > 0 && (
+                <button
+                  onClick={() => setFeaturesCarouselIndex(featuresCarouselIndex - 1)}
+                  className="carousel-nav-button left"
+                >
+                  <IoChevronBackOutline size={32} />
+                </button>
+              )}
+              
+              {featuresCarouselIndex < features.length - 1 && (
+                <button
+                  onClick={() => setFeaturesCarouselIndex(featuresCarouselIndex + 1)}
+                  className="carousel-nav-button right"
+                >
+                  <IoChevronForwardOutline size={32} />
+                </button>
+              )}
+              
+              {/* Carousel Controls */}
+              <div className="carousel-controls">
+                {features.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setFeaturesCarouselIndex(index)}
+                    className={`carousel-dot ${index === featuresCarouselIndex ? 'active' : 'inactive'}`}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Modal */}
+      {showAndroidPrompt && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2 className="modal-title">Download Information</h2>
+            <p className="modal-description">
+              This is placeholder text for download instructions or additional information about getting the application.
+            </p>
+            <a
+              href={androidTestersGroupUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="button-base modal-button"
+            >
+              <IoPeopleOutline size={20} /> Placeholder Link
+            </a>
+            <br />
+            {!showAndroidInstall ? (
+              <button
+                onClick={() => setShowAndroidInstall(true)}
+                className="button-base modal-button modal-button-continue"
+              >
+                <IoLogoAndroid size={20} /> Continue to Download
+              </button>
+            ) : (
+              <a
+                href={androidUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="button-base modal-button modal-button-continue"
+              >
+                <IoLogoAndroid size={20} /> Download App
+              </a>
+            )}
+            <br />
+            <button
+              onClick={() => { setShowAndroidPrompt(false); setShowAndroidInstall(false); }}
+              className="button-base modal-button-close"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default HomePage
