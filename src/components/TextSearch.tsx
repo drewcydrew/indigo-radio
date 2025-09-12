@@ -90,11 +90,11 @@ const styles = StyleSheet.create({
   searchLabel: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#333",
+    color: "#D5851F",
     letterSpacing: 0.3,
   },
   clearButton: {
-    backgroundColor: "#ff0000",
+    backgroundColor: "#D5851F",
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8f8f8",
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#D5851F",
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     maxWidth: "100%",
   },
   searchButton: {
-    backgroundColor: "#000",
+    backgroundColor: "#D5851F",
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 8,

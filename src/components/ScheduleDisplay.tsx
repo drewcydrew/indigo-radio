@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: "#000",
+    backgroundColor: "#D5851F",
     borderRadius: 4,
     textTransform: "uppercase",
     letterSpacing: 0.5,
@@ -297,14 +297,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8f8f8",
     borderRadius: 20,
     marginRight: 8,
+    borderWidth: 2,
+    borderColor: "#D5851F",
   },
   activeDayTab: {
-    backgroundColor: "#000",
+    backgroundColor: "#D5851F",
   },
   dayTabText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#666",
+    color: "#D5851F",
   },
   activeDayTabText: {
     color: "#fff",
@@ -331,11 +333,11 @@ const styles = StyleSheet.create({
   },
   programItem: {
     padding: 16,
-    backgroundColor: "#f8f8f8",
+    backgroundColor: "#fff",
     marginBottom: 8,
     borderRadius: 0,
     borderLeftWidth: 3,
-    borderLeftColor: "#000",
+    borderLeftColor: "#D5851F",
   },
   programContent: {
     flexDirection: "row",
@@ -396,6 +398,6 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#000",
+    color: "#D5851F",
   },
 });

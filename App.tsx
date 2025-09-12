@@ -96,7 +96,7 @@ export default function App() {
       <SafeAreaView
         style={[styles.container, Platform.OS === "web" && styles.webContainer]}
       >
-        {/* Main Content - Full Screen */}
+        {/* Main Content - Takes remaining space above player */}
         <View style={styles.mainContent}>
           {/* App Title with Toggle */}
           <View style={styles.header}>
@@ -104,44 +104,45 @@ export default function App() {
 
             {/* Toggle Switch in Header */}
             <View style={styles.headerToggleContainer}>
-              <TouchableOpacity
-                onPress={() =>
-                  setCurrentMode(currentMode === "live" ? "podcast" : "live")
-                }
-                style={styles.toggleSwitch}
-              >
-                {/* Toggle Background Track */}
-                <View
-                  style={[
-                    styles.toggleTrack,
-                    { left: currentMode === "live" ? 2 : 62 },
-                  ]}
-                />
-
+              <View style={styles.toggleSwitch}>
                 {/* Radio Option */}
-                <View style={styles.toggleOption}>
+                <TouchableOpacity
+                  style={[
+                    styles.toggleOption,
+                    currentMode === "live" && styles.toggleOptionSelected,
+                  ]}
+                  onPress={() => setCurrentMode("live")}
+                  activeOpacity={0.8}
+                >
                   <Text
                     style={[
                       styles.toggleText,
-                      { color: currentMode === "live" ? "white" : "#666" },
+                      currentMode === "live" && styles.toggleTextSelected,
                     ]}
                   >
                     Live
                   </Text>
-                </View>
+                </TouchableOpacity>
 
                 {/* Podcast Option */}
-                <View style={styles.toggleOption}>
+                <TouchableOpacity
+                  style={[
+                    styles.toggleOption,
+                    currentMode === "podcast" && styles.toggleOptionSelected,
+                  ]}
+                  onPress={() => setCurrentMode("podcast")}
+                  activeOpacity={0.8}
+                >
                   <Text
                     style={[
                       styles.toggleText,
-                      { color: currentMode === "podcast" ? "white" : "#666" },
+                      currentMode === "podcast" && styles.toggleTextSelected,
                     ]}
                   >
                     Podcast
                   </Text>
-                </View>
-              </TouchableOpacity>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
 
@@ -162,7 +163,7 @@ export default function App() {
           </View>
         </View>
 
-        {/* Single Universal Player Instance */}
+        {/* Docked Universal Player at Bottom */}
         <UniversalPlayer onGoToShow={handleGoToShow} />
       </SafeAreaView>
     </PlayerProvider>
@@ -178,7 +179,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     height: "100%",
-    //height: Platform.OS === "web" ? "100vh" : "auto",
   },
   webContainer: {
     backgroundColor: "#fff",
@@ -224,40 +224,34 @@ const styles = StyleSheet.create({
   },
   toggleSwitch: {
     flexDirection: "row",
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#fff",
     borderRadius: 6,
-    padding: 2,
     width: 128,
     height: 32,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-  },
-  toggleTrack: {
-    position: "absolute",
-    top: 2,
-    backgroundColor: "#000",
-    borderRadius: 4,
-    width: 62,
-    height: 28,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    borderWidth: 2,
+    borderColor: "#D5851F",
+    overflow: "hidden",
+    padding: 0,
   },
   toggleOption: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     zIndex: 1,
+    backgroundColor: "#fff",
+    height: "100%",
+  },
+  toggleOptionSelected: {
+    backgroundColor: "#D5851F",
   },
   toggleText: {
     fontWeight: "600",
     fontSize: 11,
     letterSpacing: 0.5,
     textTransform: "uppercase",
+    color: "#000",
+  },
+  toggleTextSelected: {
+    color: "#fff",
   },
 });

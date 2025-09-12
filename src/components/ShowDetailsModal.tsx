@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: 8,
     borderRadius: 20,
-    backgroundColor: "#000",
+    backgroundColor: "#D5851F",
     width: 36,
     height: 36,
     alignItems: "center",
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#000",
+    color: "#D5851F",
     letterSpacing: 0.5,
   },
   placeholder: {
@@ -209,17 +209,17 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   taglineContainer: {
-    backgroundColor: "#f8f8f8",
+    backgroundColor: "#fff8ec",
     padding: 16,
     borderRadius: 8,
     marginBottom: 24,
     borderLeftWidth: 3,
-    borderLeftColor: "#000",
+    borderLeftColor: "#D5851F",
   },
   taglineText: {
     fontSize: 16,
     fontStyle: "italic",
-    color: "#000",
+    color: "#D5851F",
     letterSpacing: 0.3,
   },
   infoSection: {
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
     marginBottom: 8,
-    color: "#000",
+    color: "#D5851F",
     letterSpacing: 0.5,
     textTransform: "uppercase",
   },
@@ -249,10 +249,10 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 8,
     borderWidth: 2,
-    borderColor: "#000",
+    borderColor: "#D5851F",
   },
   genreText: {
-    color: "#000",
+    color: "#D5851F",
     fontSize: 11,
     fontWeight: "700",
     letterSpacing: 0.5,
@@ -276,13 +276,13 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   goToShowButton: {
-    backgroundColor: "#000",
+    backgroundColor: "#D5851F",
     paddingVertical: 16,
     paddingHorizontal: 32,
     borderRadius: 8,
     marginTop: 24,
     alignItems: "center",
-    shadowColor: "#000",
+    shadowColor: "#D5851F",
     shadowOffset: {
       width: 0,
       height: 2,

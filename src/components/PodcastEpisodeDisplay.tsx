@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: 8,
     borderRadius: 20,
-    backgroundColor: "#000",
+    backgroundColor: "#D5851F",
     width: 36,
     height: 36,
     alignItems: "center",
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#000",
+    color: "#D5851F",
     letterSpacing: 0.5,
   },
   placeholder: {
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
   },
   showName: {
     fontWeight: "700",
-    color: "#000",
+    color: "#D5851F",
     fontSize: 12,
     marginBottom: 8,
     letterSpacing: 2,
@@ -273,14 +273,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   playEpisodeButton: {
-    backgroundColor: "#000",
+    backgroundColor: "#D5851F",
     paddingVertical: 16,
     paddingHorizontal: 32,
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
-    shadowColor: "#000",
+    shadowColor: "#D5851F",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
   viewShowButton: {
     backgroundColor: "transparent",
     borderWidth: 2,
-    borderColor: "#000",
+    borderColor: "#D5851F",
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   viewShowButtonText: {
-    color: "#000",
+    color: "#D5851F",
     fontSize: 14,
     fontWeight: "700",
     letterSpacing: 0.5,

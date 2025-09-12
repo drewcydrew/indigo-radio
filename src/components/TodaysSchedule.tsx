@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
     minHeight: 0, // Allow container to shrink
   },
   listContent: {
-    paddingBottom: 20,
+    paddingBottom: 100, // Extra padding to account for player
     width: "100%",
     maxWidth: "100%",
     flexGrow: 1, // Allow content to grow but not force height
@@ -297,18 +297,18 @@ const styles = StyleSheet.create({
   },
   programItem: {
     padding: 16,
-    backgroundColor: "#f8f8f8",
+    backgroundColor: "#fff",
     marginBottom: 8,
     borderRadius: 0,
     borderLeftWidth: 3,
-    borderLeftColor: "#000",
+    borderLeftColor: "#D5851F",
     marginHorizontal: Platform.OS === "web" ? 0 : 0,
     width: "100%",
     maxWidth: "100%",
   },
   currentProgramItem: {
-    backgroundColor: "#000",
-    borderLeftColor: "#fff",
+    backgroundColor: "#D5851F",
+    borderLeftColor: "#000",
   },
   programContent: {
     flexDirection: "row",
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#000",
+    color: "#D5851F",
     minWidth: Platform.OS === "web" ? 80 : "auto",
     textAlign: "right",
   },
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
     maxWidth: "100%",
   },
   fullScheduleButton: {
-    backgroundColor: "#000",
+    backgroundColor: "#D5851F",
     paddingVertical: 16,
     paddingHorizontal: 20,
     borderRadius: 0,
@@ -472,12 +472,12 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   liveButton: {
-    backgroundColor: "#000",
+    backgroundColor: "#D5851F",
     paddingVertical: 16,
     paddingHorizontal: 32,
     borderRadius: 8,
     alignItems: "center",
-    shadowColor: "#000",
+    shadowColor: "#D5851F",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -493,14 +493,14 @@ const styles = StyleSheet.create({
   scheduleButton: {
     backgroundColor: "transparent",
     borderWidth: 2,
-    borderColor: "#000",
+    borderColor: "#D5851F",
     paddingVertical: 16,
     paddingHorizontal: 32,
     borderRadius: 8,
     alignItems: "center",
   },
   scheduleButtonText: {
-    color: "#000",
+    color: "#D5851F",
     fontSize: 16,
     fontWeight: "700",
     letterSpacing: 1,

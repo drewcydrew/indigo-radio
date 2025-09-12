@@ -11,6 +11,8 @@ import TrackPlayer, {
   usePlaybackState,
   useProgress,
   State,
+  Event,
+  useTrackPlayerEvents,
 } from "react-native-track-player";
 import CustomSlider from "./CustomSlider";
 import WebAudioPlayer, {
@@ -41,6 +43,10 @@ export default function UniversalPlayer({
   const [webError, setWebError] = useState<string | null>(null);
   const [shouldAutoPlay, setShouldAutoPlay] = useState(false);
   const [lastContentId, setLastContentId] = useState<string>("");
+  const [streamError, setStreamError] = useState<string | null>(null);
+  const [isRetrying, setIsRetrying] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const maxRetries = 3;
 
   // Add state for show details modal
   const [selectedShow, setSelectedShow] = useState<ShowDefinition | null>(null);
@@ -59,6 +65,18 @@ export default function UniversalPlayer({
 
   // Use the hook to get show details for artwork
   const { findShowByName } = useShowDetails();
+
+  // Handle TrackPlayer errors on mobile
+  if (Platform.OS !== "web") {
+    useTrackPlayerEvents([Event.PlaybackError], (event) => {
+      if (event.type === Event.PlaybackError) {
+        console.error("TrackPlayer error:", event);
+        handleStreamError(
+          "Unable to connect to the radio stream. Please check your internet connection and try again."
+        );
+      }
+    });
+  }
 
   // Get content-specific data - MOVED UP BEFORE useEffects
   const getContentData = () => {
@@ -110,6 +128,66 @@ export default function UniversalPlayer({
     }
   }, [webAudioRef.current]);
 
+  // Handle stream errors
+  const handleStreamError = (errorMessage: string) => {
+    console.error("Stream error:", errorMessage);
+    setStreamError(errorMessage);
+    setIsRetrying(false);
+  };
+
+  // Retry stream connection
+  const retryStream = async () => {
+    if (retryCount >= maxRetries) {
+      setStreamError("Maximum retry attempts reached. Please try again later.");
+      return;
+    }
+
+    setIsRetrying(true);
+    setStreamError(null);
+    setRetryCount((prev) => prev + 1);
+
+    try {
+      // Clear any existing errors
+      setWebError(null);
+
+      // For mobile, reset TrackPlayer and try again
+      if (Platform.OS !== "web") {
+        await TrackPlayer.reset();
+        const contentData = getContentData();
+        await setupTrackForBackground(contentData);
+        setTimeout(async () => {
+          try {
+            await TrackPlayer.play();
+            setIsRetrying(false);
+            setRetryCount(0); // Reset on success
+          } catch (error) {
+            console.error("Retry failed:", error);
+            handleStreamError(
+              "Retry failed. Please check your connection and try again."
+            );
+          }
+        }, 1000);
+      } else {
+        // For web, try to reload the audio
+        setTimeout(async () => {
+          try {
+            await audioService.play();
+            setIsRetrying(false);
+            setRetryCount(0); // Reset on success
+          } catch (error) {
+            console.error("Web retry failed:", error);
+            handleStreamError(
+              "Retry failed. Please check your connection and try again."
+            );
+          }
+        }, 1000);
+      }
+    } catch (error) {
+      console.error("Error during retry:", error);
+      handleStreamError("Retry failed. Please try again later.");
+    }
+  };
+
   // Helper function to get a unique ID for the current content
   const getCurrentContentId = () => {
     if (!currentContent) return "";
@@ -126,8 +204,10 @@ export default function UniversalPlayer({
     if (!currentContent) {
       setCurrentAudioUrl("");
       setWebError(null);
+      setStreamError(null);
       setShouldAutoPlay(false);
       setLastContentId("");
+      setRetryCount(0);
       return;
     }
 
@@ -148,6 +228,8 @@ export default function UniversalPlayer({
 
       // Clear any previous errors
       setWebError(null);
+      setStreamError(null);
+      setRetryCount(0);
 
       // Signal that we're transitioning and should auto-play
       if (Platform.OS === "web") {
@@ -321,6 +403,12 @@ export default function UniversalPlayer({
 
   const togglePlayPause = async () => {
     try {
+      // Clear any existing stream errors when user tries to play
+      if (!isPlaying) {
+        setStreamError(null);
+        setRetryCount(0);
+      }
+
       if (Platform.OS !== "web") {
         // Use TrackPlayer directly for better background support
         if (isPlaying) {
@@ -338,11 +426,31 @@ export default function UniversalPlayer({
       }
     } catch (error) {
       console.error("Error toggling play/pause:", error);
+      if (currentContent?.type === "live") {
+        handleStreamError(
+          "Unable to connect to the radio stream. Please try again."
+        );
+      } else {
+        setWebError("Playback failed. Please try again.");
+      }
     }
   };
 
   const handleWebAudioError = (error: string) => {
     console.error("Web audio error:", error);
+
+    // Check if it's a network/stream error
+    if (
+      error.includes("NETWORK_ERR") ||
+      error.includes("failed to load") ||
+      error.includes("404")
+    ) {
+      handleStreamError(
+        "Unable to connect to the radio stream. Please check your internet connection and try again."
+      );
+      return;
+    }
+
     setWebError(error);
 
     // If it's a CORS error and we're playing a podcast, show a helpful message
@@ -439,13 +547,13 @@ export default function UniversalPlayer({
           <TouchableOpacity
             style={styles.minimizedPlayButton}
             onPress={togglePlayPause}
-            disabled={isLoading}
+            disabled={isLoading || isRetrying}
           >
-            {isLoading ? (
+            {isLoading || isRetrying ? (
               <LoadingIndicator color="#000" />
             ) : (
               <Text style={styles.minimizedPlayButtonText}>
-                {isPlaying ? "||" : "▶"}
+                {isPlaying ? "❚❚" : "▶"}
               </Text>
             )}
           </TouchableOpacity>
@@ -503,8 +611,28 @@ export default function UniversalPlayer({
       </View>
 
       <View style={styles.expandedContent}>
-        {/* Error Message for Web */}
-        {Platform.OS === "web" && webError && (
+        {/* Error Messages */}
+        {streamError && (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>📡 {streamError}</Text>
+            <TouchableOpacity
+              style={styles.retryButton}
+              onPress={retryStream}
+              disabled={isRetrying}
+            >
+              <Text style={styles.retryButtonText}>
+                {isRetrying ? "RETRYING..." : "TRY AGAIN"}
+              </Text>
+            </TouchableOpacity>
+            {retryCount > 0 && (
+              <Text style={styles.retryCountText}>
+                Attempt {retryCount} of {maxRetries}
+              </Text>
+            )}
+          </View>
+        )}
+
+        {Platform.OS === "web" && webError && !streamError && (
           <View style={styles.errorContainer}>
             <Text style={styles.errorText}>⚠️ {webError}</Text>
           </View>
@@ -592,7 +720,11 @@ export default function UniversalPlayer({
               isLoading && styles.loadingButton,
             ]}
             onPress={togglePlayPause}
-            disabled={(Platform.OS === "web" && !!webError) || isLoading}
+            disabled={
+              (Platform.OS === "web" && !!webError && !streamError) ||
+              isLoading ||
+              isRetrying
+            }
           >
             {isLoading ? (
               <LoadingIndicator color={isPlaying ? "#fff" : "#000"} />
@@ -608,7 +740,7 @@ export default function UniversalPlayer({
                     styles.disabledButtonIcon,
                 ]}
               >
-                {isPlaying ? "⏸" : "▶"}
+                {isPlaying ? "❚❚" : "▶︎"}
               </Text>
             )}
           </TouchableOpacity>
@@ -636,15 +768,9 @@ export default function UniversalPlayer({
 const styles = StyleSheet.create({
   // ...existing code from PlayingWindow styles...
   minimizedContainer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
     backgroundColor: "#000",
     borderTopWidth: 1,
     borderTopColor: "#333",
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
     paddingHorizontal: Platform.OS === "web" ? 24 : 16,
     paddingVertical: 12,
     shadowColor: "#000",
@@ -652,7 +778,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 6,
     elevation: 10,
-    zIndex: 1000,
     height: 80,
     maxWidth: Platform.OS === "web" ? 1200 : "100%",
     alignSelf: Platform.OS === "web" ? "center" : "auto",
@@ -722,10 +847,6 @@ const styles = StyleSheet.create({
   },
   // Expanded styles
   expandedContainer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
     backgroundColor: "#000",
     borderTopWidth: 1,
     borderTopColor: "#333",
@@ -737,7 +858,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 6,
     elevation: 10,
-    zIndex: 1000,
     maxWidth: Platform.OS === "web" ? 1200 : "100%",
     alignSelf: Platform.OS === "web" ? "center" : "auto",
     width: "100%",
@@ -872,9 +992,10 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   playButtonIcon: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "700",
     textAlign: "center",
+    letterSpacing: 0,
   },
   playButtonActiveIcon: {
     color: "#000",
@@ -940,5 +1061,27 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     textAlign: "center",
     lineHeight: 18,
+    marginBottom: 12,
+  },
+  retryButton: {
+    backgroundColor: "#D5851F",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+    alignSelf: "center",
+    marginBottom: 8,
+  },
+  retryButtonText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+  },
+  retryCountText: {
+    color: "#ccc",
+    fontSize: 10,
+    textAlign: "center",
+    fontStyle: "italic",
   },
 });

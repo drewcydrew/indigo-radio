@@ -157,29 +157,35 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     //minHeight: Platform.OS === "web" ? "100vh" : "auto",
+    backgroundColor: "#fff",
   },
   webContainer: {
     maxWidth: "100%",
     width: "100%",
     alignSelf: "center",
+    backgroundColor: "#fff",
   },
   content: {
     flex: 1,
     paddingHorizontal: 20,
     minHeight: 0, // Allow content to shrink
+    backgroundColor: "#fff",
   },
   webContent: {
     maxWidth: 1200,
     width: "100%",
     alignSelf: "center",
     paddingHorizontal: 24,
+    backgroundColor: "#fff",
   },
   episodeListContainer: {
     flex: 1,
     minHeight: 0, // Important for proper scrolling
+    backgroundColor: "#fff",
   },
   webEpisodeListContainer: {
     width: "100%",
     maxWidth: "100%",
+    backgroundColor: "#fff",
   },
 });
