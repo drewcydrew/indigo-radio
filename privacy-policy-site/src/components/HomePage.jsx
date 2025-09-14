@@ -28,7 +28,7 @@ function HomePage({ heroImage }) {
 
   const androidUrl = "https://play.google.com/apps/testing/com.drew92.indigoradio";
   const androidTestersGroupUrl = "https://groups.google.com/g/indigo-radio";
-  const iosUrl = "#";
+  const iosUrl = "https://testflight.apple.com/join/FJsnW24u";
   const webAppurl = "https://indigo-radio.onrender.com/";
 
   const features = [
