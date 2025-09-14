@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  SafeAreaView,
   Text,
   View,
   TouchableOpacity,
@@ -12,6 +11,7 @@ import LiveRadio from "./src/components/LiveRadio";
 import Podcast from "./src/components/Podcast";
 import { PlayerProvider } from "./src/contexts/PlayerContext";
 import UniversalPlayer from "./src/components/UniversalPlayer";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 async function setupPlayer() {
   if (Platform.OS !== "web") {
