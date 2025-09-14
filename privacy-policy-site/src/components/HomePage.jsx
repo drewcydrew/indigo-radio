@@ -26,10 +26,10 @@ function HomePage({ heroImage }) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const androidUrl = "#";
-  const androidTestersGroupUrl = "#";
+  const androidUrl = "https://play.google.com/apps/testing/com.drew92.indigoradio";
+  const androidTestersGroupUrl = "https://groups.google.com/g/indigo-radio";
   const iosUrl = "#";
-  const webAppurl = "#";
+  const webAppurl = "https://indigo-radio.onrender.com/";
 
   const features = [
     {
@@ -192,7 +192,7 @@ function HomePage({ heroImage }) {
           <div className="modal-content">
             <h2 className="modal-title">Download Information</h2>
             <p className="modal-description">
-              This is placeholder text for download instructions or additional information about getting the application.
+              In order to install the app, you must be a member of the testing group. Use the link below to join group.
             </p>
             <a
               href={androidTestersGroupUrl}
@@ -200,7 +200,7 @@ function HomePage({ heroImage }) {
               rel="noopener noreferrer"
               className="button-base modal-button"
             >
-              <IoPeopleOutline size={20} /> Placeholder Link
+              <IoPeopleOutline size={20} /> Join Testing Group
             </a>
             <br />
             {!showAndroidInstall ? (
