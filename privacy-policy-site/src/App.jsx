@@ -29,14 +29,16 @@ function App() {
 
     // Hash-based navigation
     const handleHashChange = () => {
-      const hash = window.location.hash.replace('#', '')
-      const path = window.location.pathname.replace(/^\/|\/$/g, '')
+      const hash = window.location.hash.replace('#', '');
+      const path = window.location.pathname.replace(/^\/|\/$/g, '');
       let newActiveTab = 'home';
       if (path === 'privacy') newActiveTab = 'privacy';
+      else if (path === 'foreground-services') newActiveTab = 'foreground-services';
+      else if (path === 'support') newActiveTab = 'support';
       else newActiveTab = 'home';
       setActiveTab(newActiveTab);
       setInitialSection(hash || null);
-    }
+    };
     handleHashChange();
     window.addEventListener('hashchange', handleHashChange);
     window.addEventListener('popstate', handleHashChange);
@@ -44,7 +46,7 @@ function App() {
       window.removeEventListener('resize', checkMobile);
       window.removeEventListener('hashchange', handleHashChange);
       window.removeEventListener('popstate', handleHashChange);
-    }
+    };
   }, [])
 
   const toggleSidebar = () => {
@@ -91,20 +93,22 @@ function App() {
 
   // New navigation handler using hash and path
   const handleTabChange = (tab, section = null) => {
-    setActiveTab(tab)
+    setActiveTab(tab);
     if (section) {
-      setInitialSection(section)
+      setInitialSection(section);
     } else {
-      setInitialSection(null)
+      setInitialSection(null);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     // Update path and hash
     let path = '/';
     if (tab === 'privacy') path = '/privacy';
+    else if (tab === 'foreground-services') path = '/foreground-services';
+    else if (tab === 'support') path = '/support';
     else path = '/';
     const hash = section ? `#${section}` : '';
     window.history.pushState({}, '', `${path}${hash}`);
-    if (isMobile) setIsSidebarOpen(false)
+    if (isMobile) setIsSidebarOpen(false);
   }
 
   return (
