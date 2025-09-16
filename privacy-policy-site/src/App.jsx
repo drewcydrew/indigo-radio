@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import PrivacyPolicy from './components/PrivacyPolicy'
 import HomePage from './components/HomePage'
 import ForegroundServices from './components/ForegroundServices'
+import Support from './components/Support'
 import { 
   IoHomeOutline,
   IoDocumentTextOutline, 
@@ -75,6 +76,13 @@ function App() {
     {
       key: 'foreground-services',
       title: 'Foreground Services',
+      icon: IoDocumentTextOutline,
+      color: '#666',
+      hasSubsections: false
+    },
+    {
+      key: 'support',
+      title: 'Support',
       icon: IoDocumentTextOutline,
       color: '#666',
       hasSubsections: false
@@ -196,8 +204,10 @@ function App() {
               <HomePage heroImage="/app-icon.png" />
             ) : activeTab === 'privacy' ? (
               <PrivacyPolicy />
-            ) : (
+            ) : activeTab === 'foreground-services' ? (
               <ForegroundServices />
+            ) : (
+              <Support />
             )}
           </div>
         </div>
