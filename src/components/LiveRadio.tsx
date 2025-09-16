@@ -17,7 +17,7 @@ import { usePlayer } from "../contexts/PlayerContext";
 import { audioService } from "../services/AudioService";
 import ScheduleDisplay from "./ScheduleDisplay";
 
-const STREAM_URL = "https://internetradio.indigofm.au:8032/stream";
+const STREAM_URL = "https://internetradio.indigofm.au:8174/stream";
 
 interface LiveRadioProps {
   onNowPlayingUpdate: (title: string) => void;

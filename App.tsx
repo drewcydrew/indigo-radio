@@ -11,7 +11,7 @@ import LiveRadio from "./src/components/LiveRadio";
 import Podcast from "./src/components/Podcast";
 import { PlayerProvider } from "./src/contexts/PlayerContext";
 import UniversalPlayer from "./src/components/UniversalPlayer";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 async function setupPlayer() {
   if (Platform.OS !== "web") {
@@ -85,88 +85,95 @@ export default function App() {
   // Don't render components until player is ready
   if (!isPlayerReady) {
     return (
-      <SafeAreaView style={styles.loadingContainer}>
-        <Text>Loading player...</Text>
-      </SafeAreaView>
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.loadingContainer}>
+          <Text>Loading player...</Text>
+        </SafeAreaView>
+      </SafeAreaProvider>
     );
   }
 
   return (
-    <PlayerProvider>
-      <SafeAreaView
-        style={[styles.container, Platform.OS === "web" && styles.webContainer]}
-      >
-        {/* Main Content - Takes remaining space above player */}
-        <View style={styles.mainContent}>
-          {/* App Title with Toggle */}
-          <View style={styles.header}>
-            <Text style={styles.title}>Indigo FM</Text>
+    <SafeAreaProvider>
+      <PlayerProvider>
+        <SafeAreaView
+          style={[
+            styles.container,
+            Platform.OS === "web" && styles.webContainer,
+          ]}
+        >
+          {/* Main Content - Takes remaining space above player */}
+          <View style={styles.mainContent}>
+            {/* App Title with Toggle */}
+            <View style={styles.header}>
+              <Text style={styles.title}>Indigo FM</Text>
 
-            {/* Toggle Switch in Header */}
-            <View style={styles.headerToggleContainer}>
-              <View style={styles.toggleSwitch}>
-                {/* Radio Option */}
-                <TouchableOpacity
-                  style={[
-                    styles.toggleOption,
-                    currentMode === "live" && styles.toggleOptionSelected,
-                  ]}
-                  onPress={() => setCurrentMode("live")}
-                  activeOpacity={0.8}
-                >
-                  <Text
+              {/* Toggle Switch in Header */}
+              <View style={styles.headerToggleContainer}>
+                <View style={styles.toggleSwitch}>
+                  {/* Radio Option */}
+                  <TouchableOpacity
                     style={[
-                      styles.toggleText,
-                      currentMode === "live" && styles.toggleTextSelected,
+                      styles.toggleOption,
+                      currentMode === "live" && styles.toggleOptionSelected,
                     ]}
+                    onPress={() => setCurrentMode("live")}
+                    activeOpacity={0.8}
                   >
-                    Live
-                  </Text>
-                </TouchableOpacity>
+                    <Text
+                      style={[
+                        styles.toggleText,
+                        currentMode === "live" && styles.toggleTextSelected,
+                      ]}
+                    >
+                      Live
+                    </Text>
+                  </TouchableOpacity>
 
-                {/* Podcast Option */}
-                <TouchableOpacity
-                  style={[
-                    styles.toggleOption,
-                    currentMode === "podcast" && styles.toggleOptionSelected,
-                  ]}
-                  onPress={() => setCurrentMode("podcast")}
-                  activeOpacity={0.8}
-                >
-                  <Text
+                  {/* Podcast Option */}
+                  <TouchableOpacity
                     style={[
-                      styles.toggleText,
-                      currentMode === "podcast" && styles.toggleTextSelected,
+                      styles.toggleOption,
+                      currentMode === "podcast" && styles.toggleOptionSelected,
                     ]}
+                    onPress={() => setCurrentMode("podcast")}
+                    activeOpacity={0.8}
                   >
-                    Podcast
-                  </Text>
-                </TouchableOpacity>
+                    <Text
+                      style={[
+                        styles.toggleText,
+                        currentMode === "podcast" && styles.toggleTextSelected,
+                      ]}
+                    >
+                      Podcast
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
+            </View>
+
+            {/* Full Screen Component */}
+            <View style={styles.content}>
+              {currentMode === "live" ? (
+                <LiveRadio
+                  onNowPlayingUpdate={handleNowPlayingUpdate}
+                  onGoToShow={handleGoToShow}
+                />
+              ) : (
+                <Podcast
+                  onNowPlayingUpdate={handleNowPlayingUpdate}
+                  initialFilter={podcastFilter}
+                  onGoToShow={handleGoToShow}
+                />
+              )}
             </View>
           </View>
 
-          {/* Full Screen Component */}
-          <View style={styles.content}>
-            {currentMode === "live" ? (
-              <LiveRadio
-                onNowPlayingUpdate={handleNowPlayingUpdate}
-                onGoToShow={handleGoToShow}
-              />
-            ) : (
-              <Podcast
-                onNowPlayingUpdate={handleNowPlayingUpdate}
-                initialFilter={podcastFilter}
-                onGoToShow={handleGoToShow}
-              />
-            )}
-          </View>
-        </View>
-
-        {/* Docked Universal Player at Bottom */}
-        <UniversalPlayer onGoToShow={handleGoToShow} />
-      </SafeAreaView>
-    </PlayerProvider>
+          {/* Docked Universal Player at Bottom */}
+          <UniversalPlayer onGoToShow={handleGoToShow} />
+        </SafeAreaView>
+      </PlayerProvider>
+    </SafeAreaProvider>
   );
 }
 
