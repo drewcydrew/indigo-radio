@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import styles from "./page.module.css";
 import PodcastTable from "../components/PodcastTable";
 import ProgrammeTable from "../components/ProgrammeTable";
+import ShowsTable from "../components/ShowsTable";
 
 interface PodcastEpisode {
   id: number;
@@ -25,42 +26,61 @@ interface ProgrammeEntry {
   endTime: string;
 }
 
+interface ShowEntry {
+  id: number;
+  name: string;
+  description: string;
+}
+
 export default function Home() {
   const [radioAddress, setRadioAddress] = useState<string>("");
   const [podcasts, setPodcasts] = useState<PodcastEpisode[]>([]);
   const [programmes, setProgrammes] = useState<ProgrammeEntry[]>([]);
+  const [shows, setShows] = useState<ShowEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [isEditing, setIsEditing] = useState(false);
   const [editAddress, setEditAddress] = useState<string>("");
   const [updating, setUpdating] = useState(false);
-  const [activeTab, setActiveTab] = useState<"podcasts" | "programmes">(
-    "podcasts"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "podcasts" | "programmes" | "shows"
+  >("podcasts");
   const [availableShows, setAvailableShows] = useState<string[]>([]);
   const [availableDays, setAvailableDays] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [radioResponse, podcastResponse, programmeResponse] =
-          await Promise.all([
-            fetch("/api/shows/radioaddress"),
-            fetch("/api/shows/podcasts"),
-            fetch("/api/shows/programme"),
-          ]);
+        const [
+          radioResponse,
+          podcastResponse,
+          programmeResponse,
+          showsResponse,
+        ] = await Promise.all([
+          fetch("/api/shows/radioaddress"),
+          fetch("/api/shows/podcasts"),
+          fetch("/api/shows/programme"),
+          fetch("/api/shows/shows"),
+        ]);
 
-        if (!radioResponse.ok || !podcastResponse.ok || !programmeResponse.ok) {
+        if (
+          !radioResponse.ok ||
+          !podcastResponse.ok ||
+          !programmeResponse.ok ||
+          !showsResponse.ok
+        ) {
           throw new Error("Failed to fetch data");
         }
 
         const radioData: RadioData = await radioResponse.json();
         const podcastData: PodcastEpisode[] = await podcastResponse.json();
         const programmeData: ProgrammeEntry[] = await programmeResponse.json();
+        const showsData: ShowEntry[] = await showsResponse.json();
 
         setRadioAddress(radioData.radioAddress);
         setPodcasts(podcastData);
         setProgrammes(programmeData);
+        setShows(showsData);
 
         // Extract unique show names for filtering
         const uniqueShows = Array.from(
@@ -259,13 +279,33 @@ export default function Home() {
                     activeTab === "programmes" ? "none" : "1px solid #ddd",
                   borderLeft: "none",
                   borderTopLeftRadius: "0",
-                  borderTopRightRadius: "4px",
+                  borderTopRightRadius: "0",
                   cursor: "pointer",
                   fontSize: "16px",
                   fontWeight: activeTab === "programmes" ? "bold" : "normal",
                 }}
               >
                 Programme Schedule ({programmes.length})
+              </button>
+              <button
+                onClick={() => setActiveTab("shows")}
+                style={{
+                  padding: "12px 24px",
+                  backgroundColor:
+                    activeTab === "shows" ? "#007bff" : "transparent",
+                  color: activeTab === "shows" ? "white" : "#666",
+                  border: "1px solid #ddd",
+                  borderBottom:
+                    activeTab === "shows" ? "none" : "1px solid #ddd",
+                  borderLeft: "none",
+                  borderTopLeftRadius: "0",
+                  borderTopRightRadius: "4px",
+                  cursor: "pointer",
+                  fontSize: "16px",
+                  fontWeight: activeTab === "shows" ? "bold" : "normal",
+                }}
+              >
+                Shows ({shows.length})
               </button>
             </div>
           </div>
@@ -287,6 +327,10 @@ export default function Home() {
               availableDays={availableDays}
               setAvailableDays={setAvailableDays}
             />
+          )}
+
+          {activeTab === "shows" && (
+            <ShowsTable shows={shows} setShows={setShows} />
           )}
         </section>
       </main>
