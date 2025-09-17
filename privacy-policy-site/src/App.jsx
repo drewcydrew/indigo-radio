@@ -65,8 +65,15 @@ function App() {
   const navigationStructure = [
     {
       key: 'home',
-      title: 'App Name',
+      title: 'Indigo Radio',
       icon: IoHomeOutline,
+      color: '#666',
+      hasSubsections: false
+    },
+    {
+      key: 'data-management',
+      title: 'Data Management',
+      icon: IoDocumentTextOutline,
       color: '#666',
       hasSubsections: false
     },
@@ -87,13 +94,6 @@ function App() {
     {
       key: 'support',
       title: 'Support',
-      icon: IoDocumentTextOutline,
-      color: '#666',
-      hasSubsections: false
-    },
-    {
-      key: 'data-management',
-      title: 'Data Management',
       icon: IoDocumentTextOutline,
       color: '#666',
       hasSubsections: false
