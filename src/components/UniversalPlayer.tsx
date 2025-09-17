@@ -24,6 +24,7 @@ import { usePlayer } from "../contexts/PlayerContext";
 import useShowDetails from "../hooks/useShowDetails";
 import { ShowDefinition } from "../types/types";
 import ShowDetailsModal from "./ShowDetailsModal";
+import UpdateRadioAddressModal from "./UpdateRadioAddressModal";
 
 const STREAM_URL = "https://internetradio.indigofm.au:8174/stream";
 
@@ -50,6 +51,8 @@ export default function UniversalPlayer({
 
   // Add state for show details modal
   const [selectedShow, setSelectedShow] = useState<ShowDefinition | null>(null);
+  const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
+  const [streamUrl, setStreamUrl] = useState(STREAM_URL); // Replace STREAM_URL with state
 
   // Mobile state
   const mobilePlayback = usePlaybackState();
@@ -107,7 +110,7 @@ export default function UniversalPlayer({
         title: program?.name || "Indigo FM Live",
         subtitle: program?.host ? `Hosted by ${program.host}` : "Live Radio",
         artwork: showDef?.artwork,
-        audioUrl: STREAM_URL,
+        audioUrl: streamUrl, // Use the updated streamUrl state
         icon: "📻",
       };
     }
@@ -131,7 +134,7 @@ export default function UniversalPlayer({
   // Handle stream errors
   const handleStreamError = (errorMessage: string) => {
     console.error("Stream error:", errorMessage);
-    setStreamError(errorMessage);
+    setStreamError(`${errorMessage} (URL: ${streamUrl})`);
     setIsRetrying(false);
   };
 
@@ -163,7 +166,7 @@ export default function UniversalPlayer({
           } catch (error) {
             console.error("Retry failed:", error);
             handleStreamError(
-              "Retry failed. Please check your connection and try again."
+              `Retry failed. Please check your connection and try again. (URL: ${streamUrl})`
             );
           }
         }, 1000);
@@ -177,14 +180,16 @@ export default function UniversalPlayer({
           } catch (error) {
             console.error("Web retry failed:", error);
             handleStreamError(
-              "Retry failed. Please check your connection and try again."
+              `Retry failed. Please check your connection and try again. (URL: ${streamUrl})`
             );
           }
         }, 1000);
       }
     } catch (error) {
       console.error("Error during retry:", error);
-      handleStreamError("Retry failed. Please try again later.");
+      handleStreamError(
+        `Retry failed. Please try again later. (URL: ${streamUrl})`
+      );
     }
   };
 
@@ -496,6 +501,34 @@ export default function UniversalPlayer({
     }
   };
 
+  const handleUpdateRadioAddress = async (newPort: string) => {
+    const newUrl = `https://internetradio.indigofm.au:${newPort}/stream`;
+    setStreamUrl(newUrl);
+    setIsUpdateModalVisible(false);
+    setStreamError(null); // Clear any existing errors
+
+    try {
+      // Reset the player and reinitialize with the new URL
+      if (Platform.OS !== "web") {
+        await TrackPlayer.reset();
+        const contentData = getContentData();
+        await setupTrackForBackground({ ...contentData, audioUrl: newUrl });
+      } else {
+        audioService.setWebAudioPlayerRef(webAudioRef.current);
+        await audioService.add({
+          id: "live-radio",
+          url: newUrl,
+          title: "Indigo FM Live",
+          artist: "Live Radio",
+        });
+      }
+      console.log("Updated radio address to:", newUrl);
+    } catch (error) {
+      console.error("Error updating radio address:", error);
+      setStreamError("Failed to update the radio address. Please try again.");
+    }
+  };
+
   // Check if we should show the "go to show" button
   const shouldShowGoToShowButton = () => {
     if (!currentContent) return false;
@@ -623,6 +656,12 @@ export default function UniversalPlayer({
               <Text style={styles.retryButtonText}>
                 {isRetrying ? "RETRYING..." : "TRY AGAIN"}
               </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.updateButton}
+              onPress={() => setIsUpdateModalVisible(true)}
+            >
+              <Text style={styles.updateButtonText}>UPDATE RADIO ADDRESS</Text>
             </TouchableOpacity>
             {retryCount > 0 && (
               <Text style={styles.retryCountText}>
@@ -758,6 +797,14 @@ export default function UniversalPlayer({
             show={selectedShow}
             onClose={handleShowDetailsClose}
             onGoToShow={handleGoToShowFromModal}
+          />
+        )}
+
+        {/* Update Radio Address Modal */}
+        {isUpdateModalVisible && (
+          <UpdateRadioAddressModal
+            onClose={() => setIsUpdateModalVisible(false)}
+            onUpdate={handleUpdateRadioAddress}
           />
         )}
       </View>
@@ -1083,5 +1130,21 @@ const styles = StyleSheet.create({
     fontSize: 10,
     textAlign: "center",
     fontStyle: "italic",
+  },
+  updateButton: {
+    marginTop: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    backgroundColor: "#007bff",
+    borderRadius: 4,
+    alignSelf: "center",
+  },
+  updateButtonText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+    textAlign: "center",
   },
 });
