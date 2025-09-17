@@ -15,6 +15,14 @@ interface RadioData {
   radioAddress: string;
 }
 
+interface ProgrammeEntry {
+  id: number;
+  name: string;
+  day: string;
+  startTime: string;
+  endTime: string;
+}
+
 export default function Home() {
   const [radioAddress, setRadioAddress] = useState<string>("");
   const [podcasts, setPodcasts] = useState<PodcastEpisode[]>([]);
@@ -43,24 +51,29 @@ export default function Home() {
   });
   const [selectedShow, setSelectedShow] = useState<string>("all");
   const [availableShows, setAvailableShows] = useState<string[]>([]);
+  const [programmes, setProgrammes] = useState<ProgrammeEntry[]>([]);
+  const [activeTab, setActiveTab] = useState<'podcasts' | 'programmes'>('podcasts');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [radioResponse, podcastResponse] = await Promise.all([
+        const [radioResponse, podcastResponse, programmeResponse] = await Promise.all([
           fetch("/api/shows/radioaddress"),
           fetch("/api/shows/podcasts"),
+          fetch("/api/shows/programme"),
         ]);
 
-        if (!radioResponse.ok || !podcastResponse.ok) {
+        if (!radioResponse.ok || !podcastResponse.ok || !programmeResponse.ok) {
           throw new Error("Failed to fetch data");
         }
 
         const radioData: RadioData = await radioResponse.json();
         const podcastData: PodcastEpisode[] = await podcastResponse.json();
+        const programmeData: ProgrammeEntry[] = await programmeResponse.json();
 
         setRadioAddress(radioData.radioAddress);
         setPodcasts(podcastData);
+        setProgrammes(programmeData);
 
         // Extract unique show names for filtering
         const uniqueShows = Array.from(
@@ -425,6 +438,256 @@ export default function Home() {
     );
   }
 
+  const handleProgrammeCellSave = async (programme: ProgrammeEntry, column: string) => {
+    if (!editingCell) return;
+
+    setSavingCell({ row: editingCell.row, column });
+
+    try {
+      const updatedData = {
+        ...programme,
+        [column]: editValue,
+      };
+
+      const response = await fetch(`/api/shows/programme/${programme.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to update programme");
+      }
+
+      // Update local state
+      setProgrammes((prev) =>
+        prev.map((p) =>
+          p.id === programme.id ? { ...p, [column]: editValue } : p
+        )
+      );
+
+      setEditingCell(null);
+      setEditValue("");
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to update programme");
+    } finally {
+      setSavingCell(null);
+    }
+  };
+
+  const renderProgrammeEditableCell = (
+    programme: ProgrammeEntry,
+    column: string,
+    value: string,
+    rowIndex: number
+  ) => {
+    const isEditing =
+      editingCell?.row === rowIndex && editingCell?.column === column;
+    const isSaving =
+      savingCell?.row === rowIndex && savingCell?.column === column;
+
+    if (isEditing) {
+      // For day column, show dropdown
+      if (column === 'day') {
+        return (
+          <div style={{ display: "flex", gap: "4px", alignItems: "flex-start" }}>
+            <select
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "4px",
+                border: "1px solid #007bff",
+                borderRadius: "2px",
+                fontSize: "14px",
+                fontFamily: "inherit",
+              }}
+              autoFocus
+            >
+              <option value="monday">Monday</option>
+              <option value="tuesday">Tuesday</option>
+              <option value="wednesday">Wednesday</option>
+              <option value="thursday">Thursday</option>
+              <option value="friday">Friday</option>
+              <option value="saturday">Saturday</option>
+              <option value="sunday">Sunday</option>
+            </select>
+            <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+              <button
+                onClick={() => handleProgrammeCellSave(programme, column)}
+                disabled={isSaving}
+                style={{
+                  padding: "4px 8px",
+                  backgroundColor: "#28a745",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "2px",
+                  fontSize: "12px",
+                  cursor: isSaving ? "not-allowed" : "pointer",
+                }}
+              >
+                ✓
+              </button>
+              <button
+                onClick={handleCellCancel}
+                disabled={isSaving}
+                style={{
+                  padding: "4px 8px",
+                  backgroundColor: "#dc3545",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "2px",
+                  fontSize: "12px",
+                  cursor: isSaving ? "not-allowed" : "pointer",
+                }}
+              >
+                ✗
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      // For time columns, show time input
+      if (column === 'startTime' || column === 'endTime') {
+        return (
+          <div style={{ display: "flex", gap: "4px", alignItems: "flex-start" }}>
+            <input
+              type="time"
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "4px",
+                border: "1px solid #007bff",
+                borderRadius: "2px",
+                fontSize: "14px",
+                fontFamily: "inherit",
+              }}
+              autoFocus
+            />
+            <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+              <button
+                onClick={() => handleProgrammeCellSave(programme, column)}
+                disabled={isSaving}
+                style={{
+                  padding: "4px 8px",
+                  backgroundColor: "#28a745",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "2px",
+                  fontSize: "12px",
+                  cursor: isSaving ? "not-allowed" : "pointer",
+                }}
+              >
+                ✓
+              </button>
+              <button
+                onClick={handleCellCancel}
+                disabled={isSaving}
+                style={{
+                  padding: "4px 8px",
+                  backgroundColor: "#dc3545",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "2px",
+                  fontSize: "12px",
+                  cursor: isSaving ? "not-allowed" : "pointer",
+                }}
+              >
+                ✗
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      // For other columns, show text input
+      return (
+        <div style={{ display: "flex", gap: "4px", alignItems: "flex-start" }}>
+          <input
+            type="text"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "4px",
+              border: "1px solid #007bff",
+              borderRadius: "2px",
+              fontSize: "14px",
+              fontFamily: "inherit",
+            }}
+            autoFocus
+          />
+          <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+            <button
+              onClick={() => handleProgrammeCellSave(programme, column)}
+              disabled={isSaving}
+              style={{
+                padding: "4px 8px",
+                backgroundColor: "#28a745",
+                color: "white",
+                border: "none",
+                borderRadius: "2px",
+                fontSize: "12px",
+                cursor: isSaving ? "not-allowed" : "pointer",
+              }}
+            >
+              ✓
+            </button>
+            <button
+              onClick={handleCellCancel}
+              disabled={isSaving}
+              style={{
+                padding: "4px 8px",
+                backgroundColor: "#dc3545",
+                color: "white",
+                border: "none",
+                borderRadius: "2px",
+                fontSize: "12px",
+                cursor: isSaving ? "not-allowed" : "pointer",
+              }}
+            >
+              ✗
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div
+        onClick={() => handleCellEdit(rowIndex, column, value)}
+        style={{
+          cursor: "pointer",
+          padding: "4px",
+          minHeight: "20px",
+          borderRadius: "2px",
+          backgroundColor: "transparent",
+          textTransform: column === 'day' ? 'capitalize' : 'none',
+        }}
+        onMouseEnter={(e) =>
+          ((e.target as HTMLElement).style.backgroundColor = "#f8f9fa")
+        }
+        onMouseLeave={(e) =>
+          ((e.target as HTMLElement).style.backgroundColor = "transparent")
+        }
+        title="Click to edit"
+      >
+        {value || (
+          <span style={{ color: "#999", fontStyle: "italic" }}>
+            Click to edit
+          </span>
+        )}
+      </div>
+    );
+  };
+
+  // ...existing loading and error returns...
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
@@ -503,396 +766,570 @@ export default function Home() {
         </section>
 
         <section>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "1rem",
-            }}
-          >
-            <h2>Podcast Episodes</h2>
-            <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-              <div
-                style={{ display: "flex", alignItems: "center", gap: "8px" }}
-              >
-                <label
-                  htmlFor="showFilter"
-                  style={{ fontSize: "14px", color: "#666" }}
-                >
-                  Filter by show:
-                </label>
-                <select
-                  id="showFilter"
-                  value={selectedShow}
-                  onChange={(e) => setSelectedShow(e.target.value)}
-                  style={{
-                    padding: "4px 8px",
-                    border: "1px solid #ddd",
-                    borderRadius: "4px",
-                    fontSize: "14px",
-                  }}
-                >
-                  <option value="all">All Shows ({podcasts.length})</option>
-                  {availableShows.map((show) => {
-                    const count = podcasts.filter(
-                      (ep) => ep.show === show
-                    ).length;
-                    return (
-                      <option key={show} value={show}>
-                        {show} ({count})
-                      </option>
-                    );
-                  })}
-                </select>
-              </div>
-              <p style={{ fontSize: "14px", color: "#666", margin: 0 }}>
-                Click any cell to edit
-              </p>
+          {/* Tab Navigation */}
+          <div style={{ borderBottom: "1px solid #ddd", marginBottom: "1rem" }}>
+            <div style={{ display: "flex", gap: "0" }}>
               <button
-                onClick={() => setShowAddForm(!showAddForm)}
+                onClick={() => setActiveTab('podcasts')}
                 style={{
-                  padding: "8px 16px",
-                  backgroundColor: "#28a745",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px",
+                  padding: "12px 24px",
+                  backgroundColor: activeTab === 'podcasts' ? "#007bff" : "transparent",
+                  color: activeTab === 'podcasts' ? "white" : "#666",
+                  border: "1px solid #ddd",
+                  borderBottom: activeTab === 'podcasts' ? "none" : "1px solid #ddd",
+                  borderTopLeftRadius: "4px",
+                  borderTopRightRadius: "0",
                   cursor: "pointer",
+                  fontSize: "16px",
+                  fontWeight: activeTab === 'podcasts' ? "bold" : "normal",
                 }}
               >
-                {showAddForm ? "Cancel" : "Add Episode"}
+                Podcast Episodes ({podcasts.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('programmes')}
+                style={{
+                  padding: "12px 24px",
+                  backgroundColor: activeTab === 'programmes' ? "#007bff" : "transparent",
+                  color: activeTab === 'programmes' ? "white" : "#666",
+                  border: "1px solid #ddd",
+                  borderBottom: activeTab === 'programmes' ? "none" : "1px solid #ddd",
+                  borderLeft: "none",
+                  borderTopLeftRadius: "0",
+                  borderTopRightRadius: "4px",
+                  cursor: "pointer",
+                  fontSize: "16px",
+                  fontWeight: activeTab === 'programmes' ? "bold" : "normal",
+                }}
+              >
+                Programme Schedule ({programmes.length})
               </button>
             </div>
           </div>
 
-          {showAddForm && (
-            <div
-              style={{
-                marginBottom: "1rem",
-                padding: "16px",
-                border: "1px solid #ddd",
-                borderRadius: "4px",
-                backgroundColor: "#f8f9fa",
-              }}
-            >
-              <h3 style={{ margin: "0 0 12px 0" }}>Add New Episode</h3>
+          {/* Tab Content */}
+          {activeTab === 'podcasts' && (
+            <div>
               <div
                 style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 2fr 2fr",
-                  gap: "12px",
-                  marginBottom: "12px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "1rem",
                 }}
               >
-                <input
-                  type="text"
-                  placeholder="Episode ID"
-                  value={newEpisode.id}
-                  onChange={(e) =>
-                    setNewEpisode((prev) => ({ ...prev, id: e.target.value }))
-                  }
+                <h2 style={{ margin: 0 }}>Podcast Episodes</h2>
+                <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                  <div
+                    style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                  >
+                    <label
+                      htmlFor="showFilter"
+                      style={{ fontSize: "14px", color: "#666" }}
+                    >
+                      Filter by show:
+                    </label>
+                    <select
+                      id="showFilter"
+                      value={selectedShow}
+                      onChange={(e) => setSelectedShow(e.target.value)}
+                      style={{
+                        padding: "4px 8px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                        fontSize: "14px",
+                      }}
+                    >
+                      <option value="all">All Shows ({podcasts.length})</option>
+                      {availableShows.map((show) => {
+                        const count = podcasts.filter(
+                          (ep) => ep.show === show
+                        ).length;
+                        return (
+                          <option key={show} value={show}>
+                            {show} ({count})
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
+                  <p style={{ fontSize: "14px", color: "#666", margin: 0 }}>
+                    Click any cell to edit
+                  </p>
+                  <button
+                    onClick={() => setShowAddForm(!showAddForm)}
+                    style={{
+                      padding: "8px 16px",
+                      backgroundColor: "#28a745",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {showAddForm ? "Cancel" : "Add Episode"}
+                  </button>
+                </div>
+              </div>
+
+              {showAddForm && (
+                <div
                   style={{
-                    padding: "8px",
+                    marginBottom: "1rem",
+                    padding: "16px",
                     border: "1px solid #ddd",
                     borderRadius: "4px",
+                    backgroundColor: "#f8f9fa",
                   }}
-                />
-                <div style={{ position: "relative" }}>
-                  <input
-                    type="text"
-                    placeholder="Show name"
-                    value={newEpisode.show}
-                    onChange={(e) =>
-                      setNewEpisode((prev) => ({
-                        ...prev,
-                        show: e.target.value,
-                      }))
-                    }
-                    list="showSuggestions"
+                >
+                  <h3 style={{ margin: "0 0 12px 0" }}>Add New Episode</h3>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 2fr 2fr",
+                      gap: "12px",
+                      marginBottom: "12px",
+                    }}
+                  >
+                    <input
+                      type="text"
+                      placeholder="Episode ID"
+                      value={newEpisode.id}
+                      onChange={(e) =>
+                        setNewEpisode((prev) => ({ ...prev, id: e.target.value }))
+                      }
+                      style={{
+                        padding: "8px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                      }}
+                    />
+                    <div style={{ position: "relative" }}>
+                      <input
+                        type="text"
+                        placeholder="Show name"
+                        value={newEpisode.show}
+                        onChange={(e) =>
+                          setNewEpisode((prev) => ({
+                            ...prev,
+                            show: e.target.value,
+                          }))
+                        }
+                        list="showSuggestions"
+                        style={{
+                          width: "100%",
+                          padding: "8px",
+                          border: "1px solid #ddd",
+                          borderRadius: "4px",
+                        }}
+                      />
+                      <datalist id="showSuggestions">
+                        {availableShows.map((show) => (
+                          <option key={show} value={show} />
+                        ))}
+                      </datalist>
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Episode title"
+                      value={newEpisode.title}
+                      onChange={(e) =>
+                        setNewEpisode((prev) => ({
+                          ...prev,
+                          title: e.target.value,
+                        }))
+                      }
+                      style={{
+                        padding: "8px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                      }}
+                    />
+                  </div>
+                  <div style={{ marginBottom: "12px" }}>
+                    <input
+                      type="url"
+                      placeholder="Audio URL"
+                      value={newEpisode.url}
+                      onChange={(e) =>
+                        setNewEpisode((prev) => ({ ...prev, url: e.target.value }))
+                      }
+                      style={{
+                        width: "100%",
+                        padding: "8px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                      }}
+                    />
+                  </div>
+                  <div style={{ marginBottom: "12px" }}>
+                    <textarea
+                      placeholder="Description"
+                      value={newEpisode.description}
+                      onChange={(e) =>
+                        setNewEpisode((prev) => ({
+                          ...prev,
+                          description: e.target.value,
+                        }))
+                      }
+                      style={{
+                        width: "100%",
+                        padding: "8px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                        minHeight: "60px",
+                        resize: "vertical",
+                      }}
+                    />
+                  </div>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button
+                      onClick={handleAddRow}
+                      disabled={addingEpisode}
+                      style={{
+                        padding: "8px 16px",
+                        backgroundColor: addingEpisode ? "#ccc" : "#007bff",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                        cursor: addingEpisode ? "not-allowed" : "pointer",
+                      }}
+                    >
+                      {addingEpisode ? "Adding..." : "Add Episode"}
+                    </button>
+                    <button
+                      onClick={handleCancelAdd}
+                      disabled={addingEpisode}
+                      style={{
+                        padding: "8px 16px",
+                        backgroundColor: "#6c757d",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                        cursor: addingEpisode ? "not-allowed" : "pointer",
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {selectedShow !== "all" && (
+                <div
+                  style={{
+                    marginBottom: "1rem",
+                    padding: "8px",
+                    backgroundColor: "#e7f3ff",
+                    borderRadius: "4px",
+                  }}
+                >
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: "14px",
+                      color: "#0066cc",
+                    }}
+                  >
+                    Showing {filteredPodcasts.length} episode(s) for "{selectedShow}
+                    "
+                    <button
+                      onClick={() => setSelectedShow("all")}
+                      style={{
+                        marginLeft: "8px",
+                        padding: "2px 6px",
+                        backgroundColor: "transparent",
+                        color: "#0066cc",
+                        border: "1px solid #0066cc",
+                        borderRadius: "2px",
+                        fontSize: "12px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Clear filter
+                    </button>
+                  </p>
+                </div>
+              )}
+
+              {filteredPodcasts.length === 0 ? (
+                <p>
+                  {selectedShow === "all"
+                    ? "No podcast episodes available."
+                    : `No episodes found for "${selectedShow}".`}
+                </p>
+              ) : (
+                <div style={{ overflowX: "auto" }}>
+                  <table
                     style={{
                       width: "100%",
-                      padding: "8px",
-                      border: "1px solid #ddd",
-                      borderRadius: "4px",
+                      borderCollapse: "collapse",
+                      marginTop: "1rem",
                     }}
-                  />
-                  <datalist id="showSuggestions">
-                    {availableShows.map((show) => (
-                      <option key={show} value={show} />
-                    ))}
-                  </datalist>
-                </div>
-                <input
-                  type="text"
-                  placeholder="Episode title"
-                  value={newEpisode.title}
-                  onChange={(e) =>
-                    setNewEpisode((prev) => ({
-                      ...prev,
-                      title: e.target.value,
-                    }))
-                  }
-                  style={{
-                    padding: "8px",
-                    border: "1px solid #ddd",
-                    borderRadius: "4px",
-                  }}
-                />
-              </div>
-              <div style={{ marginBottom: "12px" }}>
-                <input
-                  type="url"
-                  placeholder="Audio URL"
-                  value={newEpisode.url}
-                  onChange={(e) =>
-                    setNewEpisode((prev) => ({ ...prev, url: e.target.value }))
-                  }
-                  style={{
-                    width: "100%",
-                    padding: "8px",
-                    border: "1px solid #ddd",
-                    borderRadius: "4px",
-                  }}
-                />
-              </div>
-              <div style={{ marginBottom: "12px" }}>
-                <textarea
-                  placeholder="Description"
-                  value={newEpisode.description}
-                  onChange={(e) =>
-                    setNewEpisode((prev) => ({
-                      ...prev,
-                      description: e.target.value,
-                    }))
-                  }
-                  style={{
-                    width: "100%",
-                    padding: "8px",
-                    border: "1px solid #ddd",
-                    borderRadius: "4px",
-                    minHeight: "60px",
-                    resize: "vertical",
-                  }}
-                />
-              </div>
-              <div style={{ display: "flex", gap: "8px" }}>
-                <button
-                  onClick={handleAddRow}
-                  disabled={addingEpisode}
-                  style={{
-                    padding: "8px 16px",
-                    backgroundColor: addingEpisode ? "#ccc" : "#007bff",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: addingEpisode ? "not-allowed" : "pointer",
-                  }}
-                >
-                  {addingEpisode ? "Adding..." : "Add Episode"}
-                </button>
-                <button
-                  onClick={handleCancelAdd}
-                  disabled={addingEpisode}
-                  style={{
-                    padding: "8px 16px",
-                    backgroundColor: "#6c757d",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: addingEpisode ? "not-allowed" : "pointer",
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          )}
-
-          {selectedShow !== "all" && (
-            <div
-              style={{
-                marginBottom: "1rem",
-                padding: "8px",
-                backgroundColor: "#e7f3ff",
-                borderRadius: "4px",
-              }}
-            >
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: "14px",
-                  color: "#0066cc",
-                }}
-              >
-                Showing {filteredPodcasts.length} episode(s) for "{selectedShow}
-                "
-                <button
-                  onClick={() => setSelectedShow("all")}
-                  style={{
-                    marginLeft: "8px",
-                    padding: "2px 6px",
-                    backgroundColor: "transparent",
-                    color: "#0066cc",
-                    border: "1px solid #0066cc",
-                    borderRadius: "2px",
-                    fontSize: "12px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Clear filter
-                </button>
-              </p>
-            </div>
-          )}
-
-          {filteredPodcasts.length === 0 ? (
-            <p>
-              {selectedShow === "all"
-                ? "No podcast episodes available."
-                : `No episodes found for "${selectedShow}".`}
-            </p>
-          ) : (
-            <div style={{ overflowX: "auto" }}>
-              <table
-                style={{
-                  width: "100%",
-                  borderCollapse: "collapse",
-                  marginTop: "1rem",
-                }}
-              >
-                <thead>
-                  <tr style={{ backgroundColor: "#f5f5f5" }}>
-                    <th
-                      style={{
-                        padding: "12px",
-                        textAlign: "left",
-                        border: "1px solid #ddd",
-                        color: "black",
-                      }}
-                    >
-                      ID
-                    </th>
-                    <th
-                      style={{
-                        padding: "12px",
-                        textAlign: "left",
-                        border: "1px solid #ddd",
-                        color: "black",
-                      }}
-                    >
-                      Show
-                    </th>
-                    <th
-                      style={{
-                        padding: "12px",
-                        textAlign: "left",
-                        border: "1px solid #ddd",
-                        color: "black",
-                      }}
-                    >
-                      Title
-                    </th>
-                    <th
-                      style={{
-                        padding: "12px",
-                        textAlign: "left",
-                        border: "1px solid #ddd",
-                        color: "black",
-                      }}
-                    >
-                      Description
-                    </th>
-                    <th
-                      style={{
-                        padding: "12px",
-                        textAlign: "left",
-                        border: "1px solid #ddd",
-                        color: "black",
-                      }}
-                    >
-                      Audio
-                    </th>
-                    <th
-                      style={{
-                        padding: "12px",
-                        textAlign: "left",
-                        border: "1px solid #ddd",
-                        color: "black",
-                      }}
-                    >
-                      URL
-                    </th>
-                    <th
-                      style={{
-                        padding: "12px",
-                        textAlign: "left",
-                        border: "1px solid #ddd",
-                        color: "black",
-                      }}
-                    >
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredPodcasts.map((episode, index) => (
-                    <tr key={episode.id}>
-                      <td style={{ padding: "12px", border: "1px solid #ddd" }}>
-                        {episode.id}
-                      </td>
-                      <td style={{ padding: "12px", border: "1px solid #ddd" }}>
-                        {renderEditableCell(
-                          episode,
-                          "show",
-                          episode.show,
-                          index
-                        )}
-                      </td>
-                      <td style={{ padding: "12px", border: "1px solid #ddd" }}>
-                        {renderEditableCell(
-                          episode,
-                          "title",
-                          episode.title,
-                          index
-                        )}
-                      </td>
-                      <td style={{ padding: "12px", border: "1px solid #ddd" }}>
-                        {renderEditableCell(
-                          episode,
-                          "description",
-                          episode.description,
-                          index
-                        )}
-                      </td>
-                      <td style={{ padding: "12px", border: "1px solid #ddd" }}>
-                        <audio controls style={{ width: "200px" }}>
-                          <source src={episode.url} type="audio/mpeg" />
-                          Your browser does not support the audio element.
-                        </audio>
-                      </td>
-                      <td style={{ padding: "12px", border: "1px solid #ddd" }}>
-                        {renderEditableCell(episode, "url", episode.url, index)}
-                      </td>
-                      <td style={{ padding: "12px", border: "1px solid #ddd" }}>
-                        <button
-                          onClick={() => handleDeleteRow(episode)}
+                  >
+                    <thead>
+                      <tr style={{ backgroundColor: "#f5f5f5" }}>
+                        <th
                           style={{
-                            padding: "4px 8px",
-                            backgroundColor: "#dc3545",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "4px",
-                            cursor: "pointer",
-                            fontSize: "12px",
+                            padding: "12px",
+                            textAlign: "left",
+                            border: "1px solid #ddd",
+                            color: "black",
                           }}
                         >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                          ID
+                        </th>
+                        <th
+                          style={{
+                            padding: "12px",
+                            textAlign: "left",
+                            border: "1px solid #ddd",
+                            color: "black",
+                          }}
+                        >
+                          Show
+                        </th>
+                        <th
+                          style={{
+                            padding: "12px",
+                            textAlign: "left",
+                            border: "1px solid #ddd",
+                            color: "black",
+                          }}
+                        >
+                          Title
+                        </th>
+                        <th
+                          style={{
+                            padding: "12px",
+                            textAlign: "left",
+                            border: "1px solid #ddd",
+                            color: "black",
+                          }}
+                        >
+                          Description
+                        </th>
+                        <th
+                          style={{
+                            padding: "12px",
+                            textAlign: "left",
+                            border: "1px solid #ddd",
+                            color: "black",
+                          }}
+                        >
+                          Audio
+                        </th>
+                        <th
+                          style={{
+                            padding: "12px",
+                            textAlign: "left",
+                            border: "1px solid #ddd",
+                            color: "black",
+                          }}
+                        >
+                          URL
+                        </th>
+                        <th
+                          style={{
+                            padding: "12px",
+                            textAlign: "left",
+                            border: "1px solid #ddd",
+                            color: "black",
+                          }}
+                        >
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredPodcasts.map((episode, index) => (
+                        <tr key={episode.id}>
+                          <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                            {episode.id}
+                          </td>
+                          <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                            {renderEditableCell(
+                              episode,
+                              "show",
+                              episode.show,
+                              index
+                            )}
+                          </td>
+                          <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                            {renderEditableCell(
+                              episode,
+                              "title",
+                              episode.title,
+                              index
+                            )}
+                          </td>
+                          <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                            {renderEditableCell(
+                              episode,
+                              "description",
+                              episode.description,
+                              index
+                            )}
+                          </td>
+                          <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                            <audio controls style={{ width: "200px" }}>
+                              <source src={episode.url} type="audio/mpeg" />
+                              Your browser does not support the audio element.
+                            </audio>
+                          </td>
+                          <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                            {renderEditableCell(episode, "url", episode.url, index)}
+                          </td>
+                          <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                            <button
+                              onClick={() => handleDeleteRow(episode)}
+                              style={{
+                                padding: "4px 8px",
+                                backgroundColor: "#dc3545",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "4px",
+                                cursor: "pointer",
+                                fontSize: "12px",
+                              }}
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'programmes' && (
+            <div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "1rem",
+                }}
+              >
+                <h2 style={{ margin: 0 }}>Programme Schedule</h2>
+                <p style={{ fontSize: "14px", color: "#666", margin: 0 }}>
+                  Click any cell to edit
+                </p>
+              </div>
+
+              {programmes.length === 0 ? (
+                <p>No programme entries available.</p>
+              ) : (
+                <div style={{ overflowX: "auto" }}>
+                  <table
+                    style={{
+                      width: "100%",
+                      borderCollapse: "collapse",
+                      marginTop: "1rem",
+                    }}
+                  >
+                    <thead>
+                      <tr style={{ backgroundColor: "#f5f5f5" }}>
+                        <th
+                          style={{
+                            padding: "12px",
+                            textAlign: "left",
+                            border: "1px solid #ddd",
+                            color: "black",
+                          }}
+                        >
+                          ID
+                        </th>
+                        <th
+                          style={{
+                            padding: "12px",
+                            textAlign: "left",
+                            border: "1px solid #ddd",
+                            color: "black",
+                          }}
+                        >
+                          Programme Name
+                        </th>
+                        <th
+                          style={{
+                            padding: "12px",
+                            textAlign: "left",
+                            border: "1px solid #ddd",
+                            color: "black",
+                          }}
+                        >
+                          Day
+                        </th>
+                        <th
+                          style={{
+                            padding: "12px",
+                            textAlign: "left",
+                            border: "1px solid #ddd",
+                            color: "black",
+                          }}
+                        >
+                          Start Time
+                        </th>
+                        <th
+                          style={{
+                            padding: "12px",
+                            textAlign: "left",
+                            border: "1px solid #ddd",
+                            color: "black",
+                          }}
+                        >
+                          End Time
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {programmes.map((programme, index) => (
+                        <tr key={programme.id}>
+                          <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                            {programme.id}
+                          </td>
+                          <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                            {renderProgrammeEditableCell(
+                              programme,
+                              "name",
+                              programme.name,
+                              index + 1000 // Offset to avoid conflicts with podcast table
+                            )}
+                          </td>
+                          <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                            {renderProgrammeEditableCell(
+                              programme,
+                              "day",
+                              programme.day,
+                              index + 1000
+                            )}
+                          </td>
+                          <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                            {renderProgrammeEditableCell(
+                              programme,
+                              "startTime",
+                              programme.startTime,
+                              index + 1000
+                            )}
+                          </td>
+                          <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                            {renderProgrammeEditableCell(
+                              programme,
+                              "endTime",
+                              programme.endTime,
+                              index + 1000
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           )}
         </section>
