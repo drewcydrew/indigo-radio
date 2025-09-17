@@ -236,9 +236,13 @@ export default function UniversalPlayer({
       setStreamError(null);
       setRetryCount(0);
 
-      // Signal that we're transitioning and should auto-play
+      // For web, ensure audio service is properly initialized
       if (Platform.OS === "web") {
         audioService.setTransitioning(true);
+        // Make sure web audio player ref is set
+        if (webAudioRef.current) {
+          audioService.setWebAudioPlayerRef(webAudioRef.current);
+        }
       }
       setShouldAutoPlay(true);
 
@@ -257,13 +261,19 @@ export default function UniversalPlayer({
         }
       }, 100);
     } else if (newAudioUrl !== currentAudioUrl) {
-      // Handle URL changes without content ID changes (shouldn't happen normally)
+      // Handle URL changes without content ID changes (like radio address updates)
       console.log(
         "Audio URL changed without content ID change - updating URL only"
       );
       setCurrentAudioUrl(newAudioUrl);
+
+      // For web, reinitialize with new URL
+      if (Platform.OS === "web" && webAudioRef.current) {
+        audioService.setWebAudioPlayerRef(webAudioRef.current);
+        setShouldAutoPlay(true);
+      }
     }
-  }, [currentContent, lastContentId]);
+  }, [currentContent, lastContentId, streamUrl]); // Add streamUrl dependency
 
   // Auto-play effect - separate from content change effect
   useEffect(() => {
@@ -592,11 +602,11 @@ export default function UniversalPlayer({
           </TouchableOpacity>
         </View>
 
-        {/* Web Audio Player Component */}
+        {/* Web Audio Player Component - Always render on web */}
         {Platform.OS === "web" && (
           <WebAudioPlayer
             ref={webAudioRef}
-            src={contentData.audioUrl}
+            src={currentAudioUrl || ""}
             onStateChange={(state) => audioService.updateWebAudioState(state)}
             onLoad={() => console.log("Audio loaded")}
             onError={(error) => console.error("Audio error:", error)}
@@ -610,11 +620,11 @@ export default function UniversalPlayer({
   // Full expanded display
   return (
     <View style={styles.expandedContainer}>
-      {/* Web Audio Player Component - Only render when we have an audio URL */}
-      {Platform.OS === "web" && currentAudioUrl && (
+      {/* Web Audio Player Component - Always render on web */}
+      {Platform.OS === "web" && (
         <WebAudioPlayer
           ref={webAudioRef}
-          src={currentAudioUrl}
+          src={currentAudioUrl || ""}
           onStateChange={(state) => audioService.updateWebAudioState(state)}
           onLoad={() => {
             console.log("Audio loaded:", currentAudioUrl);
