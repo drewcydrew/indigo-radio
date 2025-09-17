@@ -3,6 +3,7 @@ import PrivacyPolicy from './components/PrivacyPolicy'
 import HomePage from './components/HomePage'
 import ForegroundServices from './components/ForegroundServices'
 import Support from './components/Support'
+import DataManagement from './components/DataManagement'
 import { 
   IoHomeOutline,
   IoDocumentTextOutline, 
@@ -35,6 +36,7 @@ function App() {
       if (path === 'privacy') newActiveTab = 'privacy';
       else if (path === 'foreground-services') newActiveTab = 'foreground-services';
       else if (path === 'support') newActiveTab = 'support';
+      else if (path === 'data-management') newActiveTab = 'data-management';
       else newActiveTab = 'home';
       setActiveTab(newActiveTab);
       setInitialSection(hash || null);
@@ -88,6 +90,13 @@ function App() {
       icon: IoDocumentTextOutline,
       color: '#666',
       hasSubsections: false
+    },
+    {
+      key: 'data-management',
+      title: 'Data Management',
+      icon: IoDocumentTextOutline,
+      color: '#666',
+      hasSubsections: false
     }
   ]
 
@@ -105,6 +114,7 @@ function App() {
     if (tab === 'privacy') path = '/privacy';
     else if (tab === 'foreground-services') path = '/foreground-services';
     else if (tab === 'support') path = '/support';
+    else if (tab === 'data-management') path = '/data-management';
     else path = '/';
     const hash = section ? `#${section}` : '';
     window.history.pushState({}, '', `${path}${hash}`);
@@ -210,8 +220,10 @@ function App() {
               <PrivacyPolicy />
             ) : activeTab === 'foreground-services' ? (
               <ForegroundServices />
-            ) : (
+            ) : activeTab === 'support' ? (
               <Support />
+            ) : (
+              <DataManagement />
             )}
           </div>
         </div>

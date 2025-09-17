@@ -674,11 +674,64 @@
 .support-email a {
   font-size: 1.2rem;
   color: #007BFF;
+  
   text-decoration: none;
 }
 
 .support-email a:hover {
   text-decoration: underline;
+}
+
+/* Data Management Page */
+.data-management-container {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+  color: #333;
+}
+
+.data-management-title {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.data-management-description {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  color: #666;
+}
+
+.portal-link-container {
+  margin: 2rem 0;
+}
+
+.portal-link {
+  display: inline-block;
+  background: #333;
+  color: #fff;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.portal-link:hover {
+  background: #555;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(51, 51, 51, 0.6);
+}
+
+.portal-note {
+  font-size: 0.9rem;
+  color: #888;
+  font-style: italic;
+  margin-top: 1.5rem;
 }
 
 /* Responsive breakpoints */
