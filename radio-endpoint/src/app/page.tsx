@@ -52,16 +52,29 @@ export default function Home() {
   const [selectedShow, setSelectedShow] = useState<string>("all");
   const [availableShows, setAvailableShows] = useState<string[]>([]);
   const [programmes, setProgrammes] = useState<ProgrammeEntry[]>([]);
-  const [activeTab, setActiveTab] = useState<'podcasts' | 'programmes'>('podcasts');
+  const [activeTab, setActiveTab] = useState<"podcasts" | "programmes">(
+    "podcasts"
+  );
+  const [selectedDay, setSelectedDay] = useState<string>("all");
+  const [availableDays, setAvailableDays] = useState<string[]>([]);
+  const [showAddProgrammeForm, setShowAddProgrammeForm] = useState(false);
+  const [addingProgramme, setAddingProgramme] = useState(false);
+  const [newProgramme, setNewProgramme] = useState({
+    name: "",
+    day: "",
+    startTime: "",
+    endTime: "",
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [radioResponse, podcastResponse, programmeResponse] = await Promise.all([
-          fetch("/api/shows/radioaddress"),
-          fetch("/api/shows/podcasts"),
-          fetch("/api/shows/programme"),
-        ]);
+        const [radioResponse, podcastResponse, programmeResponse] =
+          await Promise.all([
+            fetch("/api/shows/radioaddress"),
+            fetch("/api/shows/podcasts"),
+            fetch("/api/shows/programme"),
+          ]);
 
         if (!radioResponse.ok || !podcastResponse.ok || !programmeResponse.ok) {
           throw new Error("Failed to fetch data");
@@ -82,6 +95,14 @@ export default function Home() {
           .filter((show) => show && show.trim())
           .sort();
         setAvailableShows(uniqueShows);
+
+        // Extract unique days for filtering
+        const uniqueDays = Array.from(
+          new Set(programmeData.map((programme) => programme.day))
+        )
+          .filter((day) => day && day.trim())
+          .sort();
+        setAvailableDays(uniqueDays);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
@@ -311,7 +332,7 @@ export default function Home() {
     );
   };
 
-  const handleAddRow = async () => {
+  const handleAddPodcast = async () => {
     if (
       !newEpisode.id.trim() ||
       !newEpisode.url.trim() ||
@@ -369,12 +390,12 @@ export default function Home() {
     }
   };
 
-  const handleCancelAdd = () => {
+  const handleCancelAddPodcast = () => {
     setNewEpisode({ id: "", url: "", title: "", show: "", description: "" });
     setShowAddForm(false);
   };
 
-  const handleDeleteRow = async (episode: PodcastEpisode) => {
+  const handleDeletePodcast = async (episode: PodcastEpisode) => {
     if (!confirm(`Are you sure you want to delete "${episode.title}"?`)) {
       return;
     }
@@ -418,6 +439,12 @@ export default function Home() {
       ? podcasts
       : podcasts.filter((episode) => episode.show === selectedShow);
 
+  // Filter programmes based on selected day
+  const filteredProgrammes =
+    selectedDay === "all"
+      ? programmes
+      : programmes.filter((programme) => programme.day === selectedDay);
+
   if (loading) {
     return (
       <div className={styles.page}>
@@ -438,7 +465,10 @@ export default function Home() {
     );
   }
 
-  const handleProgrammeCellSave = async (programme: ProgrammeEntry, column: string) => {
+  const handleProgrammeCellSave = async (
+    programme: ProgrammeEntry,
+    column: string
+  ) => {
     if (!editingCell) return;
 
     setSavingCell({ row: editingCell.row, column });
@@ -491,9 +521,11 @@ export default function Home() {
 
     if (isEditing) {
       // For day column, show dropdown
-      if (column === 'day') {
+      if (column === "day") {
         return (
-          <div style={{ display: "flex", gap: "4px", alignItems: "flex-start" }}>
+          <div
+            style={{ display: "flex", gap: "4px", alignItems: "flex-start" }}
+          >
             <select
               value={editValue}
               onChange={(e) => setEditValue(e.target.value)}
@@ -515,7 +547,9 @@ export default function Home() {
               <option value="saturday">Saturday</option>
               <option value="sunday">Sunday</option>
             </select>
-            <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "2px" }}
+            >
               <button
                 onClick={() => handleProgrammeCellSave(programme, column)}
                 disabled={isSaving}
@@ -552,9 +586,11 @@ export default function Home() {
       }
 
       // For time columns, show time input
-      if (column === 'startTime' || column === 'endTime') {
+      if (column === "startTime" || column === "endTime") {
         return (
-          <div style={{ display: "flex", gap: "4px", alignItems: "flex-start" }}>
+          <div
+            style={{ display: "flex", gap: "4px", alignItems: "flex-start" }}
+          >
             <input
               type="time"
               value={editValue}
@@ -569,7 +605,9 @@ export default function Home() {
               }}
               autoFocus
             />
-            <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "2px" }}
+            >
               <button
                 onClick={() => handleProgrammeCellSave(programme, column)}
                 disabled={isSaving}
@@ -667,7 +705,7 @@ export default function Home() {
           minHeight: "20px",
           borderRadius: "2px",
           backgroundColor: "transparent",
-          textTransform: column === 'day' ? 'capitalize' : 'none',
+          textTransform: column === "day" ? "capitalize" : "none",
         }}
         onMouseEnter={(e) =>
           ((e.target as HTMLElement).style.backgroundColor = "#f8f9fa")
@@ -686,7 +724,101 @@ export default function Home() {
     );
   };
 
-  // ...existing loading and error returns...
+  const handleAddProgramme = async () => {
+    if (
+      !newProgramme.name.trim() ||
+      !newProgramme.day.trim() ||
+      !newProgramme.startTime.trim() ||
+      !newProgramme.endTime.trim()
+    ) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    setAddingProgramme(true);
+    try {
+      const response = await fetch("/api/shows/programme", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newProgramme),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to add programme");
+      }
+
+      const result = await response.json();
+
+      // Add the new programme to local state
+      setProgrammes((prev) => [...prev, result.programme]);
+
+      // Update available days if this is a new day
+      if (
+        result.programme.day &&
+        !availableDays.includes(result.programme.day)
+      ) {
+        setAvailableDays((prev) => [...prev, result.programme.day].sort());
+      }
+
+      // Reset form and close it
+      setNewProgramme({ name: "", day: "", startTime: "", endTime: "" });
+      setShowAddProgrammeForm(false);
+
+      alert("Programme added successfully!");
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to add programme");
+    } finally {
+      setAddingProgramme(false);
+    }
+  };
+
+  const handleCancelAddProgramme = () => {
+    setNewProgramme({ name: "", day: "", startTime: "", endTime: "" });
+    setShowAddProgrammeForm(false);
+  };
+
+  const handleDeleteProgramme = async (programme: ProgrammeEntry) => {
+    if (!confirm(`Are you sure you want to delete "${programme.name}"?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/shows/programme/${programme.id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to delete programme");
+      }
+
+      // Remove from local state
+      setProgrammes((prev) => prev.filter((p) => p.id !== programme.id));
+
+      // Update available days if no more programmes exist for this day
+      const remainingProgrammes = programmes.filter(
+        (p) => p.id !== programme.id
+      );
+      const remainingDays = Array.from(
+        new Set(remainingProgrammes.map((prog) => prog.day))
+      )
+        .filter((day) => day && day.trim())
+        .sort();
+      setAvailableDays(remainingDays);
+
+      // Reset filter if the selected day no longer exists
+      if (selectedDay !== "all" && !remainingDays.includes(selectedDay)) {
+        setSelectedDay("all");
+      }
+
+      alert("Programme deleted successfully!");
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to delete programme");
+    }
+  };
 
   return (
     <div className={styles.page}>
@@ -770,36 +902,40 @@ export default function Home() {
           <div style={{ borderBottom: "1px solid #ddd", marginBottom: "1rem" }}>
             <div style={{ display: "flex", gap: "0" }}>
               <button
-                onClick={() => setActiveTab('podcasts')}
+                onClick={() => setActiveTab("podcasts")}
                 style={{
                   padding: "12px 24px",
-                  backgroundColor: activeTab === 'podcasts' ? "#007bff" : "transparent",
-                  color: activeTab === 'podcasts' ? "white" : "#666",
+                  backgroundColor:
+                    activeTab === "podcasts" ? "#007bff" : "transparent",
+                  color: activeTab === "podcasts" ? "white" : "#666",
                   border: "1px solid #ddd",
-                  borderBottom: activeTab === 'podcasts' ? "none" : "1px solid #ddd",
+                  borderBottom:
+                    activeTab === "podcasts" ? "none" : "1px solid #ddd",
                   borderTopLeftRadius: "4px",
                   borderTopRightRadius: "0",
                   cursor: "pointer",
                   fontSize: "16px",
-                  fontWeight: activeTab === 'podcasts' ? "bold" : "normal",
+                  fontWeight: activeTab === "podcasts" ? "bold" : "normal",
                 }}
               >
                 Podcast Episodes ({podcasts.length})
               </button>
               <button
-                onClick={() => setActiveTab('programmes')}
+                onClick={() => setActiveTab("programmes")}
                 style={{
                   padding: "12px 24px",
-                  backgroundColor: activeTab === 'programmes' ? "#007bff" : "transparent",
-                  color: activeTab === 'programmes' ? "white" : "#666",
+                  backgroundColor:
+                    activeTab === "programmes" ? "#007bff" : "transparent",
+                  color: activeTab === "programmes" ? "white" : "#666",
                   border: "1px solid #ddd",
-                  borderBottom: activeTab === 'programmes' ? "none" : "1px solid #ddd",
+                  borderBottom:
+                    activeTab === "programmes" ? "none" : "1px solid #ddd",
                   borderLeft: "none",
                   borderTopLeftRadius: "0",
                   borderTopRightRadius: "4px",
                   cursor: "pointer",
                   fontSize: "16px",
-                  fontWeight: activeTab === 'programmes' ? "bold" : "normal",
+                  fontWeight: activeTab === "programmes" ? "bold" : "normal",
                 }}
               >
                 Programme Schedule ({programmes.length})
@@ -808,7 +944,7 @@ export default function Home() {
           </div>
 
           {/* Tab Content */}
-          {activeTab === 'podcasts' && (
+          {activeTab === "podcasts" && (
             <div>
               <div
                 style={{
@@ -819,9 +955,15 @@ export default function Home() {
                 }}
               >
                 <h2 style={{ margin: 0 }}>Podcast Episodes</h2>
-                <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                <div
+                  style={{ display: "flex", gap: "12px", alignItems: "center" }}
+                >
                   <div
-                    style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
                   >
                     <label
                       htmlFor="showFilter"
@@ -896,7 +1038,10 @@ export default function Home() {
                       placeholder="Episode ID"
                       value={newEpisode.id}
                       onChange={(e) =>
-                        setNewEpisode((prev) => ({ ...prev, id: e.target.value }))
+                        setNewEpisode((prev) => ({
+                          ...prev,
+                          id: e.target.value,
+                        }))
                       }
                       style={{
                         padding: "8px",
@@ -952,7 +1097,10 @@ export default function Home() {
                       placeholder="Audio URL"
                       value={newEpisode.url}
                       onChange={(e) =>
-                        setNewEpisode((prev) => ({ ...prev, url: e.target.value }))
+                        setNewEpisode((prev) => ({
+                          ...prev,
+                          url: e.target.value,
+                        }))
                       }
                       style={{
                         width: "100%",
@@ -984,7 +1132,7 @@ export default function Home() {
                   </div>
                   <div style={{ display: "flex", gap: "8px" }}>
                     <button
-                      onClick={handleAddRow}
+                      onClick={handleAddPodcast}
                       disabled={addingEpisode}
                       style={{
                         padding: "8px 16px",
@@ -998,7 +1146,7 @@ export default function Home() {
                       {addingEpisode ? "Adding..." : "Add Episode"}
                     </button>
                     <button
-                      onClick={handleCancelAdd}
+                      onClick={handleCancelAddPodcast}
                       disabled={addingEpisode}
                       style={{
                         padding: "8px 16px",
@@ -1031,8 +1179,8 @@ export default function Home() {
                       color: "#0066cc",
                     }}
                   >
-                    Showing {filteredPodcasts.length} episode(s) for "{selectedShow}
-                    "
+                    Showing {filteredPodcasts.length} episode(s) for "
+                    {selectedShow}"
                     <button
                       onClick={() => setSelectedShow("all")}
                       style={{
@@ -1144,10 +1292,20 @@ export default function Home() {
                     <tbody>
                       {filteredPodcasts.map((episode, index) => (
                         <tr key={episode.id}>
-                          <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                          <td
+                            style={{
+                              padding: "12px",
+                              border: "1px solid #ddd",
+                            }}
+                          >
                             {episode.id}
                           </td>
-                          <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                          <td
+                            style={{
+                              padding: "12px",
+                              border: "1px solid #ddd",
+                            }}
+                          >
                             {renderEditableCell(
                               episode,
                               "show",
@@ -1155,7 +1313,12 @@ export default function Home() {
                               index
                             )}
                           </td>
-                          <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                          <td
+                            style={{
+                              padding: "12px",
+                              border: "1px solid #ddd",
+                            }}
+                          >
                             {renderEditableCell(
                               episode,
                               "title",
@@ -1163,7 +1326,12 @@ export default function Home() {
                               index
                             )}
                           </td>
-                          <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                          <td
+                            style={{
+                              padding: "12px",
+                              border: "1px solid #ddd",
+                            }}
+                          >
                             {renderEditableCell(
                               episode,
                               "description",
@@ -1171,18 +1339,38 @@ export default function Home() {
                               index
                             )}
                           </td>
-                          <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                          <td
+                            style={{
+                              padding: "12px",
+                              border: "1px solid #ddd",
+                            }}
+                          >
                             <audio controls style={{ width: "200px" }}>
                               <source src={episode.url} type="audio/mpeg" />
                               Your browser does not support the audio element.
                             </audio>
                           </td>
-                          <td style={{ padding: "12px", border: "1px solid #ddd" }}>
-                            {renderEditableCell(episode, "url", episode.url, index)}
+                          <td
+                            style={{
+                              padding: "12px",
+                              border: "1px solid #ddd",
+                            }}
+                          >
+                            {renderEditableCell(
+                              episode,
+                              "url",
+                              episode.url,
+                              index
+                            )}
                           </td>
-                          <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                          <td
+                            style={{
+                              padding: "12px",
+                              border: "1px solid #ddd",
+                            }}
+                          >
                             <button
-                              onClick={() => handleDeleteRow(episode)}
+                              onClick={() => handleDeletePodcast(episode)}
                               style={{
                                 padding: "4px 8px",
                                 backgroundColor: "#dc3545",
@@ -1205,7 +1393,7 @@ export default function Home() {
             </div>
           )}
 
-          {activeTab === 'programmes' && (
+          {activeTab === "programmes" && (
             <div>
               <div
                 style={{
@@ -1216,13 +1404,241 @@ export default function Home() {
                 }}
               >
                 <h2 style={{ margin: 0 }}>Programme Schedule</h2>
-                <p style={{ fontSize: "14px", color: "#666", margin: 0 }}>
-                  Click any cell to edit
-                </p>
+                <div
+                  style={{ display: "flex", gap: "12px", alignItems: "center" }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
+                    <label
+                      htmlFor="dayFilter"
+                      style={{ fontSize: "14px", color: "#666" }}
+                    >
+                      Filter by day:
+                    </label>
+                    <select
+                      id="dayFilter"
+                      value={selectedDay}
+                      onChange={(e) => setSelectedDay(e.target.value)}
+                      style={{
+                        padding: "4px 8px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                        fontSize: "14px",
+                      }}
+                    >
+                      <option value="all">
+                        All Days ({programmes.length})
+                      </option>
+                      {availableDays.map((day) => {
+                        const count = programmes.filter(
+                          (prog) => prog.day === day
+                        ).length;
+                        return (
+                          <option key={day} value={day}>
+                            {day.charAt(0).toUpperCase() + day.slice(1)} (
+                            {count})
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
+                  <p style={{ fontSize: "14px", color: "#666", margin: 0 }}>
+                    Click any cell to edit
+                  </p>
+                  <button
+                    onClick={() =>
+                      setShowAddProgrammeForm(!showAddProgrammeForm)
+                    }
+                    style={{
+                      padding: "8px 16px",
+                      backgroundColor: "#28a745",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {showAddProgrammeForm ? "Cancel" : "Add Programme"}
+                  </button>
+                </div>
               </div>
 
-              {programmes.length === 0 ? (
-                <p>No programme entries available.</p>
+              {showAddProgrammeForm && (
+                <div
+                  style={{
+                    marginBottom: "1rem",
+                    padding: "16px",
+                    border: "1px solid #ddd",
+                    borderRadius: "4px",
+                    backgroundColor: "#f8f9fa",
+                  }}
+                >
+                  <h3 style={{ margin: "0 0 12px 0" }}>Add New Programme</h3>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "2fr 1fr 1fr 1fr",
+                      gap: "12px",
+                      marginBottom: "12px",
+                    }}
+                  >
+                    <input
+                      type="text"
+                      placeholder="Programme name"
+                      value={newProgramme.name}
+                      onChange={(e) =>
+                        setNewProgramme((prev) => ({
+                          ...prev,
+                          name: e.target.value,
+                        }))
+                      }
+                      style={{
+                        padding: "8px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                      }}
+                    />
+                    <select
+                      value={newProgramme.day}
+                      onChange={(e) =>
+                        setNewProgramme((prev) => ({
+                          ...prev,
+                          day: e.target.value,
+                        }))
+                      }
+                      style={{
+                        padding: "8px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      <option value="">Select day</option>
+                      <option value="monday">Monday</option>
+                      <option value="tuesday">Tuesday</option>
+                      <option value="wednesday">Wednesday</option>
+                      <option value="thursday">Thursday</option>
+                      <option value="friday">Friday</option>
+                      <option value="saturday">Saturday</option>
+                      <option value="sunday">Sunday</option>
+                    </select>
+                    <input
+                      type="time"
+                      placeholder="Start time"
+                      value={newProgramme.startTime}
+                      onChange={(e) =>
+                        setNewProgramme((prev) => ({
+                          ...prev,
+                          startTime: e.target.value,
+                        }))
+                      }
+                      style={{
+                        padding: "8px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                      }}
+                    />
+                    <input
+                      type="time"
+                      placeholder="End time"
+                      value={newProgramme.endTime}
+                      onChange={(e) =>
+                        setNewProgramme((prev) => ({
+                          ...prev,
+                          endTime: e.target.value,
+                        }))
+                      }
+                      style={{
+                        padding: "8px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                      }}
+                    />
+                  </div>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button
+                      onClick={handleAddProgramme}
+                      disabled={addingProgramme}
+                      style={{
+                        padding: "8px 16px",
+                        backgroundColor: addingProgramme ? "#ccc" : "#007bff",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                        cursor: addingProgramme ? "not-allowed" : "pointer",
+                      }}
+                    >
+                      {addingProgramme ? "Adding..." : "Add Programme"}
+                    </button>
+                    <button
+                      onClick={handleCancelAddProgramme}
+                      disabled={addingProgramme}
+                      style={{
+                        padding: "8px 16px",
+                        backgroundColor: "#6c757d",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                        cursor: addingProgramme ? "not-allowed" : "pointer",
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {selectedDay !== "all" && (
+                <div
+                  style={{
+                    marginBottom: "1rem",
+                    padding: "8px",
+                    backgroundColor: "#e7f3ff",
+                    borderRadius: "4px",
+                  }}
+                >
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: "14px",
+                      color: "#0066cc",
+                    }}
+                  >
+                    Showing {filteredProgrammes.length} programme(s) for "
+                    {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}
+                    "
+                    <button
+                      onClick={() => setSelectedDay("all")}
+                      style={{
+                        marginLeft: "8px",
+                        padding: "2px 6px",
+                        backgroundColor: "transparent",
+                        color: "#0066cc",
+                        border: "1px solid #0066cc",
+                        borderRadius: "2px",
+                        fontSize: "12px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Clear filter
+                    </button>
+                  </p>
+                </div>
+              )}
+
+              {filteredProgrammes.length === 0 ? (
+                <p>
+                  {selectedDay === "all"
+                    ? "No programme entries available."
+                    : `No programmes found for "${
+                        selectedDay.charAt(0).toUpperCase() +
+                        selectedDay.slice(1)
+                      }".`}
+                </p>
               ) : (
                 <div style={{ overflowX: "auto" }}>
                   <table
@@ -1284,15 +1700,35 @@ export default function Home() {
                         >
                           End Time
                         </th>
+                        <th
+                          style={{
+                            padding: "12px",
+                            textAlign: "left",
+                            border: "1px solid #ddd",
+                            color: "black",
+                          }}
+                        >
+                          Actions
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
-                      {programmes.map((programme, index) => (
+                      {filteredProgrammes.map((programme, index) => (
                         <tr key={programme.id}>
-                          <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                          <td
+                            style={{
+                              padding: "12px",
+                              border: "1px solid #ddd",
+                            }}
+                          >
                             {programme.id}
                           </td>
-                          <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                          <td
+                            style={{
+                              padding: "12px",
+                              border: "1px solid #ddd",
+                            }}
+                          >
                             {renderProgrammeEditableCell(
                               programme,
                               "name",
@@ -1300,7 +1736,12 @@ export default function Home() {
                               index + 1000 // Offset to avoid conflicts with podcast table
                             )}
                           </td>
-                          <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                          <td
+                            style={{
+                              padding: "12px",
+                              border: "1px solid #ddd",
+                            }}
+                          >
                             {renderProgrammeEditableCell(
                               programme,
                               "day",
@@ -1308,7 +1749,12 @@ export default function Home() {
                               index + 1000
                             )}
                           </td>
-                          <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                          <td
+                            style={{
+                              padding: "12px",
+                              border: "1px solid #ddd",
+                            }}
+                          >
                             {renderProgrammeEditableCell(
                               programme,
                               "startTime",
@@ -1316,13 +1762,39 @@ export default function Home() {
                               index + 1000
                             )}
                           </td>
-                          <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                          <td
+                            style={{
+                              padding: "12px",
+                              border: "1px solid #ddd",
+                            }}
+                          >
                             {renderProgrammeEditableCell(
                               programme,
                               "endTime",
                               programme.endTime,
                               index + 1000
                             )}
+                          </td>
+                          <td
+                            style={{
+                              padding: "12px",
+                              border: "1px solid #ddd",
+                            }}
+                          >
+                            <button
+                              onClick={() => handleDeleteProgramme(programme)}
+                              style={{
+                                padding: "4px 8px",
+                                backgroundColor: "#dc3545",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "4px",
+                                cursor: "pointer",
+                                fontSize: "12px",
+                              }}
+                            >
+                              Delete
+                            </button>
                           </td>
                         </tr>
                       ))}
