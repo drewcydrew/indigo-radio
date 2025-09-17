@@ -16,8 +16,7 @@ import TodaysSchedule from "./TodaysSchedule";
 import { usePlayer } from "../contexts/PlayerContext";
 import { audioService } from "../services/AudioService";
 import ScheduleDisplay from "./ScheduleDisplay";
-
-const STREAM_URL = "https://internetradio.indigofm.au:8174/stream";
+import useRadioAddress from "../hooks/useRadioAddress";
 
 interface LiveRadioProps {
   onNowPlayingUpdate: (title: string) => void;
@@ -33,6 +32,9 @@ export default function LiveRadio({
   );
   const { setCurrentContent, setPlayerVisible } = usePlayer();
   const [showFullSchedule, setShowFullSchedule] = useState(false);
+
+  // Use the radio address hook
+  const { radioAddress } = useRadioAddress();
 
   // Use the hook to get program data
   const {
@@ -88,7 +90,7 @@ export default function LiveRadio({
       if (Platform.OS === "web") {
         await audioService.add({
           id: "live",
-          url: STREAM_URL,
+          url: radioAddress, // Use the dynamic radio address
           title: currentProgram?.name || "Indigo FM Live",
           artist: currentProgram?.host || "Live Radio",
         });

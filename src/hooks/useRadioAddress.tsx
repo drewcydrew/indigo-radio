@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 const API_URL =
-  "https://radio-endpoint-mbp1mpfmj-drewcydrews-projects.vercel.app/api/radio-address";
+  "https://radio-endpoint-git-endpoint-drewcydrews-projects.vercel.app/api/shows/radioaddress";
 
 // Fallback URL in case the API fails
 const FALLBACK_URL = "https://internetradio.indigofm.au:8174/stream";

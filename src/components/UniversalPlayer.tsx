@@ -25,8 +25,7 @@ import useShowDetails from "../hooks/useShowDetails";
 import { ShowDefinition } from "../types/types";
 import ShowDetailsModal from "./ShowDetailsModal";
 import UpdateRadioAddressModal from "./UpdateRadioAddressModal";
-
-const STREAM_URL = "https://internetradio.indigofm.au:8174/stream";
+import useRadioAddress from "../hooks/useRadioAddress";
 
 interface UniversalPlayerProps {
   onGoToShow?: (showName: string) => void;
@@ -52,7 +51,9 @@ export default function UniversalPlayer({
   // Add state for show details modal
   const [selectedShow, setSelectedShow] = useState<ShowDefinition | null>(null);
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
-  const [streamUrl, setStreamUrl] = useState(STREAM_URL); // Replace STREAM_URL with state
+
+  // Use the radio address hook instead of hardcoded URL
+  const { radioAddress, updateRadioAddress } = useRadioAddress();
 
   // Mobile state
   const mobilePlayback = usePlaybackState();
@@ -110,7 +111,7 @@ export default function UniversalPlayer({
         title: program?.name || "Indigo FM Live",
         subtitle: program?.host ? `Hosted by ${program.host}` : "Live Radio",
         artwork: showDef?.artwork,
-        audioUrl: streamUrl, // Use the updated streamUrl state
+        audioUrl: radioAddress, // Use the dynamic radio address
         icon: "📻",
       };
     }
@@ -134,7 +135,7 @@ export default function UniversalPlayer({
   // Handle stream errors
   const handleStreamError = (errorMessage: string) => {
     console.error("Stream error:", errorMessage);
-    setStreamError(`${errorMessage} (URL: ${streamUrl})`);
+    setStreamError(`${errorMessage} (URL: ${radioAddress})`);
     setIsRetrying(false);
   };
 
@@ -166,7 +167,7 @@ export default function UniversalPlayer({
           } catch (error) {
             console.error("Retry failed:", error);
             handleStreamError(
-              `Retry failed. Please check your connection and try again. (URL: ${streamUrl})`
+              `Retry failed. Please check your connection and try again. (URL: ${radioAddress})`
             );
           }
         }, 1000);
@@ -180,7 +181,7 @@ export default function UniversalPlayer({
           } catch (error) {
             console.error("Web retry failed:", error);
             handleStreamError(
-              `Retry failed. Please check your connection and try again. (URL: ${streamUrl})`
+              `Retry failed. Please check your connection and try again. (URL: ${radioAddress})`
             );
           }
         }, 1000);
@@ -188,7 +189,7 @@ export default function UniversalPlayer({
     } catch (error) {
       console.error("Error during retry:", error);
       handleStreamError(
-        `Retry failed. Please try again later. (URL: ${streamUrl})`
+        `Retry failed. Please try again later. (URL: ${radioAddress})`
       );
     }
   };
@@ -273,7 +274,7 @@ export default function UniversalPlayer({
         setShouldAutoPlay(true);
       }
     }
-  }, [currentContent, lastContentId, streamUrl]); // Add streamUrl dependency
+  }, [currentContent, lastContentId, radioAddress]); // Add radioAddress dependency
 
   // Auto-play effect - separate from content change effect
   useEffect(() => {
@@ -513,7 +514,7 @@ export default function UniversalPlayer({
 
   const handleUpdateRadioAddress = async (newPort: string) => {
     const newUrl = `https://internetradio.indigofm.au:${newPort}/stream`;
-    setStreamUrl(newUrl);
+    updateRadioAddress(newUrl); // Use the hook's update function
     setIsUpdateModalVisible(false);
     setStreamError(null); // Clear any existing errors
 
