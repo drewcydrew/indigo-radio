@@ -25,7 +25,7 @@ import useShowDetails from "../hooks/useShowDetails";
 import { ShowDefinition } from "../types/types";
 import ShowDetailsModal from "./ShowDetailsModal";
 
-const STREAM_URL = "https://internetradio.indigofm.au:8032/stream";
+const STREAM_URL = "https://internetradio.indigofm.au:8174/stream";
 
 interface UniversalPlayerProps {
   onGoToShow?: (showName: string) => void;
