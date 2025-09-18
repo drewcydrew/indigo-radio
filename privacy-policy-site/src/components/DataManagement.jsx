@@ -1,5 +1,5 @@
 function DataManagement() {
-  const portalUrl = "https://radio-endpoint-39wh2bas6-drewcydrews-projects.vercel.app/";
+  const portalUrl = "https://indigoradio-data.onrender.com/";
 
   return (
     <div className="data-management-container">
