@@ -65,7 +65,8 @@ function HomePage({ heroImage }) {
             Indigo Radio
           </h1>
           <p className={`hero-description ${isMobile ? 'mobile' : ''}`}>
-            This application connects to Indigo FM, to stream live radio and podcast content.
+            Indigo Radio is a prototype web/mobile application which connects to Indigo FM to stream live radio and podcast content.<br /><br />
+            Can be run on mobile or web using the links below.
           </p>
           
           {/* CTA Buttons */}

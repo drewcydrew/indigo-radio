@@ -5,13 +5,13 @@ function DataManagement() {
     <div className="data-management-container">
       <h1 className="data-management-title">Data Management Portal</h1>
       <p className="data-management-description">
-        The Data Management Portal is where podcast content and scheduling data is defined and can be updated. 
-        This web-based interface allows for the management of all content that appears in the Indigo FM application.
+        In addition to the live radio stream URL, there are three data tables driving the application. These can be edited in the data portal by using the link below.<br /><br />
+        Initial data has been populated manually from Indigo FM/Podmatic websites, and is subject to error.
       </p>
       
       <div className="data-types-section">
         <h2 className="data-types-title">Available Data Types</h2>
-        
+
         <div className="data-type-item">
           <h3 className="data-type-heading">Live Radio Stream URL</h3>
           <p className="data-type-description">
@@ -34,6 +34,13 @@ function DataManagement() {
           <p className="data-type-description">
             Defines the schedule for each day. This is used by the app to present the schedule. It is not actually 
             "functional" (this is what the app thinks is on, not necessarily what's actually playing).
+          </p>
+        </div>
+
+        <div className="data-type-item">
+          <h3 className="data-type-heading">Shows</h3>
+          <p className="data-type-description">
+            Defines the shows available for use in the schedule or podcast episode tables. Each show entry should use the correct show name so it can be referenced elsewhere in the app.
           </p>
         </div>
       </div>

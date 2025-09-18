@@ -4,7 +4,7 @@ function PrivacyPolicy() {
       <p className="last-updated">Effective Date: {new Date().toLocaleDateString()}</p>
 
       <p className="introduction">
-        Thank you for using Indigo FM. Your privacy is important to us. This
+        This
         Privacy Policy outlines our commitment to protecting your privacy.
       </p>
 

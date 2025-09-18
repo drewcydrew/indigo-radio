@@ -51,8 +51,8 @@ function ForegroundServices() {
           The video below demonstrates how Indigo FM uses foreground service permissions to provide
           seamless audio playback while the app is running in the background.
         </p>
-        <div className="video-container">
-          <video controls width="100%" height="auto">
+        <div className="video-container" style={{ maxWidth: 480, margin: "2rem auto", textAlign: "center" }}>
+          <video controls width="100%" style={{ maxWidth: "100%", borderRadius: "12px" }}>
             <source src="/example-foreground-service.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
