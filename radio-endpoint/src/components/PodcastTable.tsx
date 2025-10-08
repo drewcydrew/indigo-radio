@@ -123,7 +123,7 @@ export default function PodcastTable({
 
     if (isEditing) {
       return (
-        <div style={{ display: "flex", gap: "4px", alignItems: "flex-start" }}>
+        <div style={{ display: "flex", gap: "6px", alignItems: "flex-start" }}>
           <textarea
             value={editValue}
             onChange={(e) => setEditValue(e.target.value)}
@@ -131,42 +131,48 @@ export default function PodcastTable({
             style={{
               width: "100%",
               minHeight: "60px",
-              padding: "4px",
-              border: "1px solid #007bff",
-              borderRadius: "2px",
+              padding: "8px 12px",
+              border: "2px solid #6366f1",
+              borderRadius: "6px",
               fontSize: "14px",
               resize: "vertical",
               fontFamily: "inherit",
+              outline: "none",
+              boxShadow: "0 0 0 3px rgba(99, 102, 241, 0.1)",
             }}
             autoFocus
           />
-          <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             <button
               onClick={() => handleCellSave(episode, column)}
               disabled={isSaving}
               style={{
-                padding: "4px 8px",
-                backgroundColor: "#28a745",
+                padding: "6px 10px",
+                backgroundColor: isSaving ? "#9ca3af" : "#10b981",
                 color: "white",
                 border: "none",
-                borderRadius: "2px",
+                borderRadius: "4px",
                 fontSize: "12px",
+                fontWeight: "500",
                 cursor: isSaving ? "not-allowed" : "pointer",
+                transition: "background-color 0.15s ease",
               }}
             >
-              ✓
+              {isSaving ? "..." : "✓"}
             </button>
             <button
               onClick={handleCellCancel}
               disabled={isSaving}
               style={{
-                padding: "4px 8px",
-                backgroundColor: "#dc3545",
+                padding: "6px 10px",
+                backgroundColor: isSaving ? "#9ca3af" : "#ef4444",
                 color: "white",
                 border: "none",
-                borderRadius: "2px",
+                borderRadius: "4px",
                 fontSize: "12px",
+                fontWeight: "500",
                 cursor: isSaving ? "not-allowed" : "pointer",
+                transition: "background-color 0.15s ease",
               }}
             >
               ✗
@@ -181,23 +187,37 @@ export default function PodcastTable({
         onClick={() => handleCellEdit(rowIndex, column, value)}
         style={{
           cursor: "pointer",
-          padding: "4px",
-          minHeight: "20px",
-          borderRadius: "2px",
+          padding: "8px 12px",
+          minHeight: "32px",
+          borderRadius: "4px",
           backgroundColor: "transparent",
           whiteSpace: "pre-wrap",
           wordBreak: "break-word",
+          transition: "all 0.15s ease",
+          border: "1px solid transparent",
         }}
-        onMouseEnter={(e) =>
-          ((e.target as HTMLElement).style.backgroundColor = "#f8f9fa")
-        }
-        onMouseLeave={(e) =>
-          ((e.target as HTMLElement).style.backgroundColor = "transparent")
-        }
-        title="Click to edit"
+        onMouseEnter={(e) => {
+          const target = e.target as HTMLElement;
+          target.style.backgroundColor = "#1f2937";
+          target.style.borderColor = "#374151";
+          target.style.color = "white";
+        }}
+        onMouseLeave={(e) => {
+          const target = e.target as HTMLElement;
+          target.style.backgroundColor = "transparent";
+          target.style.borderColor = "transparent";
+          target.style.color = "inherit";
+        }}
+        title={`Click to edit ${column}`}
       >
         {value || (
-          <span style={{ color: "#999", fontStyle: "italic" }}>
+          <span
+            style={{
+              color: "#94a3b8",
+              fontStyle: "italic",
+              fontSize: "13px",
+            }}
+          >
             Click to edit
           </span>
         )}
@@ -299,21 +319,47 @@ export default function PodcastTable({
       : podcasts.filter((episode) => episode.show === selectedShow);
 
   return (
-    <div>
+    <div style={{ width: "100%", maxWidth: "100%" }}>
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: "1rem",
+          marginBottom: "1.5rem",
+          paddingBottom: "1rem",
+          borderBottom: "1px solid #374151",
         }}
       >
-        <h2 style={{ margin: 0 }}>Podcast Episodes</h2>
-        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+        <div>
+          <h2
+            style={{
+              margin: "0 0 4px 0",
+              color: "#111827",
+              fontSize: "24px",
+              fontWeight: "700",
+            }}
+          >
+            Podcast Episodes
+          </h2>
+          <p
+            style={{
+              margin: 0,
+              color: "#6b7280",
+              fontSize: "14px",
+            }}
+          >
+            Manage podcast episodes and audio content
+          </p>
+        </div>
+        <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <label
               htmlFor="showFilter"
-              style={{ fontSize: "14px", color: "#666" }}
+              style={{
+                fontSize: "13px",
+                color: "#6b7280",
+                fontWeight: "500",
+              }}
             >
               Filter by show:
             </label>
@@ -322,10 +368,12 @@ export default function PodcastTable({
               value={selectedShow}
               onChange={(e) => setSelectedShow(e.target.value)}
               style={{
-                padding: "4px 8px",
-                border: "1px solid #ddd",
-                borderRadius: "4px",
+                padding: "8px 12px",
+                border: "1px solid #374151",
+                borderRadius: "6px",
                 fontSize: "14px",
+                backgroundColor: "#1f2937",
+                color: "white",
               }}
             >
               <option value="all">All Shows ({podcasts.length})</option>
@@ -339,7 +387,13 @@ export default function PodcastTable({
               })}
             </select>
           </div>
-          <p style={{ fontSize: "14px", color: "#666", margin: 0 }}>
+          <p
+            style={{
+              fontSize: "14px",
+              color: "#666",
+              margin: 0,
+            }}
+          >
             Click any cell to edit
           </p>
           <button
@@ -505,7 +559,13 @@ export default function PodcastTable({
             borderRadius: "4px",
           }}
         >
-          <p style={{ margin: 0, fontSize: "14px", color: "#0066cc" }}>
+          <p
+            style={{
+              margin: 0,
+              fontSize: "14px",
+              color: "#0066cc",
+            }}
+          >
             Showing {filteredPodcasts.length} episode(s) for "{selectedShow}"
             <button
               onClick={() => setSelectedShow("all")}
@@ -527,88 +587,164 @@ export default function PodcastTable({
       )}
 
       {filteredPodcasts.length === 0 ? (
-        <p>
-          {selectedShow === "all"
-            ? "No podcast episodes available."
-            : `No episodes found for "${selectedShow}".`}
-        </p>
+        <div
+          style={{
+            textAlign: "center",
+            padding: "48px 24px",
+            backgroundColor: "#1f2937",
+            borderRadius: "8px",
+            border: "1px solid #374151",
+          }}
+        >
+          <p
+            style={{
+              margin: 0,
+              color: "white",
+              fontSize: "16px",
+              fontWeight: "500",
+            }}
+          >
+            {selectedShow === "all"
+              ? "No podcast episodes available."
+              : `No episodes found for "${selectedShow}".`}
+          </p>
+        </div>
       ) : (
-        <div style={{ overflowX: "auto" }}>
+        <div
+          style={{
+            width: "100%",
+            overflowX: "auto",
+            borderRadius: "8px",
+            border: "1px solid #374151",
+            boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
+          }}
+        >
           <table
             style={{
               width: "100%",
+              minWidth: "1200px",
               borderCollapse: "collapse",
-              marginTop: "1rem",
+              backgroundColor: "#111827",
             }}
           >
             <thead>
-              <tr style={{ backgroundColor: "#f5f5f5" }}>
+              <tr style={{ backgroundColor: "#1f2937" }}>
                 <th
+                  title="Unique identifier for each episode"
                   style={{
-                    padding: "12px",
+                    width: "80px",
+                    padding: "16px",
                     textAlign: "left",
-                    border: "1px solid #ddd",
-                    color: "black",
+                    border: "none",
+                    borderBottom: "1px solid #374151",
+                    color: "white",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    cursor: "help",
                   }}
                 >
                   ID
                 </th>
                 <th
                   style={{
-                    padding: "12px",
+                    width: "150px",
+                    padding: "16px",
                     textAlign: "left",
-                    border: "1px solid #ddd",
-                    color: "black",
+                    border: "none",
+                    borderBottom: "1px solid #374151",
+                    color: "white",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    cursor: "help",
                   }}
                 >
                   Show
                 </th>
                 <th
                   style={{
-                    padding: "12px",
+                    width: "200px",
+                    padding: "16px",
                     textAlign: "left",
-                    border: "1px solid #ddd",
-                    color: "black",
+                    border: "none",
+                    borderBottom: "1px solid #374151",
+                    color: "white",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    cursor: "help",
                   }}
                 >
                   Title
                 </th>
                 <th
                   style={{
-                    padding: "12px",
+                    width: "250px",
+                    padding: "16px",
                     textAlign: "left",
-                    border: "1px solid #ddd",
-                    color: "black",
+                    border: "none",
+                    borderBottom: "1px solid #374151",
+                    color: "white",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    cursor: "help",
                   }}
                 >
                   Description
                 </th>
                 <th
                   style={{
-                    padding: "12px",
+                    width: "220px",
+                    padding: "16px",
                     textAlign: "left",
-                    border: "1px solid #ddd",
-                    color: "black",
+                    border: "none",
+                    borderBottom: "1px solid #374151",
+                    color: "white",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    cursor: "help",
                   }}
                 >
                   Audio
                 </th>
                 <th
                   style={{
-                    padding: "12px",
+                    width: "200px",
+                    padding: "16px",
                     textAlign: "left",
-                    border: "1px solid #ddd",
-                    color: "black",
+                    border: "none",
+                    borderBottom: "1px solid #374151",
+                    color: "white",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    cursor: "help",
                   }}
                 >
                   URL
                 </th>
                 <th
                   style={{
-                    padding: "12px",
+                    width: "100px",
+                    padding: "16px",
                     textAlign: "left",
-                    border: "1px solid #ddd",
-                    color: "black",
+                    border: "none",
+                    borderBottom: "1px solid #374151",
+                    color: "white",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    cursor: "help",
                   }}
                 >
                   Actions
@@ -617,17 +753,66 @@ export default function PodcastTable({
             </thead>
             <tbody>
               {filteredPodcasts.map((episode, index) => (
-                <tr key={episode.id}>
-                  <td style={{ padding: "12px", border: "1px solid #ddd" }}>
-                    {episode.id}
+                <tr
+                  key={episode.id}
+                  style={{
+                    borderBottom:
+                      index === filteredPodcasts.length - 1
+                        ? "none"
+                        : "1px solid #374151",
+                    transition: "background-color 0.15s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.target as HTMLElement).closest(
+                      "tr"
+                    )!.style.backgroundColor = "#1f2937";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.target as HTMLElement).closest(
+                      "tr"
+                    )!.style.backgroundColor = "transparent";
+                  }}
+                >
+                  <td
+                    style={{
+                      padding: "16px",
+                      border: "none",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      color: "#9ca3af",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      fontFamily:
+                        "ui-monospace, SFMono-Regular, 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace",
+                    }}
+                  >
+                    #{episode.id}
                   </td>
-                  <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                  <td
+                    style={{
+                      padding: "16px",
+                      border: "none",
+                      overflow: "hidden",
+                    }}
+                  >
                     {renderEditableCell(episode, "show", episode.show, index)}
                   </td>
-                  <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                  <td
+                    style={{
+                      padding: "16px",
+                      border: "none",
+                      overflow: "hidden",
+                    }}
+                  >
                     {renderEditableCell(episode, "title", episode.title, index)}
                   </td>
-                  <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                  <td
+                    style={{
+                      padding: "16px",
+                      border: "none",
+                      overflow: "hidden",
+                    }}
+                  >
                     {renderEditableCell(
                       episode,
                       "description",
@@ -635,16 +820,37 @@ export default function PodcastTable({
                       index
                     )}
                   </td>
-                  <td style={{ padding: "12px", border: "1px solid #ddd" }}>
-                    <audio controls style={{ width: "200px" }}>
+                  <td
+                    style={{
+                      padding: "16px",
+                      border: "none",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <audio
+                      controls
+                      style={{ width: "100%", maxWidth: "200px" }}
+                    >
                       <source src={episode.url} type="audio/mpeg" />
                       Your browser does not support the audio element.
                     </audio>
                   </td>
-                  <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                  <td
+                    style={{
+                      padding: "16px",
+                      border: "none",
+                      overflow: "hidden",
+                    }}
+                  >
                     {renderEditableCell(episode, "url", episode.url, index)}
                   </td>
-                  <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                  <td
+                    style={{
+                      padding: "16px",
+                      border: "none",
+                      overflow: "hidden",
+                    }}
+                  >
                     <button
                       onClick={() => handleDeletePodcast(episode)}
                       style={{

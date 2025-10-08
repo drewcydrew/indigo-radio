@@ -151,7 +151,17 @@ export default function Home() {
     return (
       <div className={styles.page}>
         <main className={styles.main}>
-          <h1>Loading...</h1>
+          <div
+            style={{
+              width: "100vw",
+              maxWidth: "100vw",
+              padding: "0 60px 0 20px",
+              boxSizing: "border-box",
+              overflow: "hidden",
+            }}
+          >
+            <h1>Loading...</h1>
+          </div>
         </main>
       </div>
     );
@@ -161,7 +171,17 @@ export default function Home() {
     return (
       <div className={styles.page}>
         <main className={styles.main}>
-          <h1>Error: {error}</h1>
+          <div
+            style={{
+              width: "100vw",
+              maxWidth: "100vw",
+              padding: "0 60px 0 20px",
+              boxSizing: "border-box",
+              overflow: "hidden",
+            }}
+          >
+            <h1>Error: {error}</h1>
+          </div>
         </main>
       </div>
     );
@@ -170,169 +190,300 @@ export default function Home() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <h1>Indigo Radio Dashboard</h1>
+        <div
+          style={{
+            width: "100vw",
+            maxWidth: "100vw",
+            padding: "0 60px 0 20px",
+            boxSizing: "border-box",
+            margin: "0",
+            overflow: "hidden",
+          }}
+        >
+          <header style={{ marginBottom: "2rem" }}>
+            <h1 style={{ margin: "0 0 2rem 0" }}>Indigo Radio Dashboard</h1>
 
-        <section style={{ marginBottom: "2rem" }}>
-          <h2>Live Radio Stream</h2>
-          {isEditing ? (
-            <div style={{ marginBottom: "1rem" }}>
-              <input
-                type="text"
-                value={editAddress}
-                onChange={(e) => setEditAddress(e.target.value)}
-                style={{
-                  width: "100%",
-                  maxWidth: "500px",
-                  padding: "8px",
-                  marginBottom: "8px",
-                  border: "1px solid #ddd",
-                  borderRadius: "4px",
-                }}
-                placeholder="Enter streaming address"
-              />
-              <div>
-                <button
-                  onClick={handleSaveAddress}
-                  disabled={updating}
+            <section style={{ marginBottom: "2rem" }}>
+              <h2 style={{ margin: "0 0 1rem 0" }}>Live Radio Stream</h2>
+              {isEditing ? (
+                <div style={{ marginBottom: "1rem" }}>
+                  <input
+                    type="text"
+                    value={editAddress}
+                    onChange={(e) => setEditAddress(e.target.value)}
+                    style={{
+                      width: "100%",
+                      maxWidth: "500px",
+                      padding: "8px",
+                      marginBottom: "8px",
+                      border: "1px solid #ddd",
+                      borderRadius: "4px",
+                      boxSizing: "border-box",
+                    }}
+                    placeholder="Enter streaming address"
+                  />
+                  <div>
+                    <button
+                      onClick={handleSaveAddress}
+                      disabled={updating}
+                      style={{
+                        padding: "8px 16px",
+                        marginRight: "8px",
+                        backgroundColor: "#28a745",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                        cursor: updating ? "not-allowed" : "pointer",
+                        fontWeight: "500",
+                      }}
+                    >
+                      {updating ? "Saving..." : "Save"}
+                    </button>
+                    <button
+                      onClick={handleCancelEdit}
+                      disabled={updating}
+                      style={{
+                        padding: "8px 16px",
+                        backgroundColor: "#6c757d",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                        cursor: updating ? "not-allowed" : "pointer",
+                        fontWeight: "500",
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div
                   style={{
-                    padding: "8px 16px",
-                    marginRight: "8px",
-                    backgroundColor: "#0070f3",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: updating ? "not-allowed" : "pointer",
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: "12px",
                   }}
                 >
-                  {updating ? "Saving..." : "Save"}
+                  <span
+                    style={{
+                      color: "#374151",
+                      fontWeight: "600",
+                      minWidth: "100px",
+                      fontSize: "14px",
+                      lineHeight: "1.5",
+                      paddingTop: "12px",
+                    }}
+                  >
+                    Stream URL:
+                  </span>
+                  <div
+                    onClick={handleEditClick}
+                    title="Click to edit the radio stream URL. This URL is used by the app to retrieve the live radio stream for playback."
+                    style={{
+                      flex: 1,
+                      padding: "12px 16px",
+                      backgroundColor: radioAddress ? "#ffffff" : "#fef3c7",
+                      border: `1px solid ${
+                        radioAddress ? "#d1d5db" : "#f59e0b"
+                      }`,
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                      fontSize: "14px",
+                      minHeight: "48px",
+                      display: "flex",
+                      alignItems: "center",
+                      transition: "all 0.15s ease-in-out",
+                      wordBreak: "break-all",
+                      boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+                      position: "relative",
+                      maxWidth: "calc(100% - 112px)",
+                    }}
+                    onMouseEnter={(e) => {
+                      const target = e.target as HTMLElement;
+                      target.style.backgroundColor = radioAddress
+                        ? "#f9fafb"
+                        : "#fef3c7";
+                      target.style.borderColor = radioAddress
+                        ? "#6366f1"
+                        : "#f59e0b";
+                      target.style.boxShadow = radioAddress
+                        ? "0 0 0 3px rgba(99, 102, 241, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.05)"
+                        : "0 0 0 3px rgba(245, 158, 11, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.05)";
+                    }}
+                    onMouseLeave={(e) => {
+                      const target = e.target as HTMLElement;
+                      target.style.backgroundColor = radioAddress
+                        ? "#ffffff"
+                        : "#fef3c7";
+                      target.style.borderColor = radioAddress
+                        ? "#d1d5db"
+                        : "#f59e0b";
+                      target.style.boxShadow =
+                        "0 1px 2px 0 rgba(0, 0, 0, 0.05)";
+                    }}
+                  >
+                    {radioAddress ? (
+                      <span
+                        style={{
+                          color: "#374151",
+                          fontFamily:
+                            "ui-monospace, SFMono-Regular, 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace",
+                        }}
+                      >
+                        {radioAddress}
+                      </span>
+                    ) : (
+                      <span
+                        style={{
+                          color: "#92400e",
+                          fontStyle: "italic",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: "16px",
+                            color: "#f59e0b",
+                          }}
+                        >
+                          ⚠
+                        </span>
+                        No stream URL configured - Click to set up your radio
+                        stream
+                      </span>
+                    )}
+                    <span
+                      style={{
+                        position: "absolute",
+                        right: "16px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        fontSize: "11px",
+                        fontWeight: "500",
+                        color: "#6b7280",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                      }}
+                    >
+                      EDIT
+                    </span>
+                  </div>
+                </div>
+              )}
+            </section>
+          </header>
+
+          <section>
+            {/* Tab Navigation */}
+            <div
+              style={{
+                borderBottom: "1px solid #ddd",
+                marginBottom: "1rem",
+                position: "sticky",
+                top: "0",
+                backgroundColor: "white",
+                zIndex: 10,
+                paddingBottom: "0",
+              }}
+            >
+              <div style={{ display: "flex", gap: "0", flexWrap: "wrap" }}>
+                <button
+                  onClick={() => setActiveTab("podcasts")}
+                  style={{
+                    padding: "12px 24px",
+                    backgroundColor:
+                      activeTab === "podcasts" ? "#007bff" : "transparent",
+                    color: activeTab === "podcasts" ? "white" : "#666",
+                    border: "1px solid #ddd",
+                    borderBottom:
+                      activeTab === "podcasts" ? "none" : "1px solid #ddd",
+                    borderTopLeftRadius: "4px",
+                    borderTopRightRadius: "0",
+                    cursor: "pointer",
+                    fontSize: "16px",
+                    fontWeight: activeTab === "podcasts" ? "bold" : "normal",
+                  }}
+                >
+                  Podcast Episodes ({podcasts.length})
                 </button>
                 <button
-                  onClick={handleCancelEdit}
-                  disabled={updating}
+                  onClick={() => setActiveTab("programmes")}
                   style={{
-                    padding: "8px 16px",
-                    backgroundColor: "#666",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: updating ? "not-allowed" : "pointer",
+                    padding: "12px 24px",
+                    backgroundColor:
+                      activeTab === "programmes" ? "#007bff" : "transparent",
+                    color: activeTab === "programmes" ? "white" : "#666",
+                    border: "1px solid #ddd",
+                    borderBottom:
+                      activeTab === "programmes" ? "none" : "1px solid #ddd",
+                    borderLeft: "none",
+                    borderTopLeftRadius: "0",
+                    borderTopRightRadius: "0",
+                    cursor: "pointer",
+                    fontSize: "16px",
+                    fontWeight: activeTab === "programmes" ? "bold" : "normal",
                   }}
                 >
-                  Cancel
+                  Programme Schedule ({programmes.length})
+                </button>
+                <button
+                  onClick={() => setActiveTab("shows")}
+                  style={{
+                    padding: "12px 24px",
+                    backgroundColor:
+                      activeTab === "shows" ? "#007bff" : "transparent",
+                    color: activeTab === "shows" ? "white" : "#666",
+                    border: "1px solid #ddd",
+                    borderBottom:
+                      activeTab === "shows" ? "none" : "1px solid #ddd",
+                    borderLeft: "none",
+                    borderTopLeftRadius: "0",
+                    borderTopRightRadius: "4px",
+                    cursor: "pointer",
+                    fontSize: "16px",
+                    fontWeight: activeTab === "shows" ? "bold" : "normal",
+                  }}
+                >
+                  Shows ({shows.length})
                 </button>
               </div>
             </div>
-          ) : (
-            <div>
-              <p>
-                <strong>Stream URL:</strong> {radioAddress}
-                <button
-                  onClick={handleEditClick}
-                  style={{
-                    marginLeft: "12px",
-                    padding: "4px 8px",
-                    backgroundColor: "#f0f0f0",
-                    border: "1px solid #ddd",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Edit
-                </button>
-              </p>
+
+            {/* Tab Content Container */}
+            <div
+              style={{
+                width: "100%",
+                minHeight: "500px",
+                overflow: "hidden",
+              }}
+            >
+              {/* Tab Content */}
+              {activeTab === "podcasts" && (
+                <PodcastTable
+                  podcasts={podcasts}
+                  setPodcasts={setPodcasts}
+                  availableShows={availableShows}
+                  setAvailableShows={setAvailableShows}
+                />
+              )}
+
+              {activeTab === "programmes" && (
+                <ProgrammeTable
+                  programmes={programmes}
+                  setProgrammes={setProgrammes}
+                  availableDays={availableDays}
+                  setAvailableDays={setAvailableDays}
+                />
+              )}
+
+              {activeTab === "shows" && (
+                <ShowsTable shows={shows} setShows={setShows} />
+              )}
             </div>
-          )}
-        </section>
-
-        <section>
-          {/* Tab Navigation */}
-          <div style={{ borderBottom: "1px solid #ddd", marginBottom: "1rem" }}>
-            <div style={{ display: "flex", gap: "0" }}>
-              <button
-                onClick={() => setActiveTab("podcasts")}
-                style={{
-                  padding: "12px 24px",
-                  backgroundColor:
-                    activeTab === "podcasts" ? "#007bff" : "transparent",
-                  color: activeTab === "podcasts" ? "white" : "#666",
-                  border: "1px solid #ddd",
-                  borderBottom:
-                    activeTab === "podcasts" ? "none" : "1px solid #ddd",
-                  borderTopLeftRadius: "4px",
-                  borderTopRightRadius: "0",
-                  cursor: "pointer",
-                  fontSize: "16px",
-                  fontWeight: activeTab === "podcasts" ? "bold" : "normal",
-                }}
-              >
-                Podcast Episodes ({podcasts.length})
-              </button>
-              <button
-                onClick={() => setActiveTab("programmes")}
-                style={{
-                  padding: "12px 24px",
-                  backgroundColor:
-                    activeTab === "programmes" ? "#007bff" : "transparent",
-                  color: activeTab === "programmes" ? "white" : "#666",
-                  border: "1px solid #ddd",
-                  borderBottom:
-                    activeTab === "programmes" ? "none" : "1px solid #ddd",
-                  borderLeft: "none",
-                  borderTopLeftRadius: "0",
-                  borderTopRightRadius: "0",
-                  cursor: "pointer",
-                  fontSize: "16px",
-                  fontWeight: activeTab === "programmes" ? "bold" : "normal",
-                }}
-              >
-                Programme Schedule ({programmes.length})
-              </button>
-              <button
-                onClick={() => setActiveTab("shows")}
-                style={{
-                  padding: "12px 24px",
-                  backgroundColor:
-                    activeTab === "shows" ? "#007bff" : "transparent",
-                  color: activeTab === "shows" ? "white" : "#666",
-                  border: "1px solid #ddd",
-                  borderBottom:
-                    activeTab === "shows" ? "none" : "1px solid #ddd",
-                  borderLeft: "none",
-                  borderTopLeftRadius: "0",
-                  borderTopRightRadius: "4px",
-                  cursor: "pointer",
-                  fontSize: "16px",
-                  fontWeight: activeTab === "shows" ? "bold" : "normal",
-                }}
-              >
-                Shows ({shows.length})
-              </button>
-            </div>
-          </div>
-
-          {/* Tab Content */}
-          {activeTab === "podcasts" && (
-            <PodcastTable
-              podcasts={podcasts}
-              setPodcasts={setPodcasts}
-              availableShows={availableShows}
-              setAvailableShows={setAvailableShows}
-            />
-          )}
-
-          {activeTab === "programmes" && (
-            <ProgrammeTable
-              programmes={programmes}
-              setProgrammes={setProgrammes}
-              availableDays={availableDays}
-              setAvailableDays={setAvailableDays}
-            />
-          )}
-
-          {activeTab === "shows" && (
-            <ShowsTable shows={shows} setShows={setShows} />
-          )}
-        </section>
+          </section>
+        </div>
       </main>
     </div>
   );

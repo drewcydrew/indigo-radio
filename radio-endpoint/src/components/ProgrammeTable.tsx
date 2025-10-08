@@ -113,18 +113,20 @@ export default function ProgrammeTable({
       if (column === "day") {
         return (
           <div
-            style={{ display: "flex", gap: "4px", alignItems: "flex-start" }}
+            style={{ display: "flex", gap: "6px", alignItems: "flex-start" }}
           >
             <select
               value={editValue}
               onChange={(e) => setEditValue(e.target.value)}
               style={{
                 width: "100%",
-                padding: "4px",
-                border: "1px solid #007bff",
-                borderRadius: "2px",
+                padding: "8px 12px",
+                border: "2px solid #6366f1",
+                borderRadius: "6px",
                 fontSize: "14px",
                 fontFamily: "inherit",
+                outline: "none",
+                boxShadow: "0 0 0 3px rgba(99, 102, 241, 0.1)",
               }}
               autoFocus
             >
@@ -136,36 +138,39 @@ export default function ProgrammeTable({
               <option value="saturday">Saturday</option>
               <option value="sunday">Sunday</option>
             </select>
-            {/* ...existing button controls... */}
             <div
-              style={{ display: "flex", flexDirection: "column", gap: "2px" }}
+              style={{ display: "flex", flexDirection: "column", gap: "4px" }}
             >
               <button
                 onClick={() => handleProgrammeCellSave(programme, column)}
                 disabled={isSaving}
                 style={{
-                  padding: "4px 8px",
-                  backgroundColor: "#28a745",
+                  padding: "6px 10px",
+                  backgroundColor: isSaving ? "#9ca3af" : "#10b981",
                   color: "white",
                   border: "none",
-                  borderRadius: "2px",
+                  borderRadius: "4px",
                   fontSize: "12px",
+                  fontWeight: "500",
                   cursor: isSaving ? "not-allowed" : "pointer",
+                  transition: "background-color 0.15s ease",
                 }}
               >
-                ✓
+                {isSaving ? "..." : "✓"}
               </button>
               <button
                 onClick={handleCellCancel}
                 disabled={isSaving}
                 style={{
-                  padding: "4px 8px",
-                  backgroundColor: "#dc3545",
+                  padding: "6px 10px",
+                  backgroundColor: isSaving ? "#9ca3af" : "#ef4444",
                   color: "white",
                   border: "none",
-                  borderRadius: "2px",
+                  borderRadius: "4px",
                   fontSize: "12px",
+                  fontWeight: "500",
                   cursor: isSaving ? "not-allowed" : "pointer",
+                  transition: "background-color 0.15s ease",
                 }}
               >
                 ✗
@@ -178,7 +183,7 @@ export default function ProgrammeTable({
       if (column === "startTime" || column === "endTime") {
         return (
           <div
-            style={{ display: "flex", gap: "4px", alignItems: "flex-start" }}
+            style={{ display: "flex", gap: "6px", alignItems: "flex-start" }}
           >
             <input
               type="time"
@@ -186,44 +191,49 @@ export default function ProgrammeTable({
               onChange={(e) => setEditValue(e.target.value)}
               style={{
                 width: "100%",
-                padding: "4px",
-                border: "1px solid #007bff",
-                borderRadius: "2px",
+                padding: "8px 12px",
+                border: "2px solid #6366f1",
+                borderRadius: "6px",
                 fontSize: "14px",
                 fontFamily: "inherit",
+                outline: "none",
+                boxShadow: "0 0 0 3px rgba(99, 102, 241, 0.1)",
               }}
               autoFocus
             />
-            {/* ...existing button controls... */}
             <div
-              style={{ display: "flex", flexDirection: "column", gap: "2px" }}
+              style={{ display: "flex", flexDirection: "column", gap: "4px" }}
             >
               <button
                 onClick={() => handleProgrammeCellSave(programme, column)}
                 disabled={isSaving}
                 style={{
-                  padding: "4px 8px",
-                  backgroundColor: "#28a745",
+                  padding: "6px 10px",
+                  backgroundColor: isSaving ? "#9ca3af" : "#10b981",
                   color: "white",
                   border: "none",
-                  borderRadius: "2px",
+                  borderRadius: "4px",
                   fontSize: "12px",
+                  fontWeight: "500",
                   cursor: isSaving ? "not-allowed" : "pointer",
+                  transition: "background-color 0.15s ease",
                 }}
               >
-                ✓
+                {isSaving ? "..." : "✓"}
               </button>
               <button
                 onClick={handleCellCancel}
                 disabled={isSaving}
                 style={{
-                  padding: "4px 8px",
-                  backgroundColor: "#dc3545",
+                  padding: "6px 10px",
+                  backgroundColor: isSaving ? "#9ca3af" : "#ef4444",
                   color: "white",
                   border: "none",
-                  borderRadius: "2px",
+                  borderRadius: "4px",
                   fontSize: "12px",
+                  fontWeight: "500",
                   cursor: isSaving ? "not-allowed" : "pointer",
+                  transition: "background-color 0.15s ease",
                 }}
               >
                 ✗
@@ -234,48 +244,54 @@ export default function ProgrammeTable({
       }
 
       return (
-        <div style={{ display: "flex", gap: "4px", alignItems: "flex-start" }}>
+        <div style={{ display: "flex", gap: "6px", alignItems: "flex-start" }}>
           <input
             type="text"
             value={editValue}
             onChange={(e) => setEditValue(e.target.value)}
             style={{
               width: "100%",
-              padding: "4px",
-              border: "1px solid #007bff",
-              borderRadius: "2px",
+              padding: "8px 12px",
+              border: "2px solid #6366f1",
+              borderRadius: "6px",
               fontSize: "14px",
               fontFamily: "inherit",
+              outline: "none",
+              boxShadow: "0 0 0 3px rgba(99, 102, 241, 0.1)",
             }}
             autoFocus
           />
-          <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             <button
               onClick={() => handleProgrammeCellSave(programme, column)}
               disabled={isSaving}
               style={{
-                padding: "4px 8px",
-                backgroundColor: "#28a745",
+                padding: "6px 10px",
+                backgroundColor: isSaving ? "#9ca3af" : "#10b981",
                 color: "white",
                 border: "none",
-                borderRadius: "2px",
+                borderRadius: "4px",
                 fontSize: "12px",
+                fontWeight: "500",
                 cursor: isSaving ? "not-allowed" : "pointer",
+                transition: "background-color 0.15s ease",
               }}
             >
-              ✓
+              {isSaving ? "..." : "✓"}
             </button>
             <button
               onClick={handleCellCancel}
               disabled={isSaving}
               style={{
-                padding: "4px 8px",
-                backgroundColor: "#dc3545",
+                padding: "6px 10px",
+                backgroundColor: isSaving ? "#9ca3af" : "#ef4444",
                 color: "white",
                 border: "none",
-                borderRadius: "2px",
+                borderRadius: "4px",
                 fontSize: "12px",
+                fontWeight: "500",
                 cursor: isSaving ? "not-allowed" : "pointer",
+                transition: "background-color 0.15s ease",
               }}
             >
               ✗
@@ -290,22 +306,36 @@ export default function ProgrammeTable({
         onClick={() => handleCellEdit(rowIndex, column, value)}
         style={{
           cursor: "pointer",
-          padding: "4px",
-          minHeight: "20px",
-          borderRadius: "2px",
+          padding: "8px 12px",
+          minHeight: "32px",
+          borderRadius: "4px",
           backgroundColor: "transparent",
           textTransform: column === "day" ? "capitalize" : "none",
+          transition: "all 0.15s ease",
+          border: "1px solid transparent",
         }}
-        onMouseEnter={(e) =>
-          ((e.target as HTMLElement).style.backgroundColor = "#f8f9fa")
-        }
-        onMouseLeave={(e) =>
-          ((e.target as HTMLElement).style.backgroundColor = "transparent")
-        }
-        title="Click to edit"
+        onMouseEnter={(e) => {
+          const target = e.target as HTMLElement;
+          target.style.backgroundColor = "#1f2937";
+          target.style.borderColor = "#374151";
+          target.style.color = "white";
+        }}
+        onMouseLeave={(e) => {
+          const target = e.target as HTMLElement;
+          target.style.backgroundColor = "transparent";
+          target.style.borderColor = "transparent";
+          target.style.color = "inherit";
+        }}
+        title={`Click to edit ${column}`}
       >
         {value || (
-          <span style={{ color: "#999", fontStyle: "italic" }}>
+          <span
+            style={{
+              color: "#94a3b8",
+              fontStyle: "italic",
+              fontSize: "13px",
+            }}
+          >
             Click to edit
           </span>
         )}
@@ -409,21 +439,47 @@ export default function ProgrammeTable({
       : programmes.filter((programme) => programme.day === selectedDay);
 
   return (
-    <div>
+    <div style={{ width: "100%", maxWidth: "100%" }}>
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: "1rem",
+          marginBottom: "1.5rem",
+          paddingBottom: "1rem",
+          borderBottom: "1px solid #374151",
         }}
       >
-        <h2 style={{ margin: 0 }}>Programme Schedule</h2>
-        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+        <div>
+          <h2
+            style={{
+              margin: "0 0 4px 0",
+              color: "#111827",
+              fontSize: "24px",
+              fontWeight: "700",
+            }}
+          >
+            Programme Schedule
+          </h2>
+          <p
+            style={{
+              margin: 0,
+              color: "#6b7280",
+              fontSize: "14px",
+            }}
+          >
+            Manage daily programme schedules and time slots
+          </p>
+        </div>
+        <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <label
               htmlFor="dayFilter"
-              style={{ fontSize: "14px", color: "#666" }}
+              style={{
+                fontSize: "13px",
+                color: "#6b7280",
+                fontWeight: "500",
+              }}
             >
               Filter by day:
             </label>
@@ -432,10 +488,12 @@ export default function ProgrammeTable({
               value={selectedDay}
               onChange={(e) => setSelectedDay(e.target.value)}
               style={{
-                padding: "4px 8px",
-                border: "1px solid #ddd",
-                borderRadius: "4px",
+                padding: "8px 12px",
+                border: "1px solid #374151",
+                borderRadius: "6px",
                 fontSize: "14px",
+                backgroundColor: "#1f2937",
+                color: "white",
               }}
             >
               <option value="all">All Days ({programmes.length})</option>
@@ -451,18 +509,29 @@ export default function ProgrammeTable({
               })}
             </select>
           </div>
-          <p style={{ fontSize: "14px", color: "#666", margin: 0 }}>
+          <p
+            style={{
+              fontSize: "13px",
+              color: "#6b7280",
+              margin: 0,
+              fontWeight: "500",
+            }}
+          >
             Click any cell to edit
           </p>
           <button
             onClick={() => setShowAddProgrammeForm(!showAddProgrammeForm)}
             style={{
-              padding: "8px 16px",
-              backgroundColor: "#28a745",
+              padding: "10px 20px",
+              backgroundColor: showAddProgrammeForm ? "#6b7280" : "#10b981",
               color: "white",
               border: "none",
-              borderRadius: "4px",
+              borderRadius: "6px",
               cursor: "pointer",
+              fontSize: "14px",
+              fontWeight: "600",
+              transition: "all 0.15s ease",
+              boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
             }}
           >
             {showAddProgrammeForm ? "Cancel" : "Add Programme"}
@@ -473,15 +542,24 @@ export default function ProgrammeTable({
       {showAddProgrammeForm && (
         <div
           style={{
-            marginBottom: "1rem",
-            padding: "16px",
-            border: "1px solid #ddd",
-            borderRadius: "4px",
-            backgroundColor: "#f8f9fa",
+            marginBottom: "2rem",
+            padding: "24px",
+            border: "1px solid #374151",
+            borderRadius: "8px",
+            backgroundColor: "#1f2937",
+            boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
           }}
         >
-          <h3 style={{ margin: "0 0 12px 0" }}>Add New Programme</h3>
-          {/* ...existing form fields... */}
+          <h3
+            style={{
+              margin: "0 0 16px 0",
+              color: "white",
+              fontSize: "18px",
+              fontWeight: "600",
+            }}
+          >
+            Add New Programme
+          </h3>
           <div
             style={{
               display: "grid",
@@ -499,8 +577,14 @@ export default function ProgrammeTable({
               }
               style={{
                 padding: "8px",
-                border: "1px solid #ddd",
-                borderRadius: "4px",
+                border: "2px solid #374151",
+                borderRadius: "6px",
+                backgroundColor: "#111827",
+                color: "white",
+                fontSize: "14px",
+                transition: "border-color 0.15s ease",
+                outline: "none",
+                boxShadow: "0 0 0 3px rgba(99, 102, 241, 0.1)",
               }}
             />
             <select
@@ -510,8 +594,14 @@ export default function ProgrammeTable({
               }
               style={{
                 padding: "8px",
-                border: "1px solid #ddd",
-                borderRadius: "4px",
+                border: "2px solid #374151",
+                borderRadius: "6px",
+                backgroundColor: "#111827",
+                color: "white",
+                fontSize: "14px",
+                transition: "border-color 0.15s ease",
+                outline: "none",
+                boxShadow: "0 0 0 3px rgba(99, 102, 241, 0.1)",
               }}
             >
               <option value="">Select day</option>
@@ -535,8 +625,14 @@ export default function ProgrammeTable({
               }
               style={{
                 padding: "8px",
-                border: "1px solid #ddd",
-                borderRadius: "4px",
+                border: "2px solid #374151",
+                borderRadius: "6px",
+                backgroundColor: "#111827",
+                color: "white",
+                fontSize: "14px",
+                transition: "border-color 0.15s ease",
+                outline: "none",
+                boxShadow: "0 0 0 3px rgba(99, 102, 241, 0.1)",
               }}
             />
             <input
@@ -551,8 +647,14 @@ export default function ProgrammeTable({
               }
               style={{
                 padding: "8px",
-                border: "1px solid #ddd",
-                borderRadius: "4px",
+                border: "2px solid #374151",
+                borderRadius: "6px",
+                backgroundColor: "#111827",
+                color: "white",
+                fontSize: "14px",
+                transition: "border-color 0.15s ease",
+                outline: "none",
+                boxShadow: "0 0 0 3px rgba(99, 102, 241, 0.1)",
               }}
             />
           </div>
@@ -561,12 +663,16 @@ export default function ProgrammeTable({
               onClick={handleAddProgramme}
               disabled={addingProgramme}
               style={{
-                padding: "8px 16px",
-                backgroundColor: addingProgramme ? "#ccc" : "#007bff",
+                padding: "10px 20px",
+                backgroundColor: addingProgramme ? "#6c757d" : "#10b981",
                 color: "white",
                 border: "none",
-                borderRadius: "4px",
+                borderRadius: "6px",
                 cursor: addingProgramme ? "not-allowed" : "pointer",
+                fontSize: "14px",
+                fontWeight: "600",
+                transition: "background-color 0.15s ease",
+                boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
               }}
             >
               {addingProgramme ? "Adding..." : "Add Programme"}
@@ -575,12 +681,16 @@ export default function ProgrammeTable({
               onClick={handleCancelAddProgramme}
               disabled={addingProgramme}
               style={{
-                padding: "8px 16px",
+                padding: "10px 20px",
                 backgroundColor: "#6c757d",
                 color: "white",
                 border: "none",
-                borderRadius: "4px",
+                borderRadius: "6px",
                 cursor: addingProgramme ? "not-allowed" : "pointer",
+                fontSize: "14px",
+                fontWeight: "600",
+                transition: "background-color 0.15s ease",
+                boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
               }}
             >
               Cancel
@@ -621,80 +731,154 @@ export default function ProgrammeTable({
       )}
 
       {filteredProgrammes.length === 0 ? (
-        <p>
-          {selectedDay === "all"
-            ? "No programme entries available."
-            : `No programmes found for "${
-                selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)
-              }".`}
-        </p>
+        <div
+          style={{
+            textAlign: "center",
+            padding: "48px 24px",
+            backgroundColor: "#1f2937",
+            borderRadius: "8px",
+            border: "1px solid #374151",
+          }}
+        >
+          <p
+            style={{
+              margin: 0,
+              color: "white",
+              fontSize: "16px",
+              fontWeight: "500",
+            }}
+          >
+            {selectedDay === "all"
+              ? "No programme entries available."
+              : `No programmes found for "${
+                  selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)
+                }".`}
+          </p>
+        </div>
       ) : (
-        <div style={{ overflowX: "auto" }}>
+        <div
+          style={{
+            width: "100%",
+            overflowX: "auto",
+            borderRadius: "8px",
+            border: "1px solid #374151",
+            boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
+          }}
+        >
           <table
             style={{
               width: "100%",
+              minWidth: "800px",
               borderCollapse: "collapse",
-              marginTop: "1rem",
+              backgroundColor: "#111827",
             }}
           >
             <thead>
-              <tr style={{ backgroundColor: "#f5f5f5" }}>
+              <tr style={{ backgroundColor: "#1f2937" }}>
                 <th
+                  title="Unique identifier for each programme"
                   style={{
-                    padding: "12px",
+                    width: "80px",
+                    padding: "16px",
                     textAlign: "left",
-                    border: "1px solid #ddd",
-                    color: "black",
+                    border: "none",
+                    borderBottom: "1px solid #374151",
+                    color: "white",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    cursor: "help",
                   }}
                 >
                   ID
                 </th>
                 <th
+                  title="The name of the programme - click to edit"
                   style={{
-                    padding: "12px",
+                    width: "250px",
+                    padding: "16px",
                     textAlign: "left",
-                    border: "1px solid #ddd",
-                    color: "black",
+                    border: "none",
+                    borderBottom: "1px solid #374151",
+                    color: "white",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    cursor: "help",
                   }}
                 >
                   Programme Name
                 </th>
                 <th
+                  title="Day of the week when this programme airs - click to edit"
                   style={{
-                    padding: "12px",
+                    width: "120px",
+                    padding: "16px",
                     textAlign: "left",
-                    border: "1px solid #ddd",
-                    color: "black",
+                    border: "none",
+                    borderBottom: "1px solid #374151",
+                    color: "white",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    cursor: "help",
                   }}
                 >
                   Day
                 </th>
                 <th
+                  title="Programme start time - click to edit"
                   style={{
-                    padding: "12px",
+                    width: "120px",
+                    padding: "16px",
                     textAlign: "left",
-                    border: "1px solid #ddd",
-                    color: "black",
+                    border: "none",
+                    borderBottom: "1px solid #374151",
+                    color: "white",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    cursor: "help",
                   }}
                 >
                   Start Time
                 </th>
                 <th
+                  title="Programme end time - click to edit"
                   style={{
-                    padding: "12px",
+                    width: "120px",
+                    padding: "16px",
                     textAlign: "left",
-                    border: "1px solid #ddd",
-                    color: "black",
+                    border: "none",
+                    borderBottom: "1px solid #374151",
+                    color: "white",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    cursor: "help",
                   }}
                 >
                   End Time
                 </th>
                 <th
+                  title="Available actions for this programme"
                   style={{
-                    padding: "12px",
+                    width: "100px",
+                    padding: "16px",
                     textAlign: "left",
-                    border: "1px solid #ddd",
-                    color: "black",
+                    border: "none",
+                    borderBottom: "1px solid #374151",
+                    color: "white",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    cursor: "help",
                   }}
                 >
                   Actions
@@ -703,11 +887,49 @@ export default function ProgrammeTable({
             </thead>
             <tbody>
               {filteredProgrammes.map((programme, index) => (
-                <tr key={programme.id}>
-                  <td style={{ padding: "12px", border: "1px solid #ddd" }}>
-                    {programme.id}
+                <tr
+                  key={programme.id}
+                  style={{
+                    borderBottom:
+                      index === filteredProgrammes.length - 1
+                        ? "none"
+                        : "1px solid #374151",
+                    transition: "background-color 0.15s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.target as HTMLElement).closest(
+                      "tr"
+                    )!.style.backgroundColor = "#1f2937";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.target as HTMLElement).closest(
+                      "tr"
+                    )!.style.backgroundColor = "transparent";
+                  }}
+                >
+                  <td
+                    style={{
+                      padding: "16px",
+                      border: "none",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      color: "#9ca3af",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      fontFamily:
+                        "ui-monospace, SFMono-Regular, 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace",
+                    }}
+                  >
+                    #{programme.id}
                   </td>
-                  <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                  <td
+                    style={{
+                      padding: "12px 16px",
+                      border: "none",
+                      overflow: "hidden",
+                      color: "white",
+                    }}
+                  >
                     {renderProgrammeEditableCell(
                       programme,
                       "name",
@@ -715,7 +937,14 @@ export default function ProgrammeTable({
                       index + 1000
                     )}
                   </td>
-                  <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                  <td
+                    style={{
+                      padding: "12px 16px",
+                      border: "none",
+                      overflow: "hidden",
+                      color: "white",
+                    }}
+                  >
                     {renderProgrammeEditableCell(
                       programme,
                       "day",
@@ -723,7 +952,14 @@ export default function ProgrammeTable({
                       index + 1000
                     )}
                   </td>
-                  <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                  <td
+                    style={{
+                      padding: "12px 16px",
+                      border: "none",
+                      overflow: "hidden",
+                      color: "white",
+                    }}
+                  >
                     {renderProgrammeEditableCell(
                       programme,
                       "startTime",
@@ -731,7 +967,14 @@ export default function ProgrammeTable({
                       index + 1000
                     )}
                   </td>
-                  <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                  <td
+                    style={{
+                      padding: "12px 16px",
+                      border: "none",
+                      overflow: "hidden",
+                      color: "white",
+                    }}
+                  >
                     {renderProgrammeEditableCell(
                       programme,
                       "endTime",
@@ -739,7 +982,13 @@ export default function ProgrammeTable({
                       index + 1000
                     )}
                   </td>
-                  <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+                  <td
+                    style={{
+                      padding: "12px",
+                      border: "none",
+                      overflow: "hidden",
+                    }}
+                  >
                     <button
                       onClick={() => handleDeleteProgramme(programme)}
                       style={{
