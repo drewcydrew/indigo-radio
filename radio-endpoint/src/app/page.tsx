@@ -153,11 +153,10 @@ export default function Home() {
         <main className={styles.main}>
           <div
             style={{
-              width: "100vw",
-              maxWidth: "100vw",
-              padding: "0 60px 0 20px",
+              width: "100%",
+              maxWidth: "100%",
+              padding: "0 40px 0 20px",
               boxSizing: "border-box",
-              overflow: "hidden",
             }}
           >
             <h1>Loading...</h1>
@@ -173,11 +172,10 @@ export default function Home() {
         <main className={styles.main}>
           <div
             style={{
-              width: "100vw",
-              maxWidth: "100vw",
-              padding: "0 60px 0 20px",
+              width: "100%",
+              maxWidth: "100%",
+              padding: "0 40px 0 20px",
               boxSizing: "border-box",
-              overflow: "hidden",
             }}
           >
             <h1>Error: {error}</h1>
@@ -192,12 +190,11 @@ export default function Home() {
       <main className={styles.main}>
         <div
           style={{
-            width: "100vw",
-            maxWidth: "100vw",
-            padding: "0 60px 0 20px",
+            width: "100%",
+            maxWidth: "100%",
+            padding: "0 40px 0 20px",
             boxSizing: "border-box",
             margin: "0",
-            overflow: "hidden",
           }}
         >
           <header style={{ marginBottom: "2rem" }}>
@@ -456,7 +453,7 @@ export default function Home() {
               style={{
                 width: "100%",
                 minHeight: "500px",
-                overflow: "hidden",
+                maxWidth: "100%",
               }}
             >
               {/* Tab Content */}
