@@ -198,9 +198,9 @@ export default function PodcastTable({
         }}
         onMouseEnter={(e) => {
           const target = e.target as HTMLElement;
-          target.style.backgroundColor = "#1f2937";
+          target.style.backgroundColor = "#f9fafb";
           target.style.borderColor = "#374151";
-          target.style.color = "white";
+          target.style.color = "#1f2937";
         }}
         onMouseLeave={(e) => {
           const target = e.target as HTMLElement;
@@ -357,7 +357,7 @@ export default function PodcastTable({
               htmlFor="showFilter"
               style={{
                 fontSize: "13px",
-                color: "#6b7280",
+                color: "#374151",
                 fontWeight: "500",
               }}
             >
@@ -369,11 +369,11 @@ export default function PodcastTable({
               onChange={(e) => setSelectedShow(e.target.value)}
               style={{
                 padding: "8px 12px",
-                border: "1px solid #374151",
+                border: "1px solid #d1d5db",
                 borderRadius: "6px",
                 fontSize: "14px",
-                backgroundColor: "#1f2937",
-                color: "white",
+                backgroundColor: "#ffffff",
+                color: "#1f2937",
               }}
             >
               <option value="all">All Shows ({podcasts.length})</option>
@@ -390,7 +390,7 @@ export default function PodcastTable({
           <p
             style={{
               fontSize: "14px",
-              color: "#666",
+              color: "#6b7280",
               margin: 0,
             }}
           >
@@ -417,9 +417,9 @@ export default function PodcastTable({
           style={{
             marginBottom: "1rem",
             padding: "16px",
-            border: "1px solid #ddd",
+            border: "1px solid #d1d5db",
             borderRadius: "4px",
-            backgroundColor: "#f8f9fa",
+            backgroundColor: "#f8fafc",
           }}
         >
           <h3 style={{ margin: "0 0 12px 0" }}>Add New Episode</h3>
@@ -441,7 +441,7 @@ export default function PodcastTable({
               }
               style={{
                 padding: "8px",
-                border: "1px solid #ddd",
+                border: "1px solid #d1d5db",
                 borderRadius: "4px",
               }}
             />
@@ -457,7 +457,7 @@ export default function PodcastTable({
                 style={{
                   width: "100%",
                   padding: "8px",
-                  border: "1px solid #ddd",
+                  border: "1px solid #d1d5db",
                   borderRadius: "4px",
                 }}
               />
@@ -476,7 +476,7 @@ export default function PodcastTable({
               }
               style={{
                 padding: "8px",
-                border: "1px solid #ddd",
+                border: "1px solid #d1d5db",
                 borderRadius: "4px",
               }}
             />
@@ -492,7 +492,7 @@ export default function PodcastTable({
               style={{
                 width: "100%",
                 padding: "8px",
-                border: "1px solid #ddd",
+                border: "1px solid #d1d5db",
                 borderRadius: "4px",
               }}
             />
@@ -510,7 +510,7 @@ export default function PodcastTable({
               style={{
                 width: "100%",
                 padding: "8px",
-                border: "1px solid #ddd",
+                border: "1px solid #d1d5db",
                 borderRadius: "4px",
                 minHeight: "60px",
                 resize: "vertical",
@@ -523,7 +523,7 @@ export default function PodcastTable({
               disabled={addingEpisode}
               style={{
                 padding: "8px 16px",
-                backgroundColor: addingEpisode ? "#ccc" : "#007bff",
+                backgroundColor: addingEpisode ? "#d1d5db" : "#2563eb",
                 color: "white",
                 border: "none",
                 borderRadius: "4px",
@@ -591,15 +591,15 @@ export default function PodcastTable({
           style={{
             textAlign: "center",
             padding: "48px 24px",
-            backgroundColor: "#1f2937",
+            backgroundColor: "#f8fafc",
             borderRadius: "8px",
-            border: "1px solid #374151",
+            border: "1px solid #e2e8f0",
           }}
         >
           <p
             style={{
               margin: 0,
-              color: "white",
+              color: "#475569",
               fontSize: "16px",
               fontWeight: "500",
             }}
@@ -615,7 +615,7 @@ export default function PodcastTable({
             width: "100%",
             overflowX: "auto",
             borderRadius: "8px",
-            border: "1px solid #374151",
+            border: "1px solid #e2e8f0",
             boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
           }}
         >
@@ -624,11 +624,11 @@ export default function PodcastTable({
               width: "100%",
               minWidth: "1200px",
               borderCollapse: "collapse",
-              backgroundColor: "#111827",
+              backgroundColor: "#ffffff",
             }}
           >
             <thead>
-              <tr style={{ backgroundColor: "#1f2937" }}>
+              <tr style={{ backgroundColor: "#f8fafc" }}>
                 <th
                   title="Unique identifier for each episode"
                   style={{
@@ -636,8 +636,8 @@ export default function PodcastTable({
                     padding: "16px",
                     textAlign: "left",
                     border: "none",
-                    borderBottom: "1px solid #374151",
-                    color: "white",
+                    borderBottom: "1px solid #e2e8f0",
+                    color: "#374151",
                     fontSize: "13px",
                     fontWeight: "600",
                     textTransform: "uppercase",
@@ -653,8 +653,8 @@ export default function PodcastTable({
                     padding: "16px",
                     textAlign: "left",
                     border: "none",
-                    borderBottom: "1px solid #374151",
-                    color: "white",
+                    borderBottom: "1px solid #e2e8f0",
+                    color: "#374151",
                     fontSize: "13px",
                     fontWeight: "600",
                     textTransform: "uppercase",
@@ -670,8 +670,8 @@ export default function PodcastTable({
                     padding: "16px",
                     textAlign: "left",
                     border: "none",
-                    borderBottom: "1px solid #374151",
-                    color: "white",
+                    borderBottom: "1px solid #e2e8f0",
+                    color: "#374151",
                     fontSize: "13px",
                     fontWeight: "600",
                     textTransform: "uppercase",
@@ -687,8 +687,8 @@ export default function PodcastTable({
                     padding: "16px",
                     textAlign: "left",
                     border: "none",
-                    borderBottom: "1px solid #374151",
-                    color: "white",
+                    borderBottom: "1px solid #e2e8f0",
+                    color: "#374151",
                     fontSize: "13px",
                     fontWeight: "600",
                     textTransform: "uppercase",
@@ -704,8 +704,8 @@ export default function PodcastTable({
                     padding: "16px",
                     textAlign: "left",
                     border: "none",
-                    borderBottom: "1px solid #374151",
-                    color: "white",
+                    borderBottom: "1px solid #e2e8f0",
+                    color: "#374151",
                     fontSize: "13px",
                     fontWeight: "600",
                     textTransform: "uppercase",
@@ -721,8 +721,8 @@ export default function PodcastTable({
                     padding: "16px",
                     textAlign: "left",
                     border: "none",
-                    borderBottom: "1px solid #374151",
-                    color: "white",
+                    borderBottom: "1px solid #e2e8f0",
+                    color: "#374151",
                     fontSize: "13px",
                     fontWeight: "600",
                     textTransform: "uppercase",
@@ -738,8 +738,8 @@ export default function PodcastTable({
                     padding: "16px",
                     textAlign: "left",
                     border: "none",
-                    borderBottom: "1px solid #374151",
-                    color: "white",
+                    borderBottom: "1px solid #e2e8f0",
+                    color: "#374151",
                     fontSize: "13px",
                     fontWeight: "600",
                     textTransform: "uppercase",
@@ -759,13 +759,13 @@ export default function PodcastTable({
                     borderBottom:
                       index === filteredPodcasts.length - 1
                         ? "none"
-                        : "1px solid #374151",
+                        : "1px solid #e2e8f0",
                     transition: "background-color 0.15s ease",
                   }}
                   onMouseEnter={(e) => {
                     (e.target as HTMLElement).closest(
                       "tr"
-                    )!.style.backgroundColor = "#1f2937";
+                    )!.style.backgroundColor = "#f9fafb";
                   }}
                   onMouseLeave={(e) => {
                     (e.target as HTMLElement).closest(

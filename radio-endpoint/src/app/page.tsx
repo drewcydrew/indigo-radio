@@ -376,7 +376,7 @@ export default function Home() {
             {/* Tab Navigation */}
             <div
               style={{
-                borderBottom: "1px solid #ddd",
+                borderBottom: "1px solid #e2e8f0",
                 marginBottom: "1rem",
                 position: "sticky",
                 top: "0",
@@ -391,11 +391,11 @@ export default function Home() {
                   style={{
                     padding: "12px 24px",
                     backgroundColor:
-                      activeTab === "podcasts" ? "#007bff" : "transparent",
-                    color: activeTab === "podcasts" ? "white" : "#666",
-                    border: "1px solid #ddd",
+                      activeTab === "podcasts" ? "#2563eb" : "transparent",
+                    color: activeTab === "podcasts" ? "white" : "#6b7280",
+                    border: "1px solid #e2e8f0",
                     borderBottom:
-                      activeTab === "podcasts" ? "none" : "1px solid #ddd",
+                      activeTab === "podcasts" ? "none" : "1px solid #e2e8f0",
                     borderTopLeftRadius: "4px",
                     borderTopRightRadius: "0",
                     cursor: "pointer",
@@ -410,11 +410,11 @@ export default function Home() {
                   style={{
                     padding: "12px 24px",
                     backgroundColor:
-                      activeTab === "programmes" ? "#007bff" : "transparent",
-                    color: activeTab === "programmes" ? "white" : "#666",
-                    border: "1px solid #ddd",
+                      activeTab === "programmes" ? "#2563eb" : "transparent",
+                    color: activeTab === "programmes" ? "white" : "#6b7280",
+                    border: "1px solid #e2e8f0",
                     borderBottom:
-                      activeTab === "programmes" ? "none" : "1px solid #ddd",
+                      activeTab === "programmes" ? "none" : "1px solid #e2e8f0",
                     borderLeft: "none",
                     borderTopLeftRadius: "0",
                     borderTopRightRadius: "0",
@@ -430,11 +430,11 @@ export default function Home() {
                   style={{
                     padding: "12px 24px",
                     backgroundColor:
-                      activeTab === "shows" ? "#007bff" : "transparent",
-                    color: activeTab === "shows" ? "white" : "#666",
-                    border: "1px solid #ddd",
+                      activeTab === "shows" ? "#2563eb" : "transparent",
+                    color: activeTab === "shows" ? "white" : "#6b7280",
+                    border: "1px solid #e2e8f0",
                     borderBottom:
-                      activeTab === "shows" ? "none" : "1px solid #ddd",
+                      activeTab === "shows" ? "none" : "1px solid #e2e8f0",
                     borderLeft: "none",
                     borderTopLeftRadius: "0",
                     borderTopRightRadius: "4px",

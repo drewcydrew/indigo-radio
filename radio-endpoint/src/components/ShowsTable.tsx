@@ -183,9 +183,9 @@ export default function ShowsTable({ shows, setShows }: ShowsTableProps) {
         }}
         onMouseEnter={(e) => {
           const target = e.target as HTMLElement;
-          target.style.backgroundColor = "#1f2937";
+          target.style.backgroundColor = "#f9fafb";
           target.style.borderColor = "#374151";
-          target.style.color = "white";
+          target.style.color = "#1f2937";
         }}
         onMouseLeave={(e) => {
           const target = e.target as HTMLElement;
@@ -345,16 +345,16 @@ export default function ShowsTable({ shows, setShows }: ShowsTableProps) {
           style={{
             marginBottom: "2rem",
             padding: "24px",
-            border: "1px solid #374151",
+            border: "1px solid #d1d5db",
             borderRadius: "8px",
-            backgroundColor: "#1f2937",
+            backgroundColor: "#f8fafc",
             boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
           }}
         >
           <h3
             style={{
               margin: "0 0 16px 0",
-              color: "white",
+              color: "#1f2937",
               fontSize: "18px",
               fontWeight: "600",
             }}
@@ -372,17 +372,17 @@ export default function ShowsTable({ shows, setShows }: ShowsTableProps) {
               style={{
                 width: "100%",
                 padding: "12px 16px",
-                border: "1px solid #374151",
+                border: "1px solid #d1d5db",
                 borderRadius: "6px",
                 fontSize: "14px",
                 boxSizing: "border-box",
                 transition: "border-color 0.15s ease",
-                backgroundColor: "#111827",
-                color: "white",
+                backgroundColor: "#ffffff",
+                color: "#1f2937",
                 outline: "none",
               }}
               onFocus={(e) => (e.target.style.borderColor = "#6366f1")}
-              onBlur={(e) => (e.target.style.borderColor = "#374151")}
+              onBlur={(e) => (e.target.style.borderColor = "#d1d5db")}
             />
           </div>
           <div style={{ marginBottom: "20px" }}>
@@ -395,19 +395,19 @@ export default function ShowsTable({ shows, setShows }: ShowsTableProps) {
               style={{
                 width: "100%",
                 padding: "12px 16px",
-                border: "1px solid #374151",
+                border: "1px solid #d1d5db",
                 borderRadius: "6px",
                 minHeight: "80px",
                 resize: "vertical",
                 fontSize: "14px",
                 boxSizing: "border-box",
                 transition: "border-color 0.15s ease",
-                backgroundColor: "#111827",
-                color: "white",
+                backgroundColor: "#ffffff",
+                color: "#1f2937",
                 outline: "none",
               }}
               onFocus={(e) => (e.target.style.borderColor = "#6366f1")}
-              onBlur={(e) => (e.target.style.borderColor = "#374151")}
+              onBlur={(e) => (e.target.style.borderColor = "#d1d5db")}
             />
           </div>
           <div style={{ display: "flex", gap: "12px" }}>
@@ -453,15 +453,15 @@ export default function ShowsTable({ shows, setShows }: ShowsTableProps) {
           style={{
             textAlign: "center",
             padding: "48px 24px",
-            backgroundColor: "#1f2937",
+            backgroundColor: "#f8fafc",
             borderRadius: "8px",
-            border: "1px solid #374151",
+            border: "1px solid #e2e8f0",
           }}
         >
           <p
             style={{
               margin: 0,
-              color: "white",
+              color: "#475569",
               fontSize: "16px",
               fontWeight: "500",
             }}
@@ -475,7 +475,7 @@ export default function ShowsTable({ shows, setShows }: ShowsTableProps) {
             width: "100%",
             overflowX: "auto",
             borderRadius: "8px",
-            border: "1px solid #374151",
+            border: "1px solid #e2e8f0",
             boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
           }}
         >
@@ -484,11 +484,11 @@ export default function ShowsTable({ shows, setShows }: ShowsTableProps) {
               width: "100%",
               minWidth: "700px",
               borderCollapse: "collapse",
-              backgroundColor: "#111827",
+              backgroundColor: "#ffffff",
             }}
           >
             <thead>
-              <tr style={{ backgroundColor: "#1f2937" }}>
+              <tr style={{ backgroundColor: "#f8fafc" }}>
                 <th
                   title="Unique identifier for each show"
                   style={{
@@ -496,8 +496,8 @@ export default function ShowsTable({ shows, setShows }: ShowsTableProps) {
                     padding: "16px",
                     textAlign: "left",
                     border: "none",
-                    borderBottom: "1px solid #374151",
-                    color: "white",
+                    borderBottom: "1px solid #e2e8f0",
+                    color: "#374151",
                     fontSize: "13px",
                     fontWeight: "600",
                     textTransform: "uppercase",
@@ -514,8 +514,8 @@ export default function ShowsTable({ shows, setShows }: ShowsTableProps) {
                     padding: "16px",
                     textAlign: "left",
                     border: "none",
-                    borderBottom: "1px solid #374151",
-                    color: "white",
+                    borderBottom: "1px solid #e2e8f0",
+                    color: "#374151",
                     fontSize: "13px",
                     fontWeight: "600",
                     textTransform: "uppercase",
@@ -532,8 +532,8 @@ export default function ShowsTable({ shows, setShows }: ShowsTableProps) {
                     padding: "16px",
                     textAlign: "left",
                     border: "none",
-                    borderBottom: "1px solid #374151",
-                    color: "white",
+                    borderBottom: "1px solid #e2e8f0",
+                    color: "#374151",
                     fontSize: "13px",
                     fontWeight: "600",
                     textTransform: "uppercase",
@@ -550,8 +550,8 @@ export default function ShowsTable({ shows, setShows }: ShowsTableProps) {
                     padding: "16px",
                     textAlign: "left",
                     border: "none",
-                    borderBottom: "1px solid #374151",
-                    color: "white",
+                    borderBottom: "1px solid #e2e8f0",
+                    color: "#374151",
                     fontSize: "13px",
                     fontWeight: "600",
                     textTransform: "uppercase",
@@ -569,13 +569,13 @@ export default function ShowsTable({ shows, setShows }: ShowsTableProps) {
                   key={show.id}
                   style={{
                     borderBottom:
-                      index === shows.length - 1 ? "none" : "1px solid #374151",
+                      index === shows.length - 1 ? "none" : "1px solid #e2e8f0",
                     transition: "background-color 0.15s ease",
                   }}
                   onMouseEnter={(e) => {
                     (e.target as HTMLElement).closest(
                       "tr"
-                    )!.style.backgroundColor = "#1f2937";
+                    )!.style.backgroundColor = "#f9fafb";
                   }}
                   onMouseLeave={(e) => {
                     (e.target as HTMLElement).closest(
@@ -603,7 +603,7 @@ export default function ShowsTable({ shows, setShows }: ShowsTableProps) {
                       padding: "12px 16px",
                       border: "none",
                       overflow: "hidden",
-                      color: "white",
+                      color: "#1f2937",
                     }}
                   >
                     {renderEditableCell(show, "name", show.name, index + 2000)}
@@ -613,7 +613,7 @@ export default function ShowsTable({ shows, setShows }: ShowsTableProps) {
                       padding: "12px 16px",
                       border: "none",
                       overflow: "hidden",
-                      color: "white",
+                      color: "#1f2937",
                     }}
                   >
                     {renderEditableCell(
