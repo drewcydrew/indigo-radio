@@ -159,17 +159,9 @@ export default function TodaysSchedule({
 
   const renderHeader = () => (
     <View>
-      {showTitle && <Text style={styles.title}>Today's Schedule</Text>}
-
       {/* Action Buttons - only show if callbacks are provided */}
       {(onPlayLive || onShowFullSchedule) && (
         <View style={styles.actionButtonsContainer}>
-          {onPlayLive && (
-            <TouchableOpacity style={styles.liveButton} onPress={onPlayLive}>
-              <Text style={styles.liveButtonText}>▶ PLAY LIVE RADIO</Text>
-            </TouchableOpacity>
-          )}
-
           {onShowFullSchedule && (
             <TouchableOpacity
               style={styles.scheduleButton}

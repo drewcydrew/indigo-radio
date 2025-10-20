@@ -251,6 +251,19 @@ export default function Today({
                   )}
                 </View>
               </View>
+
+              {/* Play Live Radio Button - Inside the card */}
+              <TouchableOpacity
+                style={styles.playButtonInCard}
+                onPress={(e) => {
+                  e.stopPropagation(); // Prevent triggering the card's onPress
+                  playLiveRadio();
+                }}
+              >
+                <Text style={styles.playButtonInCardText}>
+                  ▶ PLAY LIVE RADIO
+                </Text>
+              </TouchableOpacity>
             </TouchableOpacity>
           ) : (
             <View style={styles.noShowCard}>
@@ -260,6 +273,16 @@ export default function Today({
               <Text style={styles.currentTimeText}>
                 Current time: {getCurrentTime()}
               </Text>
+
+              {/* Play Live Radio Button - Also in the no show card */}
+              <TouchableOpacity
+                style={styles.playButtonInCard}
+                onPress={playLiveRadio}
+              >
+                <Text style={styles.playButtonInCardText}>
+                  ▶ PLAY LIVE RADIO
+                </Text>
+              </TouchableOpacity>
             </View>
           )}
         </View>
@@ -311,11 +334,6 @@ export default function Today({
             </TouchableOpacity>
           </View>
         )}
-
-        {/* Play Live Radio Button */}
-        <TouchableOpacity style={styles.playButton} onPress={playLiveRadio}>
-          <Text style={styles.playButtonText}>▶ PLAY LIVE RADIO</Text>
-        </TouchableOpacity>
 
         {/* View Full Schedule Button */}
         {onShowFullSchedule && (
@@ -481,21 +499,22 @@ const styles = StyleSheet.create({
     color: "#999",
     fontWeight: "500",
   },
-  playButton: {
+  playButtonInCard: {
     backgroundColor: "#D5851F",
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 6,
     alignItems: "center",
+    marginTop: 16,
     shadowColor: "#D5851F",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
-  playButtonText: {
+  playButtonInCardText: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "700",
     letterSpacing: 1,
     textTransform: "uppercase",
