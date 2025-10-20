@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { RadioProgram, ShowDefinition } from "../types/types";
 import useShowDetails from "../hooks/useShowDetails";
-import ShowDetailsModal from "./ShowDetailsModal";
 import ScheduleDisplay from "./ScheduleDisplay";
 
 interface TodaysScheduleProps {
@@ -19,6 +18,7 @@ interface TodaysScheduleProps {
   currentProgram?: RadioProgram | null;
   showTitle?: boolean;
   onGoToShow?: (showName: string) => void;
+  onShowDetails?: (show: ShowDefinition) => void;
   programsLoading?: boolean;
   hideFooterButton?: boolean;
   onPlayLive?: () => void;
@@ -30,12 +30,12 @@ export default function TodaysSchedule({
   currentProgram,
   showTitle = false,
   onGoToShow,
+  onShowDetails,
   programsLoading = false,
   hideFooterButton = false,
   onPlayLive,
   onShowFullSchedule,
 }: TodaysScheduleProps) {
-  const [selectedShow, setSelectedShow] = useState<ShowDefinition | null>(null);
   const [showFullSchedule, setShowFullSchedule] = useState(false);
 
   // Use the hook to get show details
@@ -70,13 +70,9 @@ export default function TodaysSchedule({
 
   const handleProgramPress = (program: RadioProgram) => {
     const showDef = findShowDefinition(program.name);
-    if (showDef) {
-      setSelectedShow(showDef);
+    if (showDef && onShowDetails) {
+      onShowDetails(showDef);
     }
-  };
-
-  const hideDetails = () => {
-    setSelectedShow(null);
   };
 
   const renderProgram = ({ item: program }: { item: RadioProgram }) => {
@@ -255,20 +251,12 @@ export default function TodaysSchedule({
         contentContainerStyle={styles.listContent}
       />
 
-      {/* Show Details Modal */}
-      {selectedShow && (
-        <ShowDetailsModal
-          show={selectedShow}
-          onClose={hideDetails}
-          onGoToShow={onGoToShow}
-        />
-      )}
-
       {/* Full Schedule Modal - Only render if not hidden */}
       {!hideFooterButton && showFullSchedule && (
         <ScheduleDisplay
           programs={programs}
           onGoToShow={onGoToShow}
+          onShowDetails={onShowDetails}
           onClose={() => setShowFullSchedule(false)}
         />
       )}

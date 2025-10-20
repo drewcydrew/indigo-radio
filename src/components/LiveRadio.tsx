@@ -10,7 +10,7 @@ import TrackPlayer, {
   Event,
   useTrackPlayerEvents,
 } from "react-native-track-player";
-import { RadioProgram } from "../types/types";
+import { RadioProgram, ShowDefinition } from "../types/types";
 import usePrograms from "../hooks/usePrograms";
 import TodaysSchedule from "./TodaysSchedule";
 import { usePlayer } from "../contexts/PlayerContext";
@@ -21,11 +21,13 @@ import useRadioAddress from "../hooks/useRadioAddress";
 interface LiveRadioProps {
   onNowPlayingUpdate: (title: string) => void;
   onGoToShow?: (showName: string) => void;
+  onShowDetails?: (show: ShowDefinition) => void;
 }
 
 export default function LiveRadio({
   onNowPlayingUpdate,
   onGoToShow,
+  onShowDetails,
 }: LiveRadioProps) {
   const [currentProgram, setCurrentProgram] = useState<RadioProgram | null>(
     null
@@ -121,6 +123,7 @@ export default function LiveRadio({
             currentProgram={currentProgram}
             showTitle={true}
             onGoToShow={onGoToShow}
+            onShowDetails={onShowDetails}
             programsLoading={programsLoading}
             hideFooterButton={true}
             onPlayLive={playLiveRadio}
@@ -134,6 +137,7 @@ export default function LiveRadio({
         <ScheduleDisplay
           programs={programs}
           onGoToShow={onGoToShow}
+          onShowDetails={onShowDetails}
           onClose={() => setShowFullSchedule(false)}
         />
       )}

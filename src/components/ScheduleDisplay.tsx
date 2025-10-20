@@ -16,12 +16,14 @@ import ShowDetailsModal from "./ShowDetailsModal";
 interface ScheduleDisplayProps {
   programs: RadioProgram[];
   onGoToShow?: (showName: string) => void;
+  onShowDetails?: (show: ShowDefinition) => void;
   onClose?: () => void;
 }
 
 export default function ScheduleDisplay({
   programs,
   onGoToShow,
+  onShowDetails,
   onClose,
 }: ScheduleDisplayProps) {
   const [isVisible, setIsVisible] = useState(false);
@@ -150,7 +152,12 @@ export default function ScheduleDisplay({
             return (
               <TouchableOpacity
                 key={program.id}
-                onPress={() => showDef && showDetails(showDef)}
+                onPress={() => {
+                  if (showDef) {
+                    showDetails(showDef);
+                    onShowDetails && onShowDetails(showDef); // Call onShowDetails if provided
+                  }
+                }}
                 style={styles.programItem}
                 disabled={!showDef}
               >

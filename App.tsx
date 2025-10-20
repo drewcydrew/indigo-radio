@@ -1,17 +1,10 @@
 import React, { useEffect, useState } from "react";
-import {
-  Text,
-  View,
-  TouchableOpacity,
-  Platform,
-  StyleSheet,
-} from "react-native";
+import { Text, View, Platform, StyleSheet } from "react-native";
 import TrackPlayer, { Capability } from "react-native-track-player";
-import LiveRadio from "./src/components/LiveRadio";
-import Podcast from "./src/components/Podcast";
 import { PlayerProvider } from "./src/contexts/PlayerContext";
 import UniversalPlayer from "./src/components/UniversalPlayer";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import AppNavigator from "./src/navigation/AppNavigator";
 
 async function setupPlayer() {
   if (Platform.OS !== "web") {
@@ -47,12 +40,7 @@ async function setupPlayer() {
 }
 
 export default function App() {
-  const [now, setNow] = useState<string>("Indigo FM");
-  const [currentMode, setCurrentMode] = useState<"live" | "podcast">("live");
   const [isPlayerReady, setIsPlayerReady] = useState(false);
-  const [podcastFilter, setPodcastFilter] = useState<string | undefined>(
-    undefined
-  );
 
   useEffect(() => {
     const initializePlayer = async () => {
@@ -72,15 +60,6 @@ export default function App() {
 
     initializePlayer();
   }, []);
-
-  const handleNowPlayingUpdate = (title: string) => {
-    setNow(title);
-  };
-
-  const handleGoToShow = (showName: string) => {
-    setPodcastFilter(showName);
-    setCurrentMode("podcast");
-  };
 
   // Don't render components until player is ready
   if (!isPlayerReady) {
@@ -102,75 +81,16 @@ export default function App() {
             Platform.OS === "web" && styles.webContainer,
           ]}
         >
-          {/* Main Content - Takes remaining space above player */}
+          {/* Main Content with Navigation */}
           <View style={styles.mainContent}>
-            {/* App Title with Toggle */}
-            <View style={styles.header}>
-              <Text style={styles.title}>Indigo FM</Text>
-
-              {/* Toggle Switch in Header */}
-              <View style={styles.headerToggleContainer}>
-                <View style={styles.toggleSwitch}>
-                  {/* Radio Option */}
-                  <TouchableOpacity
-                    style={[
-                      styles.toggleOption,
-                      currentMode === "live" && styles.toggleOptionSelected,
-                    ]}
-                    onPress={() => setCurrentMode("live")}
-                    activeOpacity={0.8}
-                  >
-                    <Text
-                      style={[
-                        styles.toggleText,
-                        currentMode === "live" && styles.toggleTextSelected,
-                      ]}
-                    >
-                      Live
-                    </Text>
-                  </TouchableOpacity>
-
-                  {/* Podcast Option */}
-                  <TouchableOpacity
-                    style={[
-                      styles.toggleOption,
-                      currentMode === "podcast" && styles.toggleOptionSelected,
-                    ]}
-                    onPress={() => setCurrentMode("podcast")}
-                    activeOpacity={0.8}
-                  >
-                    <Text
-                      style={[
-                        styles.toggleText,
-                        currentMode === "podcast" && styles.toggleTextSelected,
-                      ]}
-                    >
-                      Podcast
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-
-            {/* Full Screen Component */}
+            {/* App Navigator */}
             <View style={styles.content}>
-              {currentMode === "live" ? (
-                <LiveRadio
-                  onNowPlayingUpdate={handleNowPlayingUpdate}
-                  onGoToShow={handleGoToShow}
-                />
-              ) : (
-                <Podcast
-                  onNowPlayingUpdate={handleNowPlayingUpdate}
-                  initialFilter={podcastFilter}
-                  onGoToShow={handleGoToShow}
-                />
-              )}
+              <AppNavigator />
             </View>
           </View>
 
           {/* Docked Universal Player at Bottom */}
-          <UniversalPlayer onGoToShow={handleGoToShow} />
+          <UniversalPlayer />
         </SafeAreaView>
       </PlayerProvider>
     </SafeAreaProvider>
@@ -197,68 +117,9 @@ const styles = StyleSheet.create({
     flex: 1,
     minHeight: 0, // Allow content to shrink
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 16,
-    paddingTop: 8,
-    paddingHorizontal: Platform.OS === "web" ? 24 : 16,
-    maxWidth: Platform.OS === "web" ? 1200 : "100%",
-    alignSelf: Platform.OS === "web" ? "center" : "auto",
-    width: "100%",
-    flexShrink: 0,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "600",
-    flex: 1,
-  },
   content: {
     flex: 1,
     minHeight: 0, // Critical for proper scrolling
     overflow: Platform.OS === "web" ? "hidden" : "visible",
-  },
-  headerToggleContainer: {
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 8,
-  },
-  toggleSwitch: {
-    flexDirection: "row",
-    backgroundColor: "#fff",
-    borderRadius: 6,
-    width: 128,
-    height: 32,
-    borderWidth: 2,
-    borderColor: "#D5851F",
-    overflow: "hidden",
-    padding: 0,
-  },
-  toggleOption: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 1,
-    backgroundColor: "#fff",
-    height: "100%",
-  },
-  toggleOptionSelected: {
-    backgroundColor: "#D5851F",
-  },
-  toggleText: {
-    fontWeight: "600",
-    fontSize: 11,
-    letterSpacing: 0.5,
-    textTransform: "uppercase",
-    color: "#000",
-  },
-  toggleTextSelected: {
-    color: "#fff",
   },
 });
