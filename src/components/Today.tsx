@@ -195,12 +195,8 @@ export default function Today({
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>Today</Text>
-
         {/* Current Show Section */}
         <View style={styles.currentShowSection}>
-          <Text style={styles.sectionTitle}>NOW PLAYING</Text>
-
           {programsLoading ? (
             <View style={styles.loadingContainer}>
               <Text style={styles.loadingText}>Loading current show...</Text>
