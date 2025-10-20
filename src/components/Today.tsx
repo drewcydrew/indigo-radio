@@ -18,12 +18,14 @@ interface TodayProps {
   onNowPlayingUpdate: (title: string) => void;
   onGoToShow?: (showName: string) => void;
   onShowDetails?: (show: ShowDefinition) => void;
+  onShowFullSchedule?: (programs: RadioProgram[]) => void;
 }
 
 export default function Today({
   onNowPlayingUpdate,
   onGoToShow,
   onShowDetails,
+  onShowFullSchedule,
 }: TodayProps) {
   const [currentProgram, setCurrentProgram] = useState<RadioProgram | null>(
     null
@@ -314,6 +316,16 @@ export default function Today({
         <TouchableOpacity style={styles.playButton} onPress={playLiveRadio}>
           <Text style={styles.playButtonText}>▶ PLAY LIVE RADIO</Text>
         </TouchableOpacity>
+
+        {/* View Full Schedule Button */}
+        {onShowFullSchedule && (
+          <TouchableOpacity
+            style={styles.scheduleButton}
+            onPress={() => onShowFullSchedule(programs)}
+          >
+            <Text style={styles.scheduleButtonText}>VIEW FULL SCHEDULE</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -561,5 +573,22 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "#D5851F",
     fontWeight: "300",
+  },
+  scheduleButton: {
+    backgroundColor: "transparent",
+    borderWidth: 2,
+    borderColor: "#D5851F",
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 12,
+  },
+  scheduleButtonText: {
+    color: "#D5851F",
+    fontSize: 16,
+    fontWeight: "700",
+    letterSpacing: 1,
+    textTransform: "uppercase",
   },
 });

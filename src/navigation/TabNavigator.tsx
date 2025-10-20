@@ -12,19 +12,19 @@ import { RootStackParamList } from "./AppNavigator";
 import LiveRadio from "../components/LiveRadio";
 import Podcast from "../components/Podcast";
 import Today from "../components/Today";
-import { ShowDefinition } from "../types/types";
+import { ShowDefinition, RadioProgram } from "../types/types";
 
 type TabNavigatorNavigationProp = StackNavigationProp<
   RootStackParamList,
   "Main"
 >;
-type TabType = "today" | "live" | "podcast";
+type TabType = "radio" | "schedule" | "podcast";
 
 interface TabNavigatorProps {}
 
 export default function TabNavigator({}: TabNavigatorProps) {
   const navigation = useNavigation<TabNavigatorNavigationProp>();
-  const [activeTab, setActiveTab] = useState<TabType>("today");
+  const [activeTab, setActiveTab] = useState<TabType>("radio");
   const [nowPlaying, setNowPlaying] = useState<string>("Indigo FM");
 
   const handleNowPlayingUpdate = (title: string) => {
@@ -41,35 +41,39 @@ export default function TabNavigator({}: TabNavigatorProps) {
     navigation.navigate("ShowDetails", { show });
   };
 
+  const handleShowFullSchedule = (programs: RadioProgram[]) => {
+    navigation.navigate("FullSchedule", { programs });
+  };
+
   return (
     <View style={styles.container}>
       {/* Tab Bar */}
       <View style={styles.tabBar}>
         <TouchableOpacity
-          style={[styles.tab, activeTab === "today" && styles.activeTab]}
-          onPress={() => setActiveTab("today")}
+          style={[styles.tab, activeTab === "radio" && styles.activeTab]}
+          onPress={() => setActiveTab("radio")}
         >
           <Text
             style={[
               styles.tabText,
-              activeTab === "today" && styles.activeTabText,
+              activeTab === "radio" && styles.activeTabText,
             ]}
           >
-            Today
+            Radio
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.tab, activeTab === "live" && styles.activeTab]}
-          onPress={() => setActiveTab("live")}
+          style={[styles.tab, activeTab === "schedule" && styles.activeTab]}
+          onPress={() => setActiveTab("schedule")}
         >
           <Text
             style={[
               styles.tabText,
-              activeTab === "live" && styles.activeTabText,
+              activeTab === "schedule" && styles.activeTabText,
             ]}
           >
-            Live Radio
+            Schedule
           </Text>
         </TouchableOpacity>
 
@@ -90,19 +94,21 @@ export default function TabNavigator({}: TabNavigatorProps) {
 
       {/* Tab Content */}
       <View style={styles.content}>
-        {activeTab === "today" && (
+        {activeTab === "radio" && (
           <Today
             onNowPlayingUpdate={handleNowPlayingUpdate}
             onGoToShow={handleGoToShow}
             onShowDetails={handleShowDetails}
+            onShowFullSchedule={handleShowFullSchedule}
           />
         )}
 
-        {activeTab === "live" && (
+        {activeTab === "schedule" && (
           <LiveRadio
             onNowPlayingUpdate={handleNowPlayingUpdate}
             onGoToShow={handleGoToShow}
             onShowDetails={handleShowDetails}
+            onShowFullSchedule={handleShowFullSchedule}
           />
         )}
 

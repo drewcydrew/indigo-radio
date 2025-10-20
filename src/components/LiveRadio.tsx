@@ -15,25 +15,25 @@ import usePrograms from "../hooks/usePrograms";
 import TodaysSchedule from "./TodaysSchedule";
 import { usePlayer } from "../contexts/PlayerContext";
 import { audioService } from "../services/AudioService";
-import ScheduleDisplay from "./ScheduleDisplay";
 import useRadioAddress from "../hooks/useRadioAddress";
 
 interface LiveRadioProps {
   onNowPlayingUpdate: (title: string) => void;
   onGoToShow?: (showName: string) => void;
   onShowDetails?: (show: ShowDefinition) => void;
+  onShowFullSchedule?: (programs: RadioProgram[]) => void;
 }
 
 export default function LiveRadio({
   onNowPlayingUpdate,
   onGoToShow,
   onShowDetails,
+  onShowFullSchedule,
 }: LiveRadioProps) {
   const [currentProgram, setCurrentProgram] = useState<RadioProgram | null>(
     null
   );
   const { setCurrentContent, setPlayerVisible } = usePlayer();
-  const [showFullSchedule, setShowFullSchedule] = useState(false);
 
   // Use the radio address hook
   const { radioAddress } = useRadioAddress();
@@ -112,6 +112,12 @@ export default function LiveRadio({
     }
   };
 
+  const handleShowFullSchedule = () => {
+    if (onShowFullSchedule) {
+      onShowFullSchedule(programs);
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Live Radio Content */}
@@ -127,20 +133,10 @@ export default function LiveRadio({
             programsLoading={programsLoading}
             hideFooterButton={true}
             onPlayLive={playLiveRadio}
-            onShowFullSchedule={() => setShowFullSchedule(true)}
+            onShowFullSchedule={handleShowFullSchedule}
           />
         </View>
       </View>
-
-      {/* Full Schedule Modal */}
-      {showFullSchedule && (
-        <ScheduleDisplay
-          programs={programs}
-          onGoToShow={onGoToShow}
-          onShowDetails={onShowDetails}
-          onClose={() => setShowFullSchedule(false)}
-        />
-      )}
     </View>
   );
 }
