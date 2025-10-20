@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import {
   View,
   Text,
@@ -6,12 +6,17 @@ import {
   TouchableOpacity,
   Image,
   StyleSheet,
+  FlatList,
+  Platform,
 } from "react-native";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
-import { ShowDefinition } from "../types/types";
+import { ShowDefinition, PodcastEpisode } from "../types/types";
 import usePodcastEpisodes from "../hooks/usePodcastEpisodes";
+import { usePlayer } from "../contexts/PlayerContext";
+import { audioService } from "../services/AudioService";
+import PodcastEpisodeDisplay from "../components/PodcastEpisodeDisplay";
 
 type ShowDetailsScreenRouteProp = RouteProp<RootStackParamList, "ShowDetails">;
 type ShowDetailsScreenNavigationProp = StackNavigationProp<
@@ -30,19 +35,147 @@ export default function ShowDetailsScreen({
   const navigation = useNavigation<ShowDetailsScreenNavigationProp>();
   const { show } = route.params;
 
-  const hostDisplay = show.hosts ? show.hosts.join(", ") : show.host;
+  const [selectedEpisode, setSelectedEpisode] = useState<PodcastEpisode | null>(
+    null
+  );
+  const [showEpisodeModal, setShowEpisodeModal] = useState(false);
+
+  const { setCurrentContent, setPlayerVisible } = usePlayer();
   const { episodes } = usePodcastEpisodes();
 
-  // Count episodes for this show
-  const episodeCount = episodes.filter(
-    (episode) => episode.show === show.name
-  ).length;
+  const hostDisplay = show.hosts ? show.hosts.join(", ") : show.host;
+
+  // Filter episodes for this show
+  const showEpisodes = useMemo(() => {
+    return episodes.filter((episode) => episode.show === show.name);
+  }, [episodes, show.name]);
 
   const handleGoToShow = () => {
     if (onGoToShow) {
       onGoToShow(show.name);
       navigation.goBack();
     }
+  };
+
+  const playEpisode = useCallback(
+    async (episodeId: string) => {
+      const episode = episodes.find((ep) => ep.id === episodeId);
+      if (episode) {
+        try {
+          // Check if we're on web and warn about potential CORS issues
+          if (Platform.OS === "web") {
+            console.warn(
+              "Playing podcasts on web may be limited due to CORS policies"
+            );
+          }
+
+          // Update player context first
+          setCurrentContent({ type: "podcast", episode });
+          setPlayerVisible(true);
+
+          // For web, set up the audio service track info
+          if (Platform.OS === "web") {
+            await audioService.add({
+              id: episode.id,
+              url: episode.url,
+              title: episode.title,
+              artist: episode.show,
+              artwork: show.artwork,
+            });
+          }
+        } catch (error) {
+          console.error("Error playing episode:", error);
+        }
+      }
+    },
+    [episodes, show.artwork, setCurrentContent, setPlayerVisible]
+  );
+
+  const handleEpisodePress = useCallback((episode: PodcastEpisode) => {
+    setSelectedEpisode(episode);
+    setShowEpisodeModal(true);
+  }, []);
+
+  const handleCloseEpisodeModal = useCallback(() => {
+    setShowEpisodeModal(false);
+    setTimeout(
+      () => {
+        setSelectedEpisode(null);
+      },
+      Platform.OS === "ios" ? 600 : 200
+    );
+  }, []);
+
+  const renderEpisode = useCallback(
+    ({ item: episode }: { item: PodcastEpisode }) => {
+      return (
+        <TouchableOpacity
+          style={styles.episodeItem}
+          onPress={() => handleEpisodePress(episode)}
+        >
+          {/* Artwork */}
+          <View style={styles.episodeArtworkContainer}>
+            {show.artwork ? (
+              <Image
+                source={{ uri: show.artwork }}
+                style={styles.episodeArtwork}
+                resizeMode="cover"
+              />
+            ) : (
+              <View style={styles.episodePlaceholderArtwork}>
+                <Text style={styles.episodePlaceholderIcon}>PODCAST</Text>
+              </View>
+            )}
+          </View>
+
+          {/* Episode Info */}
+          <View style={styles.episodeInfo}>
+            <Text style={styles.episodeTitle}>{episode.title}</Text>
+            {episode.description && (
+              <Text style={styles.episodeDescription} numberOfLines={2}>
+                {episode.description}
+              </Text>
+            )}
+          </View>
+
+          {/* Play Button */}
+          <TouchableOpacity
+            style={styles.episodePlayButton}
+            onPress={() => playEpisode(episode.id)}
+          >
+            <Text style={styles.episodePlayButtonText}>▶</Text>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      );
+    },
+    [show.artwork, handleEpisodePress, playEpisode]
+  );
+
+  const renderEpisodesSection = () => {
+    if (showEpisodes.length === 0) {
+      return (
+        <View style={styles.noEpisodesContainer}>
+          <Text style={styles.noEpisodesText}>
+            No episodes available for this show yet.
+          </Text>
+        </View>
+      );
+    }
+
+    return (
+      <View style={styles.episodesSection}>
+        <Text style={styles.episodesSectionTitle}>
+          EPISODES ({showEpisodes.length})
+        </Text>
+        <FlatList
+          data={showEpisodes}
+          renderItem={renderEpisode}
+          keyExtractor={(item) => item.id}
+          scrollEnabled={false}
+          showsVerticalScrollIndicator={false}
+        />
+      </View>
+    );
   };
 
   return (
@@ -111,16 +244,27 @@ export default function ShowDetailsScreen({
         </View>
       )}
 
+      {/* Episodes Section */}
+      {renderEpisodesSection()}
+
       {/* Go to Show Button */}
       {onGoToShow && (
         <TouchableOpacity
           style={styles.goToShowButton}
           onPress={handleGoToShow}
         >
-          <Text style={styles.goToShowText}>
-            VIEW EPISODES ({episodeCount})
-          </Text>
+          <Text style={styles.goToShowText}>VIEW ALL EPISODES</Text>
         </TouchableOpacity>
+      )}
+
+      {/* Episode Display Modal */}
+      {selectedEpisode && showEpisodeModal && (
+        <PodcastEpisodeDisplay
+          episode={selectedEpisode}
+          visible={showEpisodeModal}
+          onClose={handleCloseEpisodeModal}
+          onPlay={playEpisode}
+        />
       )}
     </ScrollView>
   );
@@ -225,6 +369,95 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#666",
     lineHeight: 18,
+  },
+  episodesSection: {
+    marginTop: 32,
+    marginBottom: 24,
+  },
+  episodesSectionTitle: {
+    fontSize: 14,
+    fontWeight: "700",
+    marginBottom: 16,
+    color: "#D5851F",
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+  },
+  episodeItem: {
+    padding: 16,
+    backgroundColor: "#f8f8f8",
+    marginBottom: 8,
+    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    borderLeftWidth: 3,
+    borderLeftColor: "#D5851F",
+  },
+  episodeArtworkContainer: {
+    marginRight: 12,
+  },
+  episodeArtwork: {
+    width: 50,
+    height: 50,
+    borderRadius: 4,
+    backgroundColor: "#e0e0e0",
+  },
+  episodePlaceholderArtwork: {
+    width: 50,
+    height: 50,
+    borderRadius: 4,
+    backgroundColor: "#ddd",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  episodePlaceholderIcon: {
+    fontSize: 8,
+    fontWeight: "700",
+    color: "#666",
+    letterSpacing: 0.5,
+  },
+  episodeInfo: {
+    flex: 1,
+    marginRight: 12,
+    minWidth: 0,
+  },
+  episodeTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#000",
+    marginBottom: 4,
+    lineHeight: 18,
+  },
+  episodeDescription: {
+    fontSize: 12,
+    color: "#666",
+    lineHeight: 16,
+    fontStyle: "italic",
+  },
+  episodePlayButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#D5851F",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  episodePlayButtonText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  noEpisodesContainer: {
+    marginTop: 32,
+    padding: 24,
+    backgroundColor: "#f8f8f8",
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  noEpisodesText: {
+    fontSize: 14,
+    color: "#666",
+    textAlign: "center",
+    fontStyle: "italic",
   },
   goToShowButton: {
     backgroundColor: "#D5851F",
