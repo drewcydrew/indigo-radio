@@ -160,6 +160,11 @@ export default function FullScheduleScreen() {
           </View>
 
           <View style={styles.programInfo}>
+            {/* Time above title */}
+            <Text style={styles.timeText}>
+              {program.startTime} - {program.endTime}
+            </Text>
+
             <View style={styles.programTitleRow}>
               <Text style={styles.programTitle}>{program.name}</Text>
             </View>
@@ -170,10 +175,6 @@ export default function FullScheduleScreen() {
               {description}
             </Text>
           </View>
-
-          <Text style={styles.timeText}>
-            {program.startTime} - {program.endTime}
-          </Text>
         </View>
       </TouchableOpacity>
     );
@@ -278,7 +279,6 @@ const styles = StyleSheet.create({
   },
   programContent: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "flex-start",
   },
   thumbnailContainer: {
@@ -306,7 +306,6 @@ const styles = StyleSheet.create({
   },
   programInfo: {
     flex: 1,
-    marginRight: 16,
   },
   programTitleRow: {
     flexDirection: "row",
@@ -333,9 +332,10 @@ const styles = StyleSheet.create({
     color: "#e2e8f0",
   },
   timeText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "600",
     color: "#FFFBE7",
-    textAlign: "center",
+    marginBottom: 4,
+    opacity: 0.8,
   },
 });

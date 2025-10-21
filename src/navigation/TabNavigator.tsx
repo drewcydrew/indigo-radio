@@ -133,12 +133,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#008080",
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0,
+    //paddingTop: Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0,
   },
   tabBar: {
     flexDirection: "row",
     backgroundColor: "#008080",
-    paddingTop: Platform.OS === "web" ? 24 : 48,
+    paddingTop: Platform.OS === "web" ? 0 : 5,
     paddingHorizontal: Platform.OS === "web" ? 24 : 16,
     paddingBottom: 0,
     maxWidth: Platform.OS === "web" ? 1200 : "100%",

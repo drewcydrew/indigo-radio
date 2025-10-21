@@ -6,6 +6,7 @@ import {
   Platform,
   TouchableOpacity,
   Image,
+  ScrollView,
 } from "react-native";
 import { RadioProgram, ShowDefinition } from "../types/types";
 import usePrograms from "../hooks/usePrograms";
@@ -192,7 +193,11 @@ export default function Radio({
 
   return (
     <View style={styles.container}>
-      <View style={styles.content}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Current Show Section */}
         <View style={styles.currentShowSection}>
           {/* Currently Playing Header */}
@@ -210,19 +215,15 @@ export default function Radio({
             >
               <View style={styles.currentShowContent}>
                 {/* Show Artwork */}
-                <View style={styles.artworkContainer}>
-                  {currentShowDef?.artwork ? (
+                {currentShowDef?.artwork && (
+                  <View style={styles.artworkContainer}>
                     <Image
                       source={{ uri: currentShowDef.artwork }}
                       style={styles.artwork}
                       resizeMode="cover"
                     />
-                  ) : (
-                    <View style={styles.placeholderArtwork}>
-                      <Text style={styles.placeholderText}>LIVE</Text>
-                    </View>
-                  )}
-                </View>
+                  </View>
+                )}
 
                 {/* Show Info */}
                 <View style={styles.showInfo}>
@@ -325,7 +326,7 @@ export default function Radio({
             </TouchableOpacity>
           </View>
         )}
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -337,13 +338,16 @@ const styles = StyleSheet.create({
     maxWidth: "100%",
     backgroundColor: "#008080",
   },
-  content: {
+  scrollView: {
     flex: 1,
+  },
+  content: {
+    flexGrow: 1,
     padding: Platform.OS === "web" ? 32 : 24,
+    paddingBottom: 120, // Extra bottom padding for universal player
     width: "100%",
     maxWidth: Platform.OS === "web" ? 1200 : "100%",
     alignSelf: Platform.OS === "web" ? "center" : "auto",
-    minHeight: 0,
   },
   title: {
     fontSize: 24,
@@ -411,12 +415,6 @@ const styles = StyleSheet.create({
     backgroundColor: "linear-gradient(135deg, #D5851F 0%, #f97316 100%)",
     alignItems: "center",
     justifyContent: "center",
-  },
-  placeholderText: {
-    color: "#FFFBE7",
-    fontSize: 18,
-    fontWeight: "700",
-    letterSpacing: 2,
   },
   liveIndicator: {
     position: "absolute",

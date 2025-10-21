@@ -171,13 +171,16 @@ export default function ScheduleDisplay({
                         resizeMode="cover"
                       />
                     ) : (
-                      <View style={styles.placeholderThumbnail}>
-                        <Text style={styles.placeholderIcon}>RADIO</Text>
-                      </View>
+                      <View style={styles.placeholderThumbnail}></View>
                     )}
                   </View>
 
                   <View style={styles.programInfo}>
+                    {/* Time above title */}
+                    <Text style={styles.timeText}>
+                      {program.startTime} - {program.endTime}
+                    </Text>
+
                     <View style={styles.programTitleRow}>
                       <Text style={styles.programTitle}>{program.name}</Text>
                     </View>
@@ -190,10 +193,6 @@ export default function ScheduleDisplay({
                       {description}
                     </Text>
                   </View>
-
-                  <Text style={styles.timeText}>
-                    {program.startTime} - {program.endTime}
-                  </Text>
                 </View>
               </TouchableOpacity>
             );
@@ -348,7 +347,6 @@ const styles = StyleSheet.create({
   },
   programContent: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "flex-start",
   },
   thumbnailContainer: {
@@ -368,15 +366,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  placeholderIcon: {
-    fontSize: 8,
-    fontWeight: "700",
-    color: "#008080",
-    letterSpacing: 0.5,
-  },
   programInfo: {
     flex: 1,
-    marginRight: 12,
   },
   programTitleRow: {
     flexDirection: "row",
@@ -403,8 +394,10 @@ const styles = StyleSheet.create({
     color: "#e2e8f0",
   },
   timeText: {
-    fontSize: 14,
-    fontWeight: "700",
+    fontSize: 12,
+    fontWeight: "600",
     color: "#FFFBE7",
+    marginBottom: 4,
+    opacity: 0.8,
   },
 });

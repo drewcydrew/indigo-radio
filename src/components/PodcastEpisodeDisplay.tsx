@@ -9,8 +9,13 @@ import {
   ScrollView,
   Platform,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../navigation/AppNavigator";
 import { PodcastEpisode } from "../types/types";
 import useShowDetails from "../hooks/useShowDetails";
+
+type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 interface PodcastEpisodeDisplayProps {
   episode: PodcastEpisode | null;
@@ -27,6 +32,7 @@ export default function PodcastEpisodeDisplay({
   onPlay,
   onShowDetails,
 }: PodcastEpisodeDisplayProps) {
+  const navigation = useNavigation<NavigationProp>();
   const { findShowByName } = useShowDetails();
 
   if (!episode) return null;
@@ -43,13 +49,13 @@ export default function PodcastEpisodeDisplay({
   };
 
   const handleViewShow = () => {
-    if (showDef && onShowDetails) {
+    if (showDef) {
       onClose(); // Close this modal first
 
       // Use a platform-specific delay to ensure modal is fully closed
       const delay = Platform.OS === "ios" ? 500 : 200;
       setTimeout(() => {
-        onShowDetails(episode.show);
+        navigation.navigate("ShowDetails", { show: showDef });
       }, delay);
     }
   };
@@ -148,7 +154,7 @@ export default function PodcastEpisodeDisplay({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#008080",
   },
   header: {
     flexDirection: "row",
@@ -156,28 +162,28 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-    backgroundColor: "#f8f8f8",
+    borderBottomWidth: 2,
+    borderBottomColor: "#FFFBE7",
+    backgroundColor: "#008080",
   },
   closeButton: {
     padding: 8,
     borderRadius: 20,
-    backgroundColor: "#D5851F",
+    backgroundColor: "#DD8210",
     width: 36,
     height: 36,
     alignItems: "center",
     justifyContent: "center",
   },
   closeButtonText: {
-    color: "#fff",
+    color: "#FFFBE7",
     fontSize: 16,
     fontWeight: "600",
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#D5851F",
+    color: "#FFFBE7",
     letterSpacing: 0.5,
   },
   placeholder: {
@@ -204,20 +210,20 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     borderRadius: 8,
-    backgroundColor: "#e0e0e0",
+    backgroundColor: "#e2e8f0",
   },
   placeholderArtwork: {
     width: 200,
     height: 200,
     borderRadius: 8,
-    backgroundColor: "#ddd",
+    backgroundColor: "#FFFBE7",
     alignItems: "center",
     justifyContent: "center",
   },
   placeholderIcon: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#666",
+    color: "#008080",
     letterSpacing: 1,
   },
   episodeInfo: {
@@ -225,7 +231,7 @@ const styles = StyleSheet.create({
   },
   showName: {
     fontWeight: "700",
-    color: "#D5851F",
+    color: "#FFFBE7",
     fontSize: 12,
     marginBottom: 8,
     letterSpacing: 2,
@@ -235,14 +241,14 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     fontSize: 24,
     marginBottom: 12,
-    color: "#000",
+    color: "#FFFBE7",
     letterSpacing: 0.3,
     textAlign: "center",
     lineHeight: 32,
   },
   artistName: {
     fontSize: 16,
-    color: "#666",
+    color: "#e2e8f0",
     marginBottom: 24,
     fontWeight: "500",
     textAlign: "center",
@@ -254,13 +260,13 @@ const styles = StyleSheet.create({
   descriptionLabel: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#000",
+    color: "#FFFBE7",
     marginBottom: 8,
     letterSpacing: 0.5,
     textTransform: "uppercase",
   },
   description: {
-    color: "#666",
+    color: "#e2e8f0",
     fontSize: 16,
     lineHeight: 24,
     textAlign: "left",
@@ -273,14 +279,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   playEpisodeButton: {
-    backgroundColor: "#D5851F",
+    backgroundColor: "#DD8210",
     paddingVertical: 16,
     paddingHorizontal: 32,
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
-    shadowColor: "#D5851F",
+    shadowColor: "#DD8210",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -290,7 +296,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   playEpisodeButtonText: {
-    color: "#fff",
+    color: "#FFFBE7",
     fontSize: 16,
     fontWeight: "700",
     letterSpacing: 1,
@@ -299,7 +305,7 @@ const styles = StyleSheet.create({
   viewShowButton: {
     backgroundColor: "transparent",
     borderWidth: 2,
-    borderColor: "#D5851F",
+    borderColor: "#FFFBE7",
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
@@ -307,7 +313,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   viewShowButtonText: {
-    color: "#D5851F",
+    color: "#FFFBE7",
     fontSize: 14,
     fontWeight: "700",
     letterSpacing: 0.5,

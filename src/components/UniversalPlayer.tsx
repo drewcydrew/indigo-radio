@@ -48,8 +48,7 @@ export default function UniversalPlayer({
   const [retryCount, setRetryCount] = useState(0);
   const maxRetries = 3;
 
-  // Add state for show details modal
-  const [selectedShow, setSelectedShow] = useState<ShowDefinition | null>(null);
+  // Remove selectedShow state since we're not using the button anymore
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
 
   // Use the radio address hook instead of hardcoded URL
@@ -485,33 +484,6 @@ export default function UniversalPlayer({
 
   const contentData = getContentData();
 
-  const handleShowDetailsPress = () => {
-    let showName = "";
-
-    if (currentContent?.type === "podcast") {
-      showName = currentContent.episode.show;
-    } else if (currentContent?.type === "live" && currentContent.program) {
-      showName = currentContent.program.name;
-    }
-
-    if (showName) {
-      const showDef = findShowByName(showName);
-      if (showDef) {
-        setSelectedShow(showDef);
-      }
-    }
-  };
-
-  const handleShowDetailsClose = () => {
-    setSelectedShow(null);
-  };
-
-  const handleGoToShowFromModal = (showName: string) => {
-    if (onGoToShow) {
-      onGoToShow(showName);
-    }
-  };
-
   const handleUpdateRadioAddress = async (newPort: string) => {
     const newUrl = `https://internetradio.indigofm.au:${newPort}/stream`;
     updateRadioAddress(newUrl); // Use the hook's update function
@@ -538,20 +510,6 @@ export default function UniversalPlayer({
       console.error("Error updating radio address:", error);
       setStreamError("Failed to update the radio address. Please try again.");
     }
-  };
-
-  // Check if we should show the "go to show" button
-  const shouldShowGoToShowButton = () => {
-    if (!currentContent) return false;
-
-    let showName = "";
-    if (currentContent.type === "podcast") {
-      showName = currentContent.episode.show;
-    } else if (currentContent.type === "live" && currentContent.program) {
-      showName = currentContent.program.name;
-    }
-
-    return showName && findShowByName(showName);
   };
 
   // Minimized display
@@ -620,78 +578,89 @@ export default function UniversalPlayer({
 
   // Full expanded display
   return (
-    <View style={styles.expandedContainer}>
-      {/* Web Audio Player Component - Always render on web */}
-      {Platform.OS === "web" && (
-        <WebAudioPlayer
-          ref={webAudioRef}
-          src={currentAudioUrl || ""}
-          onStateChange={(state) => audioService.updateWebAudioState(state)}
-          onLoad={() => {
-            console.log("Audio loaded:", currentAudioUrl);
-            setWebError(null);
-          }}
-          onError={handleWebAudioError}
-          autoPlay={false}
-        />
-      )}
+    <View style={styles.expandedOverlay}>
+      {/* Backdrop - Click to minimize */}
+      <TouchableOpacity
+        style={styles.backdrop}
+        onPress={toggleCollapsed}
+        activeOpacity={1}
+      />
 
-      {/* Header with collapse button */}
-      <View style={styles.headerContainer}>
-        <View style={styles.headerContent}>
-          <TouchableOpacity
-            onPress={toggleCollapsed}
-            style={styles.collapseButton}
-          >
-            <Text style={styles.collapseIcon}>-</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.titleRow}>
-          <Text style={styles.nowPlayingTitle} numberOfLines={1}>
-            {contentData.title}
-          </Text>
-        </View>
-      </View>
-
-      <View style={styles.expandedContent}>
-        {/* Error Messages */}
-        {streamError && (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>📡 {streamError}</Text>
-            <TouchableOpacity
-              style={styles.retryButton}
-              onPress={retryStream}
-              disabled={isRetrying}
-            >
-              <Text style={styles.retryButtonText}>
-                {isRetrying ? "RETRYING..." : "TRY AGAIN"}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.updateButton}
-              onPress={() => setIsUpdateModalVisible(true)}
-            >
-              <Text style={styles.updateButtonText}>UPDATE RADIO ADDRESS</Text>
-            </TouchableOpacity>
-            {retryCount > 0 && (
-              <Text style={styles.retryCountText}>
-                Attempt {retryCount} of {maxRetries}
-              </Text>
-            )}
-          </View>
+      <View style={styles.expandedContainer}>
+        {/* Web Audio Player Component - Always render on web */}
+        {Platform.OS === "web" && (
+          <WebAudioPlayer
+            ref={webAudioRef}
+            src={currentAudioUrl || ""}
+            onStateChange={(state) => audioService.updateWebAudioState(state)}
+            onLoad={() => {
+              console.log("Audio loaded:", currentAudioUrl);
+              setWebError(null);
+            }}
+            onError={handleWebAudioError}
+            autoPlay={false}
+          />
         )}
 
-        {Platform.OS === "web" && webError && !streamError && (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>⚠️ {webError}</Text>
-          </View>
-        )}
+        {/* Header with drag indicator and collapse button */}
+        <View style={styles.headerContainer}>
+          <View style={styles.dragIndicator} />
 
-        {/* Content details with artwork */}
-        <View style={styles.contentDetails}>
-          <View style={styles.contentHeader}>
-            {/* Large Artwork */}
+          <View style={styles.headerContent}>
+            <TouchableOpacity
+              onPress={toggleCollapsed}
+              style={styles.collapseButton}
+            >
+              <Text style={styles.collapseIcon}>✕</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.titleRow}>
+            <Text style={styles.nowPlayingTitle} numberOfLines={1}>
+              {contentData.title}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.expandedContent}>
+          {/* Error Messages */}
+          {streamError && (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>📡 {streamError}</Text>
+              <TouchableOpacity
+                style={styles.retryButton}
+                onPress={retryStream}
+                disabled={isRetrying}
+              >
+                <Text style={styles.retryButtonText}>
+                  {isRetrying ? "RETRYING..." : "TRY AGAIN"}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.updateButton}
+                onPress={() => setIsUpdateModalVisible(true)}
+              >
+                <Text style={styles.updateButtonText}>
+                  UPDATE RADIO ADDRESS
+                </Text>
+              </TouchableOpacity>
+              {retryCount > 0 && (
+                <Text style={styles.retryCountText}>
+                  Attempt {retryCount} of {maxRetries}
+                </Text>
+              )}
+            </View>
+          )}
+
+          {Platform.OS === "web" && webError && !streamError && (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>⚠️ {webError}</Text>
+            </View>
+          )}
+
+          {/* Content details with artwork */}
+          <View style={styles.contentDetails}>
+            {/* Large Artwork - Centered */}
             <View style={styles.artworkContainer}>
               {contentData.artwork ? (
                 <Image
@@ -706,7 +675,7 @@ export default function UniversalPlayer({
               )}
             </View>
 
-            {/* Content Info */}
+            {/* Content Info - Centered */}
             <View style={styles.contentInfo}>
               <Text style={styles.nowPlayingShow}>{contentData.subtitle}</Text>
               {currentContent.type === "live" && currentContent.program && (
@@ -715,116 +684,98 @@ export default function UniversalPlayer({
                   {currentContent.program.endTime}
                 </Text>
               )}
-
-              {/* Go to Show Button */}
-              {shouldShowGoToShowButton() && (
-                <TouchableOpacity
-                  style={styles.goToShowButton}
-                  onPress={handleShowDetailsPress}
-                >
-                  <Text style={styles.goToShowButtonText}>
-                    VIEW SHOW DETAILS
-                  </Text>
-                </TouchableOpacity>
-              )}
             </View>
           </View>
-        </View>
 
-        {/* Progress Bar and Time Display - Only for podcasts */}
-        {currentContent.type === "podcast" && progress.duration > 0 && (
-          <View style={styles.progressContainer}>
-            <View style={styles.timeContainer}>
-              <Text style={styles.timeText}>
-                {formatTime(progress.position)}
-              </Text>
-              <Text style={styles.timeText}>
-                {formatTime(progress.duration)}
-              </Text>
+          {/* Progress Bar and Time Display - Only for podcasts */}
+          {currentContent.type === "podcast" && progress.duration > 0 && (
+            <View style={styles.progressContainer}>
+              <View style={styles.timeContainer}>
+                <Text style={styles.timeText}>
+                  {formatTime(progress.position)}
+                </Text>
+                <Text style={styles.timeText}>
+                  {formatTime(progress.duration)}
+                </Text>
+              </View>
+
+              <CustomSlider
+                value={progress.position}
+                maximumValue={progress.duration}
+                onSlidingComplete={handleSeek}
+                minimumTrackTintColor="#fff"
+                maximumTrackTintColor="#444"
+                thumbColor="#fff"
+              />
             </View>
-
-            <CustomSlider
-              value={progress.position}
-              maximumValue={progress.duration}
-              onSlidingComplete={handleSeek}
-              minimumTrackTintColor="#fff"
-              maximumTrackTintColor="#444"
-              thumbColor="#fff"
-            />
-          </View>
-        )}
-
-        {/* Playback Controls */}
-        <View style={styles.controlsContainer}>
-          {currentContent.type === "podcast" && (
-            <TouchableOpacity style={styles.skipButton} onPress={skipBackward}>
-              <Text style={styles.skipButtonText}>← 15S</Text>
-            </TouchableOpacity>
           )}
 
-          <TouchableOpacity
-            style={[
-              styles.playButton,
-              isPlaying ? styles.pauseButton : styles.playButtonActive,
-              Platform.OS === "web" && webError && styles.disabledButton,
-              isLoading && styles.loadingButton,
-            ]}
-            onPress={togglePlayPause}
-            disabled={
-              (Platform.OS === "web" && !!webError && !streamError) ||
-              isLoading ||
-              isRetrying
-            }
-          >
-            {isLoading ? (
-              <LoadingIndicator color={isPlaying ? "#fff" : "#000"} />
-            ) : (
-              <Text
-                style={[
-                  styles.playButtonIcon,
-                  isPlaying
-                    ? styles.pauseButtonIcon
-                    : styles.playButtonActiveIcon,
-                  Platform.OS === "web" &&
-                    webError &&
-                    styles.disabledButtonIcon,
-                ]}
+          {/* Playback Controls */}
+          <View style={styles.controlsContainer}>
+            {currentContent.type === "podcast" && (
+              <TouchableOpacity
+                style={styles.skipButton}
+                onPress={skipBackward}
               >
-                {isPlaying ? "❚❚" : "▶︎"}
-              </Text>
+                <Text style={styles.skipButtonText}>← 15</Text>
+              </TouchableOpacity>
             )}
-          </TouchableOpacity>
 
-          {currentContent.type === "podcast" && (
-            <TouchableOpacity style={styles.skipButton} onPress={skipForward}>
-              <Text style={styles.skipButtonText}>15S →</Text>
+            <TouchableOpacity
+              style={[
+                styles.playButton,
+                isPlaying ? styles.pauseButton : styles.playButtonActive,
+                Platform.OS === "web" && webError && styles.disabledButton,
+                isLoading && styles.loadingButton,
+              ]}
+              onPress={togglePlayPause}
+              disabled={
+                (Platform.OS === "web" && !!webError && !streamError) ||
+                isLoading ||
+                isRetrying
+              }
+            >
+              {isLoading ? (
+                <LoadingIndicator color={isPlaying ? "#fff" : "#000"} />
+              ) : (
+                <Text
+                  style={[
+                    styles.playButtonIcon,
+                    isPlaying
+                      ? styles.pauseButtonIcon
+                      : styles.playButtonActiveIcon,
+                    Platform.OS === "web" &&
+                      webError &&
+                      styles.disabledButtonIcon,
+                  ]}
+                >
+                  {isPlaying ? "❚❚" : "▶︎"}
+                </Text>
+              )}
             </TouchableOpacity>
+
+            {currentContent.type === "podcast" && (
+              <TouchableOpacity style={styles.skipButton} onPress={skipForward}>
+                <Text style={styles.skipButtonText}>15 →</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {/* Update Radio Address Modal */}
+          {isUpdateModalVisible && (
+            <UpdateRadioAddressModal
+              onClose={() => setIsUpdateModalVisible(false)}
+              onUpdate={handleUpdateRadioAddress}
+            />
           )}
         </View>
-
-        {/* Show Details Modal */}
-        {selectedShow && (
-          <ShowDetailsModal
-            show={selectedShow}
-            onClose={handleShowDetailsClose}
-            onGoToShow={handleGoToShowFromModal}
-          />
-        )}
-
-        {/* Update Radio Address Modal */}
-        {isUpdateModalVisible && (
-          <UpdateRadioAddressModal
-            onClose={() => setIsUpdateModalVisible(false)}
-            onUpdate={handleUpdateRadioAddress}
-          />
-        )}
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  // ...existing code from PlayingWindow styles...
+  // ...existing minimized styles...
   minimizedContainer: {
     backgroundColor: "#000",
     borderTopWidth: 1,
@@ -904,143 +855,174 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   // Expanded styles
+  expandedOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 1000,
+  },
+  backdrop: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
   expandedContainer: {
-    backgroundColor: "#000",
-    borderTopWidth: 1,
-    borderTopColor: "#333",
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    padding: Platform.OS === "web" ? 24 : 16,
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#1a1a1a",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: 8,
+    paddingHorizontal: Platform.OS === "web" ? 32 : 24,
+    paddingBottom: Platform.OS === "web" ? 32 : 24,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 10,
-    maxWidth: Platform.OS === "web" ? 1200 : "100%",
+    shadowOffset: { width: 0, height: -8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 16,
+    maxWidth: Platform.OS === "web" ? 600 : "100%",
     alignSelf: Platform.OS === "web" ? "center" : "auto",
-    width: "100%",
+    maxHeight: "80%",
+  },
+  dragIndicator: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "#666",
+    alignSelf: "center",
+    marginBottom: 16,
   },
   headerContainer: {
-    marginBottom: 8,
+    marginBottom: 24,
   },
   headerContent: {
     flexDirection: "row",
     justifyContent: "flex-end",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 12,
   },
   collapseButton: {
     padding: 8,
-    borderRadius: 4,
+    borderRadius: 20,
     backgroundColor: "#333",
+    width: 36,
+    height: 36,
+    alignItems: "center",
+    justifyContent: "center",
   },
   collapseIcon: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#fff",
-    fontWeight: "bold",
+    fontWeight: "600",
   },
   titleRow: {
-    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
   },
   expandedContent: {
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: "#333",
+    flex: 1,
   },
   contentDetails: {
-    marginBottom: 16,
-  },
-  contentHeader: {
-    flexDirection: "row",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 32,
   },
   artworkContainer: {
-    marginRight: 16,
+    marginBottom: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   artwork: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
+    width: 180,
+    height: 180,
+    borderRadius: 16,
     backgroundColor: "#333",
   },
   placeholderArtwork: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
+    width: 180,
+    height: 180,
+    borderRadius: 16,
     backgroundColor: "#333",
     alignItems: "center",
     justifyContent: "center",
   },
   placeholderText: {
     color: "#fff",
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: "600",
   },
   contentInfo: {
-    flex: 1,
+    alignItems: "center",
   },
   nowPlayingTitle: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: "700",
     color: "#fff",
-    marginBottom: 4,
+    marginBottom: 8,
     letterSpacing: 0.5,
-    flexWrap: Platform.OS === "web" ? "wrap" : "nowrap",
+    textAlign: "center",
   },
   nowPlayingShow: {
-    fontSize: 14,
+    fontSize: 16,
     color: "#ccc",
     fontWeight: "500",
-    marginBottom: 4,
-    flexWrap: Platform.OS === "web" ? "wrap" : "nowrap",
+    marginBottom: 6,
+    textAlign: "center",
   },
   timeText: {
-    fontSize: 12,
+    fontSize: 14,
     color: "#888",
     fontWeight: "500",
     letterSpacing: 0.5,
+    textAlign: "center",
   },
   progressContainer: {
-    marginBottom: 16,
+    marginBottom: 32,
+    paddingHorizontal: 8,
   },
   timeContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 8,
+    marginBottom: 12,
   },
   controlsContainer: {
     flexDirection: "row",
-    gap: 12,
-    marginBottom: 12,
+    gap: 20,
     justifyContent: "center",
     alignItems: "center",
-    flexWrap: Platform.OS === "web" ? "wrap" : "nowrap",
+    paddingHorizontal: 16,
   },
   skipButton: {
-    paddingVertical: 8,
+    paddingVertical: 12,
     paddingHorizontal: 16,
-    borderRadius: 4,
+    borderRadius: 25,
     backgroundColor: "#333",
-    minWidth: 60,
+    minWidth: 70,
+    alignItems: "center",
   },
   skipButtonText: {
     color: "#fff",
-    fontSize: 12,
-    fontWeight: "700",
+    fontSize: 14,
+    fontWeight: "600",
     textAlign: "center",
-    letterSpacing: 0.5,
   },
   playButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 6,
+    paddingVertical: 16,
+    paddingHorizontal: 40,
+    borderRadius: 30,
     borderWidth: 2,
     borderColor: "#fff",
     backgroundColor: "transparent",
-    minWidth: Platform.OS === "web" ? 140 : 120,
+    minWidth: 120,
+    alignItems: "center",
   },
   playButtonActive: {
     backgroundColor: "#fff",
@@ -1050,10 +1032,9 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   playButtonIcon: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "700",
     textAlign: "center",
-    letterSpacing: 0,
   },
   playButtonActiveIcon: {
     color: "#000",
@@ -1076,12 +1057,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 3,
+    gap: 4,
   },
   loadingDot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
     opacity: 0.3,
   },
   loadingDot2: {
@@ -1090,64 +1071,47 @@ const styles = StyleSheet.create({
   loadingDot3: {
     opacity: 0.9,
   },
-  goToShowButton: {
-    marginTop: 8,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    backgroundColor: "transparent",
-    borderWidth: 1,
-    borderColor: "#fff",
-    borderRadius: 4,
-    alignSelf: "flex-start",
-  },
-  goToShowButtonText: {
-    color: "#fff",
-    fontSize: 10,
-    fontWeight: "700",
-    letterSpacing: 0.5,
-    textTransform: "uppercase",
-  },
   errorContainer: {
     backgroundColor: "#ff4444",
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 16,
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 24,
   },
   errorText: {
     color: "#fff",
     fontSize: 14,
     fontWeight: "500",
     textAlign: "center",
-    lineHeight: 18,
-    marginBottom: 12,
+    lineHeight: 20,
+    marginBottom: 16,
   },
   retryButton: {
-    backgroundColor: "#D5851F",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 4,
+    backgroundColor: "#DD8210",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
     alignSelf: "center",
-    marginBottom: 8,
+    marginBottom: 12,
   },
   retryButtonText: {
     color: "#fff",
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: "700",
     letterSpacing: 0.5,
     textTransform: "uppercase",
   },
   retryCountText: {
     color: "#ccc",
-    fontSize: 10,
+    fontSize: 12,
     textAlign: "center",
     fontStyle: "italic",
   },
   updateButton: {
     marginTop: 8,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
     backgroundColor: "#007bff",
-    borderRadius: 4,
+    borderRadius: 8,
     alignSelf: "center",
   },
   updateButtonText: {

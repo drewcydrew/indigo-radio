@@ -75,23 +75,16 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <PlayerProvider>
-        <SafeAreaView
-          style={[
-            styles.container,
-            Platform.OS === "web" && styles.webContainer,
-          ]}
-        >
-          {/* Main Content with Navigation */}
-          <View style={styles.mainContent}>
-            {/* App Navigator */}
-            <View style={styles.content}>
-              <AppNavigator />
-            </View>
+        {/* Main Content with Navigation */}
+        <View style={styles.mainContent}>
+          {/* App Navigator */}
+          <View style={styles.content}>
+            <AppNavigator />
           </View>
+        </View>
 
-          {/* Docked Universal Player at Bottom */}
-          <UniversalPlayer />
-        </SafeAreaView>
+        {/* Docked Universal Player at Bottom */}
+        <UniversalPlayer />
       </PlayerProvider>
     </SafeAreaProvider>
   );

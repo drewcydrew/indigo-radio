@@ -154,9 +154,6 @@ export default function EpisodeList({
     ({ item: episode }: { item: PodcastEpisode }) => {
       const showDef = findShowDefinition(episode.show);
       const artwork = showDef?.artwork;
-      const artist =
-        showDef?.host ||
-        (showDef?.hosts ? showDef.hosts.join(", ") : "Indigo FM Podcast");
 
       return (
         <TouchableOpacity
@@ -182,10 +179,6 @@ export default function EpisodeList({
           <View style={styles.episodeInfo}>
             <Text style={styles.showName}>{episode.show.toUpperCase()}</Text>
             <Text style={styles.episodeTitle}>{episode.title}</Text>
-            <Text style={styles.artistName}>Hosted by {artist}</Text>
-            <Text style={styles.duration}>
-              Duration: {formatDuration(currentTrackDuration)}
-            </Text>
             {episode.description && (
               <Text style={styles.description} numberOfLines={2}>
                 {episode.description}
@@ -203,12 +196,7 @@ export default function EpisodeList({
         </TouchableOpacity>
       );
     },
-    [
-      handleEpisodePress,
-      onEpisodePress,
-      currentTrackDuration,
-      findShowDefinition,
-    ]
+    [handleEpisodePress, onEpisodePress, findShowDefinition]
   );
 
   const renderHeader = useCallback(
@@ -349,23 +337,6 @@ const styles = StyleSheet.create({
     color: "#FFFBE7",
     letterSpacing: 0.3,
     flexWrap: Platform.OS === "web" ? "wrap" : "nowrap",
-  },
-  artistName: {
-    fontSize: 14,
-    color: "#e2e8f0",
-    marginBottom: 6,
-    fontWeight: "500",
-  },
-  duration: {
-    color: "#FFFBE7",
-    fontSize: 12,
-    marginBottom: 6,
-    fontWeight: "600",
-    letterSpacing: 0.5,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-    alignSelf: "flex-start",
   },
   description: {
     color: "#e2e8f0",

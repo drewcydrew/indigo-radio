@@ -105,6 +105,16 @@ export default function TodaysSchedule({
           </View>
 
           <View style={styles.programInfo}>
+            {/* Time above title */}
+            <Text
+              style={[
+                styles.timeText,
+                isCurrentProgram && styles.currentTimeText,
+              ]}
+            >
+              {program.startTime} - {program.endTime}
+            </Text>
+
             <View style={styles.programTitleRow}>
               <Text
                 style={[
@@ -114,12 +124,6 @@ export default function TodaysSchedule({
               >
                 {program.name}
               </Text>
-              {isCurrentProgram && (
-                <View style={styles.liveIndicator}>
-                  <View style={styles.liveDotSmall} />
-                  <Text style={styles.liveText}>LIVE</Text>
-                </View>
-              )}
             </View>
             {program.host && (
               <Text
@@ -141,24 +145,13 @@ export default function TodaysSchedule({
               {description}
             </Text>
           </View>
-
-          <Text
-            style={[
-              styles.timeText,
-              isCurrentProgram && styles.currentTimeText,
-            ]}
-          >
-            {program.startTime} - {program.endTime}
-          </Text>
         </View>
       </TouchableOpacity>
     );
   };
 
   const renderHeader = () => (
-    <View>
-      {/* No action buttons needed here anymore */}
-    </View>
+    <View>{/* No action buttons needed here anymore */}</View>
   );
 
   const renderFooter = () => {
@@ -301,7 +294,6 @@ const styles = StyleSheet.create({
   },
   programContent: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "flex-start",
     width: "100%",
     maxWidth: "100%",
@@ -331,7 +323,6 @@ const styles = StyleSheet.create({
   },
   programInfo: {
     flex: 1,
-    marginRight: 16,
     minWidth: 0, // Important for text truncation on web
   },
   programTitleRow: {
@@ -349,32 +340,6 @@ const styles = StyleSheet.create({
   },
   currentProgramTitle: {
     color: "#FFFBE7",
-  },
-  liveIndicator: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#dc2626",
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 4,
-    shadowColor: "#dc2626",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  liveDotSmall: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: "#FFFBE7",
-    marginRight: 4,
-  },
-  liveText: {
-    fontSize: 10,
-    fontWeight: "700",
-    color: "#FFFBE7",
-    letterSpacing: 0.5,
   },
   hostText: {
     fontSize: 14,
@@ -399,17 +364,15 @@ const styles = StyleSheet.create({
     color: "#e2e8f0",
   },
   timeText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "600",
     color: "#FFFBE7",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-    minWidth: Platform.OS === "web" ? 80 : "auto",
-    textAlign: "center",
+    marginBottom: 4,
+    opacity: 0.8,
   },
   currentTimeText: {
     color: "#FFFBE7",
+    opacity: 1,
   },
   noPrograms: {
     textAlign: "center",
