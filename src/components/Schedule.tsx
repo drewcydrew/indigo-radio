@@ -17,19 +17,19 @@ import { usePlayer } from "../contexts/PlayerContext";
 import { audioService } from "../services/AudioService";
 import useRadioAddress from "../hooks/useRadioAddress";
 
-interface LiveRadioProps {
+interface ScheduleProps {
   onNowPlayingUpdate: (title: string) => void;
   onGoToShow?: (showName: string) => void;
   onShowDetails?: (show: ShowDefinition) => void;
   onShowFullSchedule?: (programs: RadioProgram[]) => void;
 }
 
-export default function LiveRadio({
+export default function Schedule({
   onNowPlayingUpdate,
   onGoToShow,
   onShowDetails,
   onShowFullSchedule,
-}: LiveRadioProps) {
+}: ScheduleProps) {
   const [currentProgram, setCurrentProgram] = useState<RadioProgram | null>(
     null
   );
@@ -132,7 +132,6 @@ export default function LiveRadio({
             onShowDetails={onShowDetails}
             programsLoading={programsLoading}
             hideFooterButton={true}
-            onPlayLive={playLiveRadio}
             onShowFullSchedule={handleShowFullSchedule}
           />
         </View>
@@ -146,10 +145,12 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     maxWidth: "100%",
+    backgroundColor: "#008080",
   },
   content: {
     flex: 1,
-    paddingHorizontal: Platform.OS === "web" ? 0 : 20,
+    paddingHorizontal: Platform.OS === "web" ? 32 : 24,
+    paddingTop: Platform.OS === "web" ? 32 : 24,
     width: "100%",
     maxWidth: Platform.OS === "web" ? 1200 : "100%",
     alignSelf: Platform.OS === "web" ? "center" : "auto",

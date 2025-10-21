@@ -14,19 +14,17 @@ import { usePlayer } from "../contexts/PlayerContext";
 import { audioService } from "../services/AudioService";
 import useRadioAddress from "../hooks/useRadioAddress";
 
-interface TodayProps {
+interface RadioProps {
   onNowPlayingUpdate: (title: string) => void;
   onGoToShow?: (showName: string) => void;
   onShowDetails?: (show: ShowDefinition) => void;
-  onShowFullSchedule?: (programs: RadioProgram[]) => void;
 }
 
-export default function Today({
+export default function Radio({
   onNowPlayingUpdate,
   onGoToShow,
   onShowDetails,
-  onShowFullSchedule,
-}: TodayProps) {
+}: RadioProps) {
   const [currentProgram, setCurrentProgram] = useState<RadioProgram | null>(
     null
   );
@@ -197,6 +195,9 @@ export default function Today({
       <View style={styles.content}>
         {/* Current Show Section */}
         <View style={styles.currentShowSection}>
+          {/* Currently Playing Header */}
+          <Text style={styles.currentlyPlayingTitle}>CURRENTLY PLAYING</Text>
+
           {programsLoading ? (
             <View style={styles.loadingContainer}>
               <Text style={styles.loadingText}>Loading current show...</Text>
@@ -221,12 +222,6 @@ export default function Today({
                       <Text style={styles.placeholderText}>LIVE</Text>
                     </View>
                   )}
-
-                  {/* Live Indicator */}
-                  <View style={styles.liveIndicator}>
-                    <View style={styles.liveDot} />
-                    <Text style={styles.liveText}>LIVE</Text>
-                  </View>
                 </View>
 
                 {/* Show Info */}
@@ -330,16 +325,6 @@ export default function Today({
             </TouchableOpacity>
           </View>
         )}
-
-        {/* View Full Schedule Button */}
-        {onShowFullSchedule && (
-          <TouchableOpacity
-            style={styles.scheduleButton}
-            onPress={() => onShowFullSchedule(programs)}
-          >
-            <Text style={styles.scheduleButtonText}>VIEW FULL SCHEDULE</Text>
-          </TouchableOpacity>
-        )}
       </View>
     </View>
   );
@@ -350,10 +335,11 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     maxWidth: "100%",
+    backgroundColor: "#008080",
   },
   content: {
     flex: 1,
-    padding: Platform.OS === "web" ? 24 : 20,
+    padding: Platform.OS === "web" ? 32 : 24,
     width: "100%",
     maxWidth: Platform.OS === "web" ? 1200 : "100%",
     alignSelf: Platform.OS === "web" ? "center" : "auto",
@@ -363,11 +349,19 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "700",
     marginBottom: 32,
-    color: "#000",
+    color: "#1e293b",
     textAlign: "center",
   },
   currentShowSection: {
-    marginBottom: 32,
+    marginBottom: 24,
+  },
+  currentlyPlayingTitle: {
+    fontSize: 14,
+    fontWeight: "700",
+    marginBottom: 16,
+    color: "#FFFBE7",
+    letterSpacing: 1.5,
+    textAlign: "center",
   },
   sectionTitle: {
     fontSize: 14,
@@ -383,44 +377,44 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    color: "#666",
+    color: "#64748b",
   },
   currentShowCard: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 20,
+    backgroundColor: "#008080",
+    borderRadius: 16,
+    padding: 24,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 6,
+    borderWidth: 2,
+    borderColor: "#FFFBE7",
   },
   currentShowContent: {
     alignItems: "center",
   },
   artworkContainer: {
     position: "relative",
-    marginBottom: 16,
+    marginBottom: 20,
   },
   artwork: {
-    width: 120,
-    height: 120,
-    borderRadius: 8,
-    backgroundColor: "#e0e0e0",
+    width: 140,
+    height: 140,
+    borderRadius: 12,
+    backgroundColor: "#e2e8f0",
   },
   placeholderArtwork: {
-    width: 120,
-    height: 120,
-    borderRadius: 8,
-    backgroundColor: "#D5851F",
+    width: 140,
+    height: 140,
+    borderRadius: 12,
+    backgroundColor: "linear-gradient(135deg, #D5851F 0%, #f97316 100%)",
     alignItems: "center",
     justifyContent: "center",
   },
   placeholderText: {
-    color: "#fff",
-    fontSize: 16,
+    color: "#FFFBE7",
+    fontSize: 18,
     fontWeight: "700",
     letterSpacing: 2,
   },
@@ -430,87 +424,101 @@ const styles = StyleSheet.create({
     right: 8,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#ff0000",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
+    backgroundColor: "#dc2626",
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 6,
+    shadowColor: "#dc2626",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
   },
   liveDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "#fff",
-    marginRight: 4,
+    backgroundColor: "#FFFBE7",
+    marginRight: 6,
   },
   liveText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: "700",
-    color: "#fff",
+    color: "#FFFBE7",
     letterSpacing: 0.5,
   },
   showInfo: {
     alignItems: "center",
   },
   showName: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "700",
-    color: "#000",
-    marginBottom: 4,
+    color: "#FFFBE7",
+    marginBottom: 6,
     textAlign: "center",
   },
   hostName: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 8,
+    fontSize: 16,
+    color: "#e2e8f0",
+    marginBottom: 10,
     fontWeight: "500",
   },
   timeRange: {
-    fontSize: 14,
-    color: "#D5851F",
+    fontSize: 15,
+    color: "#FFFBE7",
     fontWeight: "600",
-    marginBottom: 12,
+    marginBottom: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 6,
   },
   showDescription: {
-    fontSize: 14,
-    color: "#666",
-    lineHeight: 20,
+    fontSize: 15,
+    color: "#e2e8f0",
+    lineHeight: 22,
     textAlign: "center",
   },
   noShowCard: {
-    backgroundColor: "#f8f8f8",
-    borderRadius: 12,
+    backgroundColor: "#008080",
+    borderRadius: 16,
     padding: 32,
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderWidth: 2,
+    borderColor: "#FFFBE7",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   noShowText: {
-    fontSize: 16,
-    color: "#666",
+    fontSize: 18,
+    color: "#FFFBE7",
     textAlign: "center",
     marginBottom: 8,
+    fontWeight: "500",
   },
   currentTimeText: {
-    fontSize: 14,
-    color: "#999",
+    fontSize: 15,
+    color: "#e2e8f0",
     fontWeight: "500",
   },
   playButtonInCard: {
-    backgroundColor: "#D5851F",
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 6,
+    backgroundColor: "#DD8210",
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 8,
     alignItems: "center",
-    marginTop: 16,
-    shadowColor: "#D5851F",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    marginTop: 20,
+    shadowColor: "#DD8210",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 4,
   },
   playButtonInCardText: {
-    color: "#fff",
-    fontSize: 14,
+    color: "#FFFBE7",
+    fontSize: 15,
     fontWeight: "700",
     letterSpacing: 1,
     textTransform: "uppercase",
@@ -519,19 +527,24 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   upNextTitle: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: "700",
-    marginBottom: 12,
-    color: "#666",
-    letterSpacing: 1,
+    marginBottom: 16,
+    color: "#FFFBE7",
+    letterSpacing: 1.5,
     textAlign: "center",
   },
   upNextCard: {
-    backgroundColor: "#f8f8f8",
-    borderRadius: 8,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
+    backgroundColor: "#008080",
+    borderRadius: 12,
+    padding: 20,
+    borderWidth: 2,
+    borderColor: "#FFFBE7",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
   },
   upNextContent: {
     flexDirection: "row",
@@ -539,71 +552,58 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   nextArtworkContainer: {
-    marginRight: 12,
+    marginRight: 16,
   },
   nextArtwork: {
-    width: 50,
-    height: 50,
-    borderRadius: 6,
-    backgroundColor: "#e0e0e0",
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    backgroundColor: "#e2e8f0",
   },
   nextPlaceholderArtwork: {
-    width: 50,
-    height: 50,
-    borderRadius: 6,
-    backgroundColor: "#ccc",
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    backgroundColor: "#FFFBE7",
     alignItems: "center",
     justifyContent: "center",
   },
   nextPlaceholderText: {
-    color: "#666",
-    fontSize: 10,
+    color: "#008080",
+    fontSize: 11,
     fontWeight: "700",
     letterSpacing: 1,
   },
   nextShowInfo: {
     flex: 1,
-    marginRight: 12,
+    marginRight: 16,
   },
   nextShowName: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: "600",
-    color: "#000",
-    marginBottom: 2,
-  },
-  nextHostName: {
-    fontSize: 12,
-    color: "#666",
+    color: "#FFFBE7",
     marginBottom: 4,
   },
+  nextHostName: {
+    fontSize: 13,
+    color: "#e2e8f0",
+    marginBottom: 6,
+  },
   nextTimeRange: {
-    fontSize: 12,
-    color: "#D5851F",
+    fontSize: 13,
+    color: "#FFFBE7",
     fontWeight: "600",
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+    alignSelf: "flex-start",
   },
   arrowContainer: {
     paddingHorizontal: 8,
   },
   arrow: {
-    fontSize: 20,
-    color: "#D5851F",
+    fontSize: 24,
+    color: "#FFFBE7",
     fontWeight: "300",
-  },
-  scheduleButton: {
-    backgroundColor: "transparent",
-    borderWidth: 2,
-    borderColor: "#D5851F",
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 12,
-  },
-  scheduleButtonText: {
-    color: "#D5851F",
-    fontSize: 16,
-    fontWeight: "700",
-    letterSpacing: 1,
-    textTransform: "uppercase",
   },
 });

@@ -156,36 +156,36 @@ export default function Podcast({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    //minHeight: Platform.OS === "web" ? "100vh" : "auto",
-    backgroundColor: "#fff",
+    backgroundColor: "#008080",
   },
   webContainer: {
     maxWidth: "100%",
     width: "100%",
     alignSelf: "center",
-    backgroundColor: "#fff",
+    backgroundColor: "#008080",
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: Platform.OS === "web" ? 32 : 24,
+    paddingTop: Platform.OS === "web" ? 32 : 24,
     minHeight: 0, // Allow content to shrink
-    backgroundColor: "#fff",
+    backgroundColor: "#008080",
   },
   webContent: {
     maxWidth: 1200,
     width: "100%",
     alignSelf: "center",
     paddingHorizontal: 24,
-    backgroundColor: "#fff",
+    backgroundColor: "#008080",
   },
   episodeListContainer: {
     flex: 1,
     minHeight: 0, // Important for proper scrolling
-    backgroundColor: "#fff",
+    backgroundColor: "#008080",
   },
   webEpisodeListContainer: {
     width: "100%",
     maxWidth: "100%",
-    backgroundColor: "#fff",
+    backgroundColor: "#008080",
   },
 });

@@ -5,13 +5,14 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
+  StatusBar,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "./AppNavigator";
-import LiveRadio from "../components/LiveRadio";
+import Schedule from "../components/Schedule";
 import Podcast from "../components/Podcast";
-import Today from "../components/Today";
+import Radio from "../components/Radio";
 import { ShowDefinition, RadioProgram } from "../types/types";
 
 type TabNavigatorNavigationProp = StackNavigationProp<
@@ -47,6 +48,12 @@ export default function TabNavigator({}: TabNavigatorProps) {
 
   return (
     <View style={styles.container}>
+      <StatusBar
+        backgroundColor="#008080"
+        barStyle="light-content"
+        translucent={false}
+      />
+
       {/* Tab Bar */}
       <View style={styles.tabBar}>
         <TouchableOpacity
@@ -95,16 +102,15 @@ export default function TabNavigator({}: TabNavigatorProps) {
       {/* Tab Content */}
       <View style={styles.content}>
         {activeTab === "radio" && (
-          <Today
+          <Radio
             onNowPlayingUpdate={handleNowPlayingUpdate}
             onGoToShow={handleGoToShow}
             onShowDetails={handleShowDetails}
-            onShowFullSchedule={handleShowFullSchedule}
           />
         )}
 
         {activeTab === "schedule" && (
-          <LiveRadio
+          <Schedule
             onNowPlayingUpdate={handleNowPlayingUpdate}
             onGoToShow={handleGoToShow}
             onShowDetails={handleShowDetails}
@@ -126,34 +132,39 @@ export default function TabNavigator({}: TabNavigatorProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#008080",
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0,
   },
   tabBar: {
     flexDirection: "row",
-    backgroundColor: "#f5f5f5",
-    borderRadius: 8,
-    margin: Platform.OS === "web" ? 24 : 16,
-    marginBottom: 16,
-    padding: 4,
+    backgroundColor: "#008080",
+    paddingTop: Platform.OS === "web" ? 24 : 48,
+    paddingHorizontal: Platform.OS === "web" ? 24 : 16,
+    paddingBottom: 0,
     maxWidth: Platform.OS === "web" ? 1200 : "100%",
     alignSelf: Platform.OS === "web" ? "center" : "auto",
+    borderBottomWidth: 2,
+    borderBottomColor: "#FFFBE7",
   },
   tab: {
     flex: 1,
-    paddingVertical: 12,
+    paddingVertical: 16,
     paddingHorizontal: 16,
-    borderRadius: 6,
     alignItems: "center",
+    borderBottomWidth: 3,
+    borderBottomColor: "transparent",
   },
   activeTab: {
-    backgroundColor: "#007AFF",
+    borderBottomColor: "#DD8210",
   },
   tabText: {
     fontSize: 16,
     fontWeight: "500",
-    color: "#666",
+    color: "#e2e8f0",
   },
   activeTabText: {
-    color: "#fff",
+    color: "#FFFBE7",
+    fontWeight: "700",
   },
   content: {
     flex: 1,

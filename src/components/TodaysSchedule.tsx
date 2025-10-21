@@ -21,7 +21,6 @@ interface TodaysScheduleProps {
   onShowDetails?: (show: ShowDefinition) => void;
   programsLoading?: boolean;
   hideFooterButton?: boolean;
-  onPlayLive?: () => void;
   onShowFullSchedule?: () => void;
 }
 
@@ -33,7 +32,6 @@ export default function TodaysSchedule({
   onShowDetails,
   programsLoading = false,
   hideFooterButton = false,
-  onPlayLive,
   onShowFullSchedule,
 }: TodaysScheduleProps) {
   const [showFullSchedule, setShowFullSchedule] = useState(false);
@@ -159,9 +157,14 @@ export default function TodaysSchedule({
 
   const renderHeader = () => (
     <View>
-      {/* Action Buttons - only show if callbacks are provided */}
-      {(onPlayLive || onShowFullSchedule) && (
-        <View style={styles.actionButtonsContainer}>
+      {/* No action buttons needed here anymore */}
+    </View>
+  );
+
+  const renderFooter = () => {
+    if (hideFooterButton) {
+      return (
+        <View style={styles.footerContainer}>
           {onShowFullSchedule && (
             <TouchableOpacity
               style={styles.scheduleButton}
@@ -171,13 +174,7 @@ export default function TodaysSchedule({
             </TouchableOpacity>
           )}
         </View>
-      )}
-    </View>
-  );
-
-  const renderFooter = () => {
-    if (hideFooterButton) {
-      return null;
+      );
     }
 
     return (
@@ -274,21 +271,33 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 16,
     paddingHorizontal: Platform.OS === "web" ? 0 : 16,
+    color: "#FFFBE7",
   },
   programItem: {
-    padding: 16,
-    backgroundColor: "#fff",
-    marginBottom: 8,
-    borderRadius: 0,
-    borderLeftWidth: 3,
-    borderLeftColor: "#D5851F",
+    padding: 20,
+    backgroundColor: "#008080",
+    marginBottom: 12,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: "#FFFBE7",
     marginHorizontal: Platform.OS === "web" ? 0 : 0,
     width: "100%",
     maxWidth: "100%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
   },
   currentProgramItem: {
-    backgroundColor: "#D5851F",
-    borderLeftColor: "#000",
+    backgroundColor: "#008080",
+    borderColor: "#DD8210",
+    borderWidth: 3,
+    shadowColor: "#DD8210",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   programContent: {
     flexDirection: "row",
@@ -298,129 +307,143 @@ const styles = StyleSheet.create({
     maxWidth: "100%",
   },
   thumbnailContainer: {
-    marginRight: 12,
+    marginRight: 16,
   },
   thumbnail: {
-    width: 50,
-    height: 50,
-    borderRadius: 6,
-    backgroundColor: "#e0e0e0",
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    backgroundColor: "#e2e8f0",
   },
   placeholderThumbnail: {
-    width: 50,
-    height: 50,
-    borderRadius: 0,
-    backgroundColor: "#ddd",
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    backgroundColor: "#FFFBE7",
     alignItems: "center",
     justifyContent: "center",
   },
   placeholderIcon: {
-    fontSize: 8,
+    fontSize: 10,
     fontWeight: "700",
-    color: "#666",
+    color: "#008080",
     letterSpacing: 0.5,
   },
   programInfo: {
     flex: 1,
-    marginRight: 12,
+    marginRight: 16,
     minWidth: 0, // Important for text truncation on web
   },
   programTitleRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    marginBottom: 4,
+    marginBottom: 6,
     flexWrap: Platform.OS === "web" ? "wrap" : "nowrap",
   },
   programTitle: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: "700",
-    color: "#000",
+    color: "#FFFBE7",
     flexShrink: 1,
   },
   currentProgramTitle: {
-    color: "#fff",
+    color: "#FFFBE7",
   },
   liveIndicator: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#ff0000",
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 2,
+    backgroundColor: "#dc2626",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 4,
+    shadowColor: "#dc2626",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 2,
   },
   liveDotSmall: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: "#fff",
+    backgroundColor: "#FFFBE7",
     marginRight: 4,
   },
   liveText: {
     fontSize: 10,
     fontWeight: "700",
-    color: "#fff",
+    color: "#FFFBE7",
     letterSpacing: 0.5,
   },
   hostText: {
     fontSize: 14,
-    marginBottom: 4,
-    color: "#666",
+    marginBottom: 6,
+    color: "#e2e8f0",
     fontWeight: "500",
     flexWrap: Platform.OS === "web" ? "wrap" : "nowrap",
   },
   currentHostText: {
-    color: "#ccc",
+    color: "#e2e8f0",
   },
   descriptionText: {
-    fontSize: 12,
-    opacity: 0.6,
+    fontSize: 13,
+    opacity: 0.8,
     fontStyle: "italic",
-    lineHeight: 16,
-    color: "#000",
+    lineHeight: 18,
+    color: "#e2e8f0",
     flexWrap: Platform.OS === "web" ? "wrap" : "nowrap",
   },
   currentDescriptionText: {
-    opacity: 0.8,
-    color: "#fff",
+    opacity: 0.9,
+    color: "#e2e8f0",
   },
   timeText: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#D5851F",
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#FFFBE7",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
     minWidth: Platform.OS === "web" ? 80 : "auto",
-    textAlign: "right",
+    textAlign: "center",
   },
   currentTimeText: {
-    color: "#fff",
+    color: "#FFFBE7",
   },
   noPrograms: {
     textAlign: "center",
-    opacity: 0.6,
+    opacity: 0.8,
     marginTop: 20,
     paddingHorizontal: 16,
     width: "100%",
     maxWidth: "100%",
+    color: "#FFFBE7",
+    fontSize: 16,
   },
   footerContainer: {
-    marginTop: 16,
+    marginTop: 24,
     paddingHorizontal: Platform.OS === "web" ? 0 : 16,
     width: "100%",
     maxWidth: "100%",
   },
   fullScheduleButton: {
-    backgroundColor: "#D5851F",
+    backgroundColor: "#DD8210",
     paddingVertical: 16,
-    paddingHorizontal: 20,
-    borderRadius: 0,
+    paddingHorizontal: 32,
+    borderRadius: 8,
     alignItems: "center",
-    borderWidth: 0,
     width: "100%",
     maxWidth: "100%",
+    shadowColor: "#DD8210",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 4,
   },
   fullScheduleText: {
-    color: "#fff",
-    fontSize: 12,
+    color: "#FFFBE7",
+    fontSize: 15,
     fontWeight: "700",
     letterSpacing: 1,
     textTransform: "uppercase",
@@ -443,44 +466,47 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: "#666",
+    color: "#FFFBE7",
     textAlign: "center",
     paddingHorizontal: 16,
   },
   actionButtonsContainer: {
-    marginBottom: 20,
+    marginBottom: 24,
     gap: 12,
   },
   liveButton: {
-    backgroundColor: "#D5851F",
+    backgroundColor: "#DD8210",
     paddingVertical: 16,
     paddingHorizontal: 32,
     borderRadius: 8,
     alignItems: "center",
-    shadowColor: "#D5851F",
-    shadowOffset: { width: 0, height: 2 },
+    shadowColor: "#DD8210",
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowRadius: 6,
     elevation: 4,
   },
   liveButtonText: {
-    color: "#fff",
+    color: "#FFFBE7",
     fontSize: 16,
     fontWeight: "700",
     letterSpacing: 1,
     textTransform: "uppercase",
   },
   scheduleButton: {
-    backgroundColor: "transparent",
-    borderWidth: 2,
-    borderColor: "#D5851F",
+    backgroundColor: "#DD8210",
     paddingVertical: 16,
     paddingHorizontal: 32,
     borderRadius: 8,
     alignItems: "center",
+    shadowColor: "#DD8210",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 4,
   },
   scheduleButtonText: {
-    color: "#D5851F",
+    color: "#FFFBE7",
     fontSize: 16,
     fontWeight: "700",
     letterSpacing: 1,

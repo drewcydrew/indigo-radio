@@ -30,9 +30,12 @@ export default function AppNavigator() {
             headerShown: true,
             headerTitle: "Show Details",
             headerBackTitle: "Back",
-            headerTintColor: "#D5851F",
+            headerTintColor: "#DD8210",
             headerStyle: {
-              backgroundColor: "#fff",
+              backgroundColor: "#008080",
+            },
+            headerTitleStyle: {
+              color: "#FFFBE7",
             },
           }}
         />
@@ -43,9 +46,12 @@ export default function AppNavigator() {
             headerShown: true,
             headerTitle: "Full Schedule",
             headerBackTitle: "Back",
-            headerTintColor: "#D5851F",
+            headerTintColor: "#DD8210",
             headerStyle: {
-              backgroundColor: "#fff",
+              backgroundColor: "#008080",
+            },
+            headerTitleStyle: {
+              color: "#FFFBE7",
             },
           }}
         />
